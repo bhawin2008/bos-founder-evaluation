@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Startup Health Diagnostic</title>
+  <title>Sales & Marketing Diagnostic</title>
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -11,16 +11,16 @@
     <!-- Landing Screen -->
     <div id="landing" class="screen active">
       <div class="landing-content">
-        <h1>Startup Health<br><span class="highlight">Diagnostic</span></h1>
-        <p class="subtitle">20 honest questions. 4 critical areas. One clear diagnosis.</p>
-        <p class="description">Find out if your business is built to scale — or stuck on you.</p>
+        <h1>Sales & Marketing<br><span class="highlight">Diagnostic</span></h1>
+        <p class="subtitle">20 honest questions. 4 critical dimensions. One clear diagnosis.</p>
+        <p class="description">Find out why revenue feels unstable — and what to fix first.</p>
         <button class="btn-primary" onclick="startDiagnostic()">Start Diagnostic</button>
         <div class="landing-footer">
-          <span>5 minutes</span>
+          <span>5–7 minutes</span>
           <span class="dot"></span>
           <span>20 questions</span>
           <span class="dot"></span>
-          <span>Instant results</span>
+          <span>Instant clarity report</span>
         </div>
       </div>
     </div>
@@ -42,23 +42,57 @@
       </div>
     </div>
 
-    <!-- Results Screen -->
+    <!-- Results Screen (1-Page Clarity Report) -->
     <div id="results-screen" class="screen">
       <div class="results-content">
-        <h1>Your Diagnosis</h1>
-        <div class="score-circle" id="score-circle">
-          <span class="score-number" id="score-number">0</span>
-          <span class="score-total">/ 60</span>
+        <div class="report-header">
+          <h1>Your Clarity Report</h1>
+          <p class="report-tagline">Sales & Marketing Diagnostic Results</p>
         </div>
-        <div class="status-badge" id="status-badge"></div>
-        <p class="status-description" id="status-description"></p>
 
-        <div class="category-scores" id="category-scores"></div>
+        <!-- Overall Score -->
+        <div class="overall-score-section">
+          <div class="score-circle" id="score-circle">
+            <span class="score-number" id="score-number">0</span>
+            <span class="score-total">/ 60</span>
+          </div>
+          <div class="status-badge" id="status-badge"></div>
+          <p class="status-description" id="status-description"></p>
+        </div>
 
-        <div class="bottlenecks-section">
-          <h2>Your Top 3 Bottlenecks</h2>
-          <p class="bottleneck-subtitle">These are the areas holding your business back the most.</p>
+        <!-- Section A: Scorecard -->
+        <div class="report-section">
+          <div class="report-section-header">
+            <h2>Scorecard</h2>
+            <p>How each dimension scored</p>
+          </div>
+          <div class="scorecard" id="scorecard-body"></div>
+        </div>
+
+        <!-- Section B: Top 3 Bottlenecks -->
+        <div class="report-section">
+          <div class="report-section-header">
+            <h2>Top 3 Bottlenecks</h2>
+            <p>The areas holding your revenue back the most</p>
+          </div>
           <div id="bottlenecks-list"></div>
+        </div>
+
+        <!-- Section C: What to Fix First -->
+        <div class="report-section">
+          <div class="report-section-header">
+            <h2>What to Fix First</h2>
+          </div>
+          <div id="fix-first-content"></div>
+        </div>
+
+        <!-- Section D: Recommendations -->
+        <div class="report-section">
+          <div class="report-section-header">
+            <h2>Recommendations</h2>
+            <p>Guidance for each dimension based on your score</p>
+          </div>
+          <div id="recommendations-list"></div>
         </div>
 
         <button class="btn-primary" onclick="restartDiagnostic()">Retake Diagnostic</button>

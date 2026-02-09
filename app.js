@@ -1,278 +1,296 @@
 const questions = [
-  // SALES SYSTEM MATURITY
+  // SECTION 1: DEMAND QUALITY (MARKETING INPUT)
   {
-    category: "Sales System Maturity",
-    categoryKey: "sales",
-    question: "How do most deals close today?",
+    category: "Demand Quality",
+    categoryKey: "demand",
+    question: "Where do most of your leads come from?",
     options: [
-      "Mostly through random referrals or word of mouth",
-      "Founder personally closes almost every deal",
-      "There's a loose process, but it's inconsistent",
-      "A clear, repeatable sales system that the team follows"
+      "Random / referrals / luck",
+      "Founder network",
+      "Some inbound channels",
+      "Clear, intent-based sources"
     ]
   },
   {
-    category: "Sales System Maturity",
-    categoryKey: "sales",
-    question: "How predictable is your monthly revenue?",
+    category: "Demand Quality",
+    categoryKey: "demand",
+    question: "How relevant are incoming leads?",
     options: [
-      "Completely random \u2014 we never know what's coming",
-      "We have a rough sense, but it swings wildly",
-      "Somewhat predictable with occasional surprises",
-      "Highly predictable \u2014 we forecast with confidence"
+      "Mostly poor fit",
+      "Mixed quality",
+      "Mostly relevant",
+      "Highly qualified & targeted"
     ]
   },
   {
-    category: "Sales System Maturity",
-    categoryKey: "sales",
-    question: "Do you actively qualify or reject leads?",
+    category: "Demand Quality",
+    categoryKey: "demand",
+    question: "Do leads understand why they contacted you?",
     options: [
-      "We chase every lead that comes in",
-      "We have a gut feel but no formal criteria",
-      "We have some filters, but they're loosely followed",
-      "We have a clear qualification checklist and say no fast"
+      "Often confused",
+      "Need explanation",
+      "Mostly aware",
+      "Very clear problem awareness"
     ]
   },
   {
-    category: "Sales System Maturity",
-    categoryKey: "sales",
-    question: "How confident are sales conversations across the team?",
+    category: "Demand Quality",
+    categoryKey: "demand",
+    question: "How consistent is lead flow?",
     options: [
-      "Only the founder can handle sales conversations well",
-      "One or two people can sell, but it's inconsistent",
-      "The team manages okay with some founder support",
-      "The team handles sales calls confidently and independently"
+      "Completely random",
+      "Spikes occasionally",
+      "Somewhat steady",
+      "Predictable inflow"
     ]
   },
   {
-    category: "Sales System Maturity",
-    categoryKey: "sales",
-    question: "Is your sales process documented and repeatable?",
+    category: "Demand Quality",
+    categoryKey: "demand",
+    question: "Do you intentionally attract or passively receive leads?",
     options: [
-      "It's entirely in the founder's head",
-      "Some rough notes exist, but nobody follows them",
-      "Partially documented but not consistently used",
-      "Clearly documented, trained, and followed by the team"
-    ]
-  },
-
-  // MARKETING CLARITY
-  {
-    category: "Marketing Clarity",
-    categoryKey: "marketing",
-    question: "How clearly defined is your ideal customer profile (ICP)?",
-    options: [
-      "We sell to anyone who's willing to pay",
-      "We have a vague idea but nothing written down",
-      "Somewhat defined but we still take random clients",
-      "Very specific, documented, and strictly followed"
-    ]
-  },
-  {
-    category: "Marketing Clarity",
-    categoryKey: "marketing",
-    question: "What primarily drives inbound leads today?",
-    options: [
-      "Mostly luck, random referrals, or personal network",
-      "Some social media activity but no clear strategy",
-      "A few channels are working but we're not sure why",
-      "Intent-driven marketing with clear lead sources"
-    ]
-  },
-  {
-    category: "Marketing Clarity",
-    categoryKey: "marketing",
-    question: "Is your messaging consistent across website, LinkedIn, and sales calls?",
-    options: [
-      "Completely different messaging everywhere",
-      "Similar tone but no unified message",
-      "Mostly aligned with a few gaps",
-      "Same core message across every touchpoint"
-    ]
-  },
-  {
-    category: "Marketing Clarity",
-    categoryKey: "marketing",
-    question: "Can prospects understand what you do within 10 seconds?",
-    options: [
-      "People are often confused after we explain",
-      "It takes a full conversation to get clarity",
-      "Most people get it, but it's not instant",
-      "Instantly clear \u2014 even a stranger gets it immediately"
-    ]
-  },
-  {
-    category: "Marketing Clarity",
-    categoryKey: "marketing",
-    question: "Do you know which marketing activities actually convert into revenue?",
-    options: [
-      "No tracking at all \u2014 we're guessing",
-      "We track some vanity metrics (likes, followers)",
-      "We have some data but can't connect it to revenue",
-      "Clear tracking from lead source to closed deal"
+      "Passive only",
+      "Some effort",
+      "Planned activities",
+      "Clear demand strategy"
     ]
   },
 
-  // FOUNDER DEPENDENCY
+  // SECTION 2: MESSAGE & POSITIONING CLARITY
   {
-    category: "Founder Dependency",
-    categoryKey: "founder",
-    question: "What happens if you step away for 2 weeks?",
+    category: "Message & Positioning Clarity",
+    categoryKey: "message",
+    question: "Can prospects explain what you do in one sentence?",
     options: [
-      "Everything breaks \u2014 the business stops",
-      "Major things stall, small things survive",
-      "Most things run, but key decisions wait for me",
-      "Business runs smoothly without me"
+      "No",
+      "After explanation",
+      "Mostly yes",
+      "Instantly yes"
     ]
   },
   {
-    category: "Founder Dependency",
-    categoryKey: "founder",
-    question: "Who makes critical business decisions today?",
+    category: "Message & Positioning Clarity",
+    categoryKey: "message",
+    question: "How consistent is your message across channels?",
     options: [
-      "Only the founder \u2014 no exceptions",
-      "Founder decides, but sometimes takes input",
-      "A few people can decide on smaller things",
-      "Clear ownership layers \u2014 decisions happen without the founder"
+      "Different everywhere",
+      "Slightly aligned",
+      "Mostly aligned",
+      "Fully consistent"
     ]
   },
   {
-    category: "Founder Dependency",
-    categoryKey: "founder",
-    question: "Who closes important deals?",
+    category: "Message & Positioning Clarity",
+    categoryKey: "message",
+    question: "Do you sell outcomes or services?",
     options: [
-      "Only the founder \u2014 nobody else can",
-      "Founder does most, with some team support",
-      "Team handles smaller deals, founder closes big ones",
-      "Sales team closes deals independently"
+      "Services only",
+      "Mix of both",
+      "Outcome-led sometimes",
+      "Outcome-led always"
     ]
   },
   {
-    category: "Founder Dependency",
-    categoryKey: "founder",
-    question: "Are key processes documented or only in your head?",
+    category: "Message & Positioning Clarity",
+    categoryKey: "message",
+    question: "Do prospects compare you mainly on price?",
     options: [
-      "Nothing is documented \u2014 it's all in my head",
-      "A few things are written down but outdated",
-      "Important processes are partially documented",
-      "Clear SOPs exist and are actively maintained"
+      "Always",
+      "Often",
+      "Sometimes",
+      "Rarely"
     ]
   },
   {
-    category: "Founder Dependency",
-    categoryKey: "founder",
-    question: "How often are you firefighting daily issues?",
+    category: "Message & Positioning Clarity",
+    categoryKey: "message",
+    question: "Is your differentiation clear?",
     options: [
-      "Every single day \u2014 I'm the fire department",
-      "Most days have at least one fire to put out",
-      "Occasionally, but it's getting better",
-      "Rarely \u2014 the team handles issues before they escalate"
+      "No clear difference",
+      "Generic difference",
+      "Somewhat clear",
+      "Very distinct"
     ]
   },
 
-  // TEAM CAPABILITY
+  // SECTION 3: SALES PROCESS & CONVERSION
   {
-    category: "Team Capability",
-    categoryKey: "team",
-    question: "How reliable is your team without constant follow-up?",
+    category: "Sales Process & Conversion",
+    categoryKey: "sales",
+    question: "Is there a defined sales process?",
     options: [
-      "Nothing moves unless I push it",
-      "Some things get done, but quality drops",
-      "Mostly reliable with occasional check-ins needed",
-      "Highly reliable \u2014 they deliver without follow-up"
+      "Completely ad-hoc",
+      "Founder-driven",
+      "Some structure",
+      "Documented & repeatable"
     ]
   },
   {
-    category: "Team Capability",
-    categoryKey: "team",
-    question: "Do team members take ownership beyond assigned tasks?",
+    category: "Sales Process & Conversion",
+    categoryKey: "sales",
+    question: "How are discovery calls handled?",
     options: [
-      "Rarely \u2014 they only do what's told",
-      "Sometimes, but only certain individuals",
-      "Growing \u2014 more people are stepping up",
-      "Consistently \u2014 the team owns outcomes, not just tasks"
+      "Unstructured chats",
+      "Founder intuition",
+      "Semi-structured",
+      "Clear discovery framework"
     ]
   },
   {
-    category: "Team Capability",
-    categoryKey: "team",
-    question: "Is there a leadership layer below you?",
+    category: "Sales Process & Conversion",
+    categoryKey: "sales",
+    question: "Do you qualify or reject leads?",
     options: [
-      "None \u2014 I manage everyone directly",
-      "Informal leads but no real authority",
-      "A few emerging leaders but not fully empowered",
-      "Strong leadership team that runs their areas"
+      "Almost never",
+      "Gut-based",
+      "Basic checklist",
+      "Strict qualification"
     ]
   },
   {
-    category: "Team Capability",
-    categoryKey: "team",
-    question: "How is feedback handled inside the team?",
+    category: "Sales Process & Conversion",
+    categoryKey: "sales",
+    question: "How strong is your proposal clarity?",
     options: [
-      "Avoided \u2014 people fear confrontation",
-      "Happens but gets emotional or personal",
-      "Improving \u2014 some structure is forming",
-      "Structured, safe, and part of the culture"
+      "Confusing / long",
+      "Depends on client",
+      "Mostly clear",
+      "Very crisp & outcome-led"
     ]
   },
   {
-    category: "Team Capability",
-    categoryKey: "team",
-    question: "How confident are you in your hiring decisions so far?",
+    category: "Sales Process & Conversion",
+    categoryKey: "sales",
+    question: "How confident is your close rate?",
     options: [
-      "Mostly wrong \u2014 high regret or turnover",
-      "Hit or miss \u2014 no clear pattern",
-      "Getting better \u2014 learning from past mistakes",
-      "Consistently strong hires that fit and perform"
+      "Very low / random",
+      "Inconsistent",
+      "Reasonably stable",
+      "Highly predictable"
+    ]
+  },
+
+  // SECTION 4: REVENUE PREDICTABILITY
+  {
+    category: "Revenue Predictability",
+    categoryKey: "revenue",
+    question: "Can you forecast revenue 2\u20133 months ahead?",
+    options: [
+      "No idea",
+      "Rough guess",
+      "Approximate forecast",
+      "Clear forecast"
+    ]
+  },
+  {
+    category: "Revenue Predictability",
+    categoryKey: "revenue",
+    question: "How dependent is revenue on the founder?",
+    options: [
+      "Completely dependent",
+      "Mostly dependent",
+      "Partially dependent",
+      "Largely independent"
+    ]
+  },
+  {
+    category: "Revenue Predictability",
+    categoryKey: "revenue",
+    question: "Do you know your conversion metrics?",
+    options: [
+      "No tracking",
+      "Gut feeling",
+      "Some numbers",
+      "Clear metrics"
+    ]
+  },
+  {
+    category: "Revenue Predictability",
+    categoryKey: "revenue",
+    question: "How stable are your deal sizes?",
+    options: [
+      "Very inconsistent",
+      "Mostly small deals",
+      "Some consistency",
+      "Very consistent"
+    ]
+  },
+  {
+    category: "Revenue Predictability",
+    categoryKey: "revenue",
+    question: "How calm do you feel about next quarter revenue?",
+    options: [
+      "Very anxious",
+      "Unsure",
+      "Mostly confident",
+      "Very confident"
     ]
   }
 ];
 
 const statusRanges = [
   {
-    min: 0, max: 12,
-    label: "Survival Mode",
-    className: "survival",
-    description: "The founder IS the business. No systems, no leverage. One bad week away from collapse. Immediate action needed."
+    min: 0, max: 25,
+    label: "Sales & Marketing is Broken",
+    className: "broken",
+    description: "Revenue is unpredictable and your sales and marketing systems are not functioning. Immediate, focused intervention is needed before anything else."
   },
   {
-    min: 13, max: 24,
-    label: "Fragile Growth",
-    className: "fragile",
-    description: "Revenue is coming in, but everything depends on the founder. Growth is creating more chaos, not clarity."
+    min: 26, max: 45,
+    label: "Works but Unreliable",
+    className: "unreliable",
+    description: "Some things are working, but nothing is consistent enough to scale. Revenue comes in, but you can\u2019t predict or repeat it reliably."
   },
   {
-    min: 25, max: 36,
-    label: "Emerging Structure",
-    className: "emerging",
-    description: "Some systems are forming, but inconsistently followed. The business works \u2014 until it's tested."
-  },
-  {
-    min: 37, max: 48,
-    label: "Scaling Ready",
-    className: "scaling",
-    description: "Real foundations are in place. The team is growing into ownership. A few gaps remain, but momentum is strong."
-  },
-  {
-    min: 49, max: 60,
-    label: "Built to Scale",
-    className: "built",
-    description: "Systems run the business, not the founder. Revenue is predictable, the team is capable, and growth has structure."
+    min: 46, max: 60,
+    label: "Scalable & Predictable",
+    className: "scalable",
+    description: "Your sales and marketing engine has real structure. Revenue is predictable, messaging is clear, and growth has a repeatable foundation."
   }
 ];
 
 const categoryLabels = {
-  sales: "Sales System Maturity",
-  marketing: "Marketing Clarity",
-  founder: "Founder Dependency",
-  team: "Team Capability"
+  demand: "Demand Quality",
+  message: "Message & Positioning Clarity",
+  sales: "Sales Process & Conversion",
+  revenue: "Revenue Predictability"
+};
+
+const categorySubtitles = {
+  demand: "Are the right leads coming in?",
+  message: "Do prospects get it instantly?",
+  sales: "What happens after a lead comes in?",
+  revenue: "Is growth calm or chaotic?"
+};
+
+const recommendations = {
+  demand: {
+    red: "Your marketing attracts attention, not intent. Focus on attracting problem-aware buyers before increasing volume.",
+    yellow: "Lead flow is happening but inconsistent. Define your ideal lead sources and double down on what\u2019s already working.",
+    green: "Demand generation is healthy. Keep optimizing your best-performing channels and monitor lead quality metrics."
+  },
+  message: {
+    red: "Your offering is not clearly understood. Until messaging is outcome-led, conversion will stay low.",
+    yellow: "Your message partly lands, but lacks consistency. Align all channels around one clear, outcome-driven promise.",
+    green: "Messaging is clear and differentiated. Continue refining based on prospect feedback and competitive shifts."
+  },
+  sales: {
+    red: "Revenue is unstable because sales is intuition-driven. Build a repeatable discovery and qualification process.",
+    yellow: "There\u2019s some structure, but it\u2019s not consistently followed. Document your best sales conversations and standardize them.",
+    green: "Sales process is solid and repeatable. Focus on improving conversion rates and coaching the team on edge cases."
+  },
+  revenue: {
+    red: "Growth feels stressful because revenue depends on individuals, not systems.",
+    yellow: "You have some visibility into revenue, but not enough to plan confidently. Start tracking conversion metrics weekly.",
+    green: "Revenue is predictable and founder-independent. Maintain your forecasting discipline and look for expansion opportunities."
+  }
 };
 
 const bottleneckMessages = {
-  sales: "Your revenue is unpredictable and founder-driven. Without a repeatable sales system, growth will always be a grind.",
-  marketing: "Your market doesn't clearly understand who you are, what you solve, or why you're different. You're creating noise, not signal.",
-  founder: "You ARE the business. Nothing moves without you, and that's the ceiling on your growth.",
-  team: "You have people, not a team. Execution depends on constant follow-up, not ownership."
+  demand: "Your marketing attracts attention, not intent. Focus on attracting problem-aware buyers before increasing volume.",
+  message: "Your offering is not clearly understood. Until messaging is outcome-led, conversion will stay low.",
+  sales: "Revenue is unstable because sales is intuition-driven. Build a repeatable discovery and qualification process.",
+  revenue: "Growth feels stressful because revenue depends on individuals, not systems."
 };
 
 let currentQuestion = 0;
@@ -346,7 +364,7 @@ function prevQuestion() {
 }
 
 function calculateScores() {
-  const categoryScores = { sales: 0, marketing: 0, founder: 0, team: 0 };
+  const categoryScores = { demand: 0, message: 0, sales: 0, revenue: 0 };
 
   questions.forEach((q, i) => {
     if (answers[i] >= 0) {
@@ -367,10 +385,10 @@ function getStatus(totalScore) {
   return statusRanges[0];
 }
 
-function getCategoryHealth(score) {
-  if (score <= 5) return { label: "Red Flag", barClass: "red" };
-  if (score <= 10) return { label: "Needs Attention", barClass: "orange" };
-  return { label: "Healthy", barClass: "green" };
+function getSectionStatus(score) {
+  if (score <= 6) return { label: "Critical", color: "red", indicator: "\u{1F534}" };
+  if (score <= 11) return { label: "Unstable", color: "yellow", indicator: "\u{1F7E1}" };
+  return { label: "Healthy", color: "green", indicator: "\u{1F7E2}" };
 }
 
 function getBottlenecks(categoryScores) {
@@ -383,6 +401,10 @@ function getBottlenecks(categoryScores) {
 
 function animateScore(target) {
   const el = document.getElementById("score-number");
+  if (target === 0) {
+    el.textContent = "0";
+    return;
+  }
   let current = 0;
   const duration = 1200;
   const stepTime = duration / target;
@@ -394,6 +416,11 @@ function animateScore(target) {
       clearInterval(timer);
     }
   }, stepTime);
+}
+
+function getSectionRecommendation(key, score) {
+  const status = getSectionStatus(score);
+  return recommendations[key][status.color];
 }
 
 function showResults() {
@@ -415,48 +442,86 @@ function showResults() {
   // Status description
   document.getElementById("status-description").textContent = status.description;
 
-  // Category scores
-  const categoryContainer = document.getElementById("category-scores");
-  categoryContainer.innerHTML = "";
+  // Section A: Scorecard
+  const scorecardContainer = document.getElementById("scorecard-body");
+  scorecardContainer.innerHTML = "";
 
   Object.entries(categoryScores).forEach(([key, score]) => {
-    const health = getCategoryHealth(score);
+    const sectionStatus = getSectionStatus(score);
     const percentage = (score / 15) * 100;
 
-    const card = document.createElement("div");
-    card.className = "category-card";
-    card.innerHTML =
-      '<div class="category-card-header">' +
-        '<span class="category-card-name">' + categoryLabels[key] + '</span>' +
-        '<span class="category-card-score">' + score + ' / 15</span>' +
+    const row = document.createElement("div");
+    row.className = "scorecard-row";
+    row.innerHTML =
+      '<div class="scorecard-section">' +
+        '<span class="scorecard-name">' + categoryLabels[key] + '</span>' +
+        '<span class="scorecard-subtitle">' + categorySubtitles[key] + '</span>' +
       '</div>' +
-      '<div class="category-bar-bg">' +
-        '<div class="category-bar-fill ' + health.barClass + '" style="width: 0%"></div>' +
+      '<div class="scorecard-score">' + score + ' / 15</div>' +
+      '<div class="scorecard-bar-container">' +
+        '<div class="scorecard-bar-bg">' +
+          '<div class="scorecard-bar-fill ' + sectionStatus.color + '" style="width: 0%"></div>' +
+        '</div>' +
       '</div>' +
-      '<div class="category-card-label">' + health.label + '</div>';
+      '<div class="scorecard-status ' + sectionStatus.color + '">' + sectionStatus.label + '</div>';
 
-    categoryContainer.appendChild(card);
+    scorecardContainer.appendChild(row);
 
     setTimeout(() => {
-      card.querySelector(".category-bar-fill").style.width = percentage + "%";
+      row.querySelector(".scorecard-bar-fill").style.width = percentage + "%";
     }, 300);
   });
 
-  // Bottlenecks
+  // Section B: Top 3 Bottlenecks
   const bottlenecks = getBottlenecks(categoryScores);
   const bottlenecksList = document.getElementById("bottlenecks-list");
   bottlenecksList.innerHTML = "";
 
   bottlenecks.forEach((b, i) => {
+    const sectionStatus = getSectionStatus(b.score);
     const item = document.createElement("div");
     item.className = "bottleneck-item";
     item.innerHTML =
       '<div class="bottleneck-rank">#' + (i + 1) + '</div>' +
       '<div class="bottleneck-info">' +
-        '<h3>' + b.name + ' <span style="color: var(--accent-red); font-size: 0.85rem;">(' + b.score + '/15)</span></h3>' +
+        '<h3>' + b.name +
+          ' <span class="bottleneck-score ' + sectionStatus.color + '">' + b.score + '/15 \u2014 ' + sectionStatus.label + '</span>' +
+        '</h3>' +
         '<p>' + bottleneckMessages[b.key] + '</p>' +
       '</div>';
     bottlenecksList.appendChild(item);
+  });
+
+  // Section C: What to Fix First
+  const fixFirstContainer = document.getElementById("fix-first-content");
+  const lowestSection = bottlenecks[0];
+  const lowestStatus = getSectionStatus(lowestSection.score);
+  fixFirstContainer.innerHTML =
+    '<div class="fix-first-highlight">' +
+      '<div class="fix-first-label">Your #1 priority</div>' +
+      '<div class="fix-first-section">' + lowestSection.name + '</div>' +
+      '<div class="fix-first-score ' + lowestStatus.color + '">' + lowestSection.score + '/15 \u2014 ' + lowestStatus.label + '</div>' +
+    '</div>' +
+    '<p class="fix-first-recommendation">' + getSectionRecommendation(lowestSection.key, lowestSection.score) + '</p>' +
+    '<div class="fix-first-principle">' +
+      '<strong>Remember:</strong> Fix the lowest score first. More leads will not fix broken conversion.' +
+    '</div>';
+
+  // Section D: All Recommendations
+  const recsContainer = document.getElementById("recommendations-list");
+  recsContainer.innerHTML = "";
+
+  Object.entries(categoryScores).forEach(([key, score]) => {
+    const sectionStatus = getSectionStatus(score);
+    const rec = document.createElement("div");
+    rec.className = "recommendation-item";
+    rec.innerHTML =
+      '<div class="recommendation-header">' +
+        '<span class="recommendation-name">' + categoryLabels[key] + '</span>' +
+        '<span class="recommendation-status ' + sectionStatus.color + '">' + sectionStatus.label + '</span>' +
+      '</div>' +
+      '<p class="recommendation-text">' + getSectionRecommendation(key, score) + '</p>';
+    recsContainer.appendChild(rec);
   });
 }
 
