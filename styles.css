@@ -471,6 +471,46 @@ h1, h2, h3, h4 { color: var(--text-heading); font-weight: 600; }
 .zone-dot.yellow { background: var(--zone-o); }
 .zone-dot.red { background: var(--zone-r); opacity: 0.7; }
 
+/* ---- Zone Distribution Cards ---- */
+.zone-cards-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--sp-3);
+}
+.zone-card-box {
+  border-radius: var(--radius-md);
+  padding: var(--sp-4) var(--sp-5);
+  text-align: center;
+  border: 1px solid var(--border-light);
+  transition: box-shadow var(--duration) var(--ease);
+}
+.zone-card-box:hover { box-shadow: var(--shadow-sm); }
+.zone-card-green { border-left: 3px solid var(--zone-g); background: var(--zone-g-bg); }
+.zone-card-orange { border-left: 3px solid var(--zone-o); background: var(--zone-o-bg); }
+.zone-card-red { border-left: 3px solid var(--zone-r); background: var(--zone-r-bg); }
+.zone-card-count {
+  font-size: 1.5rem;
+  font-weight: 800;
+  line-height: 1;
+  margin-bottom: 2px;
+}
+.zone-card-green .zone-card-count { color: var(--zone-g); }
+.zone-card-orange .zone-card-count { color: var(--zone-o); }
+.zone-card-red .zone-card-count { color: var(--zone-r); }
+.zone-card-pct {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+  margin-bottom: 4px;
+}
+.zone-card-label {
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+}
+
 /* ======================================================================
    TREND CHART & MOVEMENT CARDS
    ====================================================================== */
@@ -775,6 +815,42 @@ h1, h2, h3, h4 { color: var(--text-heading); font-weight: 600; }
 }
 
 .task-overdue { border-color: var(--zone-r-border); }
+
+/* ---- Attention Board ---- */
+.attn-important-item {
+  border-left: 3px solid var(--zone-o);
+  background: rgba(217, 119, 6, 0.04);
+  animation: attn-glow 3s ease-in-out infinite;
+}
+@keyframes attn-glow {
+  0%, 100% { box-shadow: none; }
+  50% { box-shadow: 0 0 8px rgba(217, 119, 6, 0.12); }
+}
+.attn-icon-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: var(--radius-sm);
+  background: var(--zone-o-bg);
+  color: var(--zone-o);
+  flex-shrink: 0;
+}
+.attn-important-tag {
+  display: inline-block;
+  padding: 1px 8px;
+  border-radius: 99px;
+  font-size: 0.62rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  background: #FEF3C7;
+  color: #92400E;
+  border: 1px solid #FDE68A;
+  vertical-align: middle;
+  margin-left: 4px;
+}
 
 /* ======================================================================
    SIGNAL BADGES (was flag badges/counts)
@@ -1288,9 +1364,14 @@ h1, h2, h3, h4 { color: var(--text-heading); font-weight: 600; }
   color: var(--zone-o);
 }
 
-/* ---- Search input ---- */
+/* ---- Search & Filter Bar ---- */
+.member-filter-bar {
+  display: flex;
+  gap: var(--sp-3);
+  align-items: center;
+}
 #member-search {
-  width: 100%;
+  flex: 1;
   padding: var(--sp-3) var(--sp-4);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-md);
@@ -1299,6 +1380,23 @@ h1, h2, h3, h4 { color: var(--text-heading); font-weight: 600; }
   font-size: 0.85rem;
   margin-bottom: var(--sp-4);
   transition: border-color var(--duration) var(--ease);
+}
+#member-dept-filter {
+  padding: var(--sp-3) var(--sp-4);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  background: var(--bg-card);
+  color: var(--text-primary);
+  font-size: 0.82rem;
+  margin-bottom: var(--sp-4);
+  min-width: 180px;
+  cursor: pointer;
+  transition: border-color var(--duration) var(--ease);
+}
+#member-dept-filter:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-light);
 }
 
 #member-search:focus {
@@ -1822,8 +1920,30 @@ h1, h2, h3, h4 { color: var(--text-heading); font-weight: 600; }
 .tt-col-status { min-width: 120px; }
 .tt-col-due { min-width: 120px; }
 .tt-col-priority { min-width: 90px; }
+.tt-col-weightage { min-width: 100px; }
 .tt-col-notes { min-width: 120px; }
 .tt-col-actions { min-width: 100px; }
+
+.tt-weightage-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 10px;
+  border-radius: 99px;
+  font-size: 0.68rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.tt-weight-important {
+  background: #FEF3C7;
+  color: #92400E;
+  border: 1px solid #FDE68A;
+}
+.tt-weight-normal {
+  background: var(--bg-subtle);
+  color: var(--text-muted);
+  border: 1px solid var(--border-light);
+}
 
 .tt-actions-wrap {
   display: flex;
@@ -3171,6 +3291,162 @@ select {
 }
 
 /* ======================================================================
+   CULTURE SUGGESTIONS MODULE
+   ====================================================================== */
+
+/* ---- Dashboard Panel ---- */
+.sug-panel {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: var(--sp-5) var(--sp-6);
+}
+.sug-panel-header {
+  margin-bottom: var(--sp-4);
+}
+.sug-panel-title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text-heading);
+}
+.sug-panel-subtitle {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+/* ---- Suggestion Cards ---- */
+.sug-card {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--sp-3);
+  padding: var(--sp-3) var(--sp-4);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-md);
+  margin-bottom: var(--sp-2);
+  transition: background var(--duration) var(--ease), box-shadow var(--duration) var(--ease);
+}
+.sug-card:hover { box-shadow: var(--shadow-sm); }
+.sug-card:last-child { margin-bottom: 0; }
+
+.sug-praise {
+  border-left: 3px solid var(--zone-g);
+}
+.sug-coaching {
+  border-left: 3px solid var(--zone-o);
+}
+
+.sug-icon {
+  width: 28px;
+  height: 28px;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.sug-praise .sug-icon {
+  background: var(--zone-g-bg);
+  color: var(--zone-g);
+}
+.sug-coaching .sug-icon {
+  background: var(--zone-o-bg);
+  color: var(--zone-o);
+}
+
+.sug-body { flex: 1; min-width: 0; }
+.sug-title {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--text-heading);
+}
+.sug-text {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  margin-top: 2px;
+}
+.sug-meta {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  margin-top: var(--sp-2);
+}
+.sug-conf {
+  display: inline-block;
+  padding: 1px 8px;
+  border-radius: 99px;
+  font-size: 0.6rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.sug-conf-high { background: var(--zone-g-bg); color: var(--zone-g); border: 1px solid var(--zone-g-border); }
+.sug-conf-med { background: var(--zone-o-bg); color: var(--zone-o); border: 1px solid var(--zone-o-border); }
+.sug-conf-low { background: var(--bg-subtle); color: var(--text-muted); border: 1px solid var(--border-light); }
+.sug-keyword {
+  font-size: 0.62rem;
+  font-weight: 600;
+  padding: 1px 6px;
+  background: var(--accent-light);
+  color: var(--accent);
+  border-radius: 99px;
+}
+.sug-count {
+  font-size: 0.62rem;
+  color: var(--text-muted);
+}
+
+/* ---- Shimmer animation for highest-confidence praise ---- */
+.sug-shimmer {
+  position: relative;
+  overflow: hidden;
+}
+.sug-shimmer::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 60%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(79, 70, 229, 0.04), transparent);
+  animation: sug-shimmer-slide 4s ease-in-out infinite;
+  pointer-events: none;
+}
+@keyframes sug-shimmer-slide {
+  0% { left: -100%; }
+  50% { left: 100%; }
+  100% { left: 100%; }
+}
+
+/* ---- Member Card Suggestion Badges ---- */
+.member-suggestions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  padding: 0 var(--sp-4);
+  margin-bottom: var(--sp-2);
+}
+.msug-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 2px 10px;
+  border-radius: 99px;
+  font-size: 0.62rem;
+  font-weight: 600;
+}
+.msug-praise {
+  background: var(--zone-g-bg);
+  color: var(--zone-g);
+  border: 1px solid var(--zone-g-border);
+}
+.msug-coaching {
+  background: var(--zone-o-bg);
+  color: var(--zone-o);
+  border: 1px solid var(--zone-o-border);
+}
+
+/* ======================================================================
    MANUAL MODULE
    ====================================================================== */
 
@@ -3849,4 +4125,7 @@ select {
   .mnl-dash-metrics { grid-template-columns: 1fr; }
   .mnl-zone-card { flex-direction: column; gap: var(--sp-3); }
   .mnl-section-header { padding: var(--sp-4); }
+  .zone-cards-row { grid-template-columns: 1fr; }
+  .member-filter-bar { flex-direction: column; }
+  #member-dept-filter { min-width: auto; }
 }

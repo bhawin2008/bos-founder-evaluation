@@ -377,7 +377,7 @@ function renderHealthReport() {
   }
   html += '</div>';
 
-  html += '<div class="rpt-section"><h4>Growth Signal Leaders</h4>';
+  html += '<div class="rpt-section"><h4>Red Signal Leaders</h4>';
   if (topRed.length > 0) {
     html += '<table class="rpt-table"><thead><tr><th>Name</th><th>Department</th><th>Net Score</th><th>Growth</th></tr></thead><tbody>';
     topRed.forEach(function(m, i) {
@@ -385,7 +385,7 @@ function renderHealthReport() {
     });
     html += '</tbody></table>';
   } else {
-    html += '<p class="rpt-empty">No members in growth zone.</p>';
+    html += '<p class="rpt-empty">No members in red zone.</p>';
   }
   html += '</div>';
   html += '</div>';
@@ -559,7 +559,7 @@ function renderRiskReport() {
   // KPIs
   var totalRisk = monthlyRisk.length + consecutiveRed.length;
   html += '<div class="rpt-kpi-grid rpt-kpi-grid-4">';
-  html += rptKPI('Monthly Risk Members', monthlyRisk.length.toString(), '2+ growth signals in ' + rptMonthLabel(targetMonth), monthlyRisk.length > 0 ? 'rpt-kpi-negative' : 'rpt-kpi-positive');
+  html += rptKPI('Monthly Risk Members', monthlyRisk.length.toString(), '2+ red signals in ' + rptMonthLabel(targetMonth), monthlyRisk.length > 0 ? 'rpt-kpi-negative' : 'rpt-kpi-positive');
   html += rptKPI('Consecutive Red', consecutiveRed.length.toString(), '2+ months in red zone', consecutiveRed.length > 0 ? 'rpt-kpi-negative' : 'rpt-kpi-positive');
   html += rptKPI('Highest Risk Dept', deptDensity.length > 0 && deptDensity[0].pct > 0 ? deptDensity[0].dept : 'None', deptDensity.length > 0 && deptDensity[0].pct > 0 ? deptDensity[0].pct + '% red density' : 'all clear', deptDensity.length > 0 && deptDensity[0].pct > 25 ? 'rpt-kpi-negative' : '');
   html += rptKPI('Top Risk Category', topCats.length > 0 ? getCategoryLabel(topCats[0].cat) : 'None', topCats.length > 0 ? topCats[0].count + ' signals' : '', '');
@@ -570,13 +570,13 @@ function renderRiskReport() {
   // Monthly risk members
   html += '<div class="rpt-section"><h4>Monthly Risk Members <span class="rpt-badge-alert">' + monthlyRisk.length + '</span></h4>';
   if (monthlyRisk.length > 0) {
-    html += '<table class="rpt-table"><thead><tr><th>Name</th><th>Department</th><th>Growth Signals</th><th>Status</th></tr></thead><tbody>';
+    html += '<table class="rpt-table"><thead><tr><th>Name</th><th>Department</th><th>Red Signals</th><th>Status</th></tr></thead><tbody>';
     monthlyRisk.forEach(function(m) {
       html += '<tr><td>' + escapeHtml(m.name) + '</td><td>' + escapeHtml(m.dept) + '</td><td class="rpt-val-negative">' + m.red + '</td><td><span class="rpt-alert-badge rpt-alert-pulse">Attention Needed</span></td></tr>';
     });
     html += '</tbody></table>';
   } else {
-    html += '<p class="rpt-empty rpt-empty-positive">No members with 2+ growth signals this month. Culture health is stable.</p>';
+    html += '<p class="rpt-empty rpt-empty-positive">No members with 2+ red signals this month. Culture health is stable.</p>';
   }
   html += '</div>';
 
@@ -609,7 +609,7 @@ function renderRiskReport() {
       return { label: getCategoryLabel(c.cat), value: c.count, display: c.count + ' signals', color: 'red' };
     }));
   } else {
-    html += '<p class="rpt-empty">No categorized growth signals.</p>';
+    html += '<p class="rpt-empty">No categorized red signals.</p>';
   }
   html += '</div>';
   html += '</div>';
@@ -665,7 +665,7 @@ function renderLeadershipReport() {
   html += '<div class="rpt-kpi-grid rpt-kpi-grid-4">';
   html += rptKPI('Leadership Ready', candidates.length.toString(), 'green 3+ months, net &ge; 3', 'rpt-kpi-positive');
   html += rptKPI('High Potential', potentials.length.toString(), 'rising trend, green 2+ months', '');
-  html += rptKPI('Avg Green Momentum', recentGreen.length > 0 ? (recentGreen.reduce(function(s, m) { return s + m.count; }, 0) / recentGreen.length).toFixed(1) : '0', 'strength signals / member (3mo)', '');
+  html += rptKPI('Avg Green Momentum', recentGreen.length > 0 ? (recentGreen.reduce(function(s, m) { return s + m.count; }, 0) / recentGreen.length).toFixed(1) : '0', 'green signals / member (3mo)', '');
   html += rptKPI('Green Zone Depth', greenStreak.filter(function(m) { return m.streak >= 1; }).length + '/' + members.length, 'members currently green', 'rpt-kpi-positive');
   html += '</div>';
 
@@ -697,7 +697,7 @@ function renderLeadershipReport() {
   html += '</div>';
 
   // Green momentum bar chart
-  html += '<div class="rpt-section"><h4>Strength Signal Momentum (Last 3 Months)</h4>';
+  html += '<div class="rpt-section"><h4>Green Signal Momentum (Last 3 Months)</h4>';
   html += rptBarChart(recentGreen.slice(0, 10).map(function(m) {
     return { label: m.name, value: m.count, display: m.count + ' signals', color: 'green' };
   }));

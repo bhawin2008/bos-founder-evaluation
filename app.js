@@ -804,7 +804,7 @@ function showMemberFlags(memberId) {
     '<div class="flags-meta-row">' +
       '<span class="trend-badge ' + trendCls + '">' + trendLabel + '</span>' +
       (eff.decayActive ? '<span class="decay-badge">Recovery Active (' + eff.cleanStreak + ' clean months → -50% old signals)</span>' : '') +
-      (monthlyWarn ? '<span class="monthly-warning-badge">Attention: 2+ Growth Signals This Month</span>' : '') +
+      (monthlyWarn ? '<span class="monthly-warning-badge">Attention: 2+ Red Signals This Month</span>' : '') +
     '</div>';
 
   var historyList = document.getElementById("flags-history-list");
@@ -959,15 +959,45 @@ function deleteMember(id) {
   openModal("confirm-modal");
 }
 
+function populateDeptFilter() {
+  var sel = document.getElementById("member-dept-filter");
+  if (!sel) return;
+  var currentVal = sel.value;
+  var depts = {};
+  data.members.forEach(function(m) {
+    var role = data.roles.find(function(r) { return r.id === m.roleId; });
+    var name = role ? role.name : "Unassigned";
+    depts[name] = m.roleId || "";
+  });
+  sel.innerHTML = '<option value="">All Departments</option>';
+  Object.keys(depts).sort().forEach(function(name) {
+    sel.innerHTML += '<option value="' + depts[name] + '">' + escapeHtml(name) + '</option>';
+  });
+  sel.value = currentVal;
+}
+
 function renderMembers() {
   var container = document.getElementById("members-list");
   if (!container) return;
   container.innerHTML = "";
 
+  populateDeptFilter();
+
   var searchInput = document.getElementById("member-search");
   var search = searchInput ? searchInput.value.toLowerCase() : "";
+  var deptFilter = document.getElementById("member-dept-filter");
+  var deptVal = deptFilter ? deptFilter.value : "";
 
   var filtered = data.members.filter(function(m) {
+    // Department filter
+    if (deptVal !== "") {
+      if (deptVal === "__unassigned__") {
+        if (m.roleId) return false;
+      } else {
+        if (m.roleId !== deptVal) return false;
+      }
+    }
+    // Text search
     if (!search) return true;
     return m.name.toLowerCase().indexOf(search) !== -1 ||
            m.email.toLowerCase().indexOf(search) !== -1;
@@ -1013,21 +1043,14 @@ function renderMembers() {
         '</div>' +
         '<div class="member-card-net ' + netClass + '">' +
           '<span class="member-card-net-value">' + (effNet > 0 ? '+' : '') + effNet + '</span>' +
-          '<span class="member-card-net-label">Net Score <span class="net-info-icon" title="Net Score = Green Signals minus Red Signals. Positive means more strengths recorded. Negative indicates growth areas. This number uses effective weights (with recovery decay applied)."><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg></span></span>' +
+          '<span class="member-card-net-label">Net Score</span>' +
         '</div>' +
       '</div>' +
       '<div class="member-card-badges">' +
         trendHtml + ' ' + alertHtml + ' ' + warningHtml + ' ' + decayHtml +
       '</div>' +
+      (typeof renderMemberSuggestionsBadge === "function" ? renderMemberSuggestionsBadge(member.id) : '') +
       '<div class="member-card-stats">' +
-        '<div class="member-stat">' +
-          '<span class="member-stat-value stat-green">' + eff.green + '</span>' +
-          '<span class="member-stat-label">Green</span>' +
-        '</div>' +
-        '<div class="member-stat">' +
-          '<span class="member-stat-value stat-red">' + eff.red + '</span>' +
-          '<span class="member-stat-label">Red</span>' +
-        '</div>' +
         '<div class="member-stat">' +
           '<span class="member-stat-value">' + taskCount + '</span>' +
           '<span class="member-stat-label">Tasks</span>' +
@@ -1067,6 +1090,7 @@ function saveTask(event) {
     notes: document.getElementById("task-notes").value.trim(),
     assigneeId: document.getElementById("task-assignee").value,
     priority: document.getElementById("task-priority").value,
+    weightage: document.getElementById("task-weightage").value || "not-important",
     dueDate: document.getElementById("task-due").value,
     status: document.getElementById("task-status").value,
     createdAt: editId
@@ -1149,7 +1173,7 @@ function checkAssigneeRisk() {
     if (catCounts[cat] >= 2) {
       warnings.push({
         type: "category",
-        text: "This member has <strong>" + catCounts[cat] + " growth signals</strong> in <strong>" + getCategoryLabel(cat) + "</strong> this month. Consider support or reassignment."
+        text: "This member has <strong>" + catCounts[cat] + " red signals</strong> in <strong>" + getCategoryLabel(cat) + "</strong> this month. Consider support or reassignment."
       });
     }
   });
@@ -1183,7 +1207,7 @@ function checkAssigneeRisk() {
     if (matchedKeywords.length > 0) {
       warnings.push({
         type: "keyword",
-        text: "Keyword overlap with recent growth signals: <strong>" + matchedKeywords.join(", ") + "</strong>. This member has struggled with similar work this month."
+        text: "Keyword overlap with recent red signals: <strong>" + matchedKeywords.join(", ") + "</strong>. This member has struggled with similar work this month."
       });
     }
   }
@@ -1212,6 +1236,7 @@ function editTask(id) {
   populateMemberDropdown("task-assignee");
   document.getElementById("task-assignee").value = task.assigneeId;
   document.getElementById("task-priority").value = task.priority;
+  document.getElementById("task-weightage").value = task.weightage || "not-important";
   document.getElementById("task-due").value = task.dueDate;
   document.getElementById("task-status").value = task.status;
   document.getElementById("task-modal-title").textContent = "Edit Task";
@@ -1355,6 +1380,7 @@ function renderTasks() {
       '<th class="tt-col-status">Status</th>' +
       '<th class="tt-col-due">Due Date</th>' +
       '<th class="tt-col-priority">Priority</th>' +
+      '<th class="tt-col-weightage">Weightage</th>' +
       '<th class="tt-col-notes">Notes</th>' +
       '<th class="tt-col-actions">Actions</th>' +
     '</tr></thead><tbody>';
@@ -1412,10 +1438,10 @@ function renderTasks() {
       actions += '<button class="tt-action-btn tt-action-complete" onclick="toggleTaskStatus(\'' + task.id + '\')" title="Complete Task"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></button>';
     }
     if (showExtraordinary) {
-      actions += '<button class="tt-action-btn tt-action-green" onclick="openExtraordinary(\'' + task.id + '\')" title="Exceptional (+2 Strength)">' + icons.star + '</button>';
+      actions += '<button class="tt-action-btn tt-action-green" onclick="openExtraordinary(\'' + task.id + '\')" title="Exceptional (+2 Green)">' + icons.star + '</button>';
     }
     if (showBlunder) {
-      actions += '<button class="tt-action-btn tt-action-red" onclick="openBlunder(\'' + task.id + '\')" title="Log Incident (+3 Growth)">' + icons.alert + '</button>';
+      actions += '<button class="tt-action-btn tt-action-red" onclick="openBlunder(\'' + task.id + '\')" title="Log Incident (+3 Red)">' + icons.alert + '</button>';
     }
     actions += '<button class="tt-action-btn tt-action-edit" onclick="editTask(\'' + task.id + '\')" title="Edit"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>';
     actions += '<button class="tt-action-btn tt-action-delete" onclick="deleteTask(\'' + task.id + '\')" title="Delete"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></button>';
@@ -1425,6 +1451,12 @@ function renderTasks() {
     autoKeywords.forEach(function(kw) {
       if (kw) taskMeta += '<span class="tt-keyword-badge">' + escapeHtml(kw) + '</span>';
     });
+
+    var weightageVal = task.weightage || "not-important";
+    var weightageLabel = weightageVal === "important" ? "Important" : "Not Important";
+    var weightageBadge = weightageVal === "important"
+      ? '<span class="tt-weightage-badge tt-weight-important"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2z"/></svg> ' + weightageLabel + '</span>'
+      : '<span class="tt-weightage-badge tt-weight-normal">' + weightageLabel + '</span>';
 
     html += '<tr class="' + rowClass + '">' +
       '<td class="tt-col-title">' +
@@ -1436,6 +1468,7 @@ function renderTasks() {
       '<td class="tt-col-status">' + statusSelect + '</td>' +
       '<td class="tt-col-due">' + dueInput + '</td>' +
       '<td class="tt-col-priority">' + prioritySelect + '</td>' +
+      '<td class="tt-col-weightage">' + weightageBadge + '</td>' +
       '<td class="tt-col-notes">' + notesInput + '</td>' +
       '<td class="tt-col-actions"><div class="tt-actions-wrap">' + actions + '</div></td>' +
     '</tr>';
@@ -1472,9 +1505,9 @@ function renderDashboard() {
   document.getElementById("stat-members").textContent = data.members.length;
   document.getElementById("stat-tasks").textContent = activeTasks.length;
   document.getElementById("stat-green-flags").textContent = (cultureMomentum > 0 ? "+" : "") + cultureMomentum;
-  document.getElementById("stat-green-flags-sub").textContent = totalGreen + " strength signals";
+  document.getElementById("stat-green-flags-sub").textContent = totalGreen + " green signals";
   document.getElementById("stat-red-flags").textContent = stabilityIndex + "%";
-  document.getElementById("stat-red-flags-sub").textContent = totalRed + " growth signals";
+  document.getElementById("stat-red-flags-sub").textContent = totalRed + " red signals";
 
   // === Zone Distribution (uses date-filtered flags) ===
   var zoneDistEl = document.getElementById("dashboard-zone-dist");
@@ -1495,15 +1528,22 @@ function renderDashboard() {
       var rPct = Math.round((redCount / total) * 100);
 
       zoneDistEl.innerHTML =
-        '<div class="zone-bar">' +
-          (gPct > 0 ? '<div class="zone-bar-seg green" style="width:' + gPct + '%">' + gPct + '%</div>' : '') +
-          (yPct > 0 ? '<div class="zone-bar-seg yellow" style="width:' + yPct + '%">' + yPct + '%</div>' : '') +
-          (rPct > 0 ? '<div class="zone-bar-seg red" style="width:' + rPct + '%">' + rPct + '%</div>' : '') +
-        '</div>' +
-        '<div class="zone-legend">' +
-          '<span class="zone-legend-item"><span class="zone-dot green"></span> Green Zone ' + greenCount + ' (' + gPct + '%)</span>' +
-          '<span class="zone-legend-item"><span class="zone-dot yellow"></span> Orange Zone ' + yellowCount + ' (' + yPct + '%)</span>' +
-          '<span class="zone-legend-item"><span class="zone-dot red"></span> Red Zone ' + redCount + ' (' + rPct + '%)</span>' +
+        '<div class="zone-cards-row">' +
+          '<div class="zone-card-box zone-card-green">' +
+            '<div class="zone-card-count">' + greenCount + '</div>' +
+            '<div class="zone-card-pct">' + gPct + '%</div>' +
+            '<div class="zone-card-label">Green Zone</div>' +
+          '</div>' +
+          '<div class="zone-card-box zone-card-orange">' +
+            '<div class="zone-card-count">' + yellowCount + '</div>' +
+            '<div class="zone-card-pct">' + yPct + '%</div>' +
+            '<div class="zone-card-label">Orange Zone</div>' +
+          '</div>' +
+          '<div class="zone-card-box zone-card-red">' +
+            '<div class="zone-card-count">' + redCount + '</div>' +
+            '<div class="zone-card-pct">' + rPct + '%</div>' +
+            '<div class="zone-card-label">Red Zone</div>' +
+          '</div>' +
         '</div>';
     }
   }
@@ -1561,13 +1601,7 @@ function renderDashboard() {
       });
 
       trendEl.innerHTML =
-        '<div class="movement-cards">' +
-          '<div class="movement-card green"><span class="movement-val">' + iPct + '%</span><span class="movement-lbl">Accelerating</span></div>' +
-          '<div class="movement-card yellow"><span class="movement-val">' + sPct + '%</span><span class="movement-lbl">Steady</span></div>' +
-          '<div class="movement-card red"><span class="movement-val">' + dPct + '%</span><span class="movement-lbl">Needs Attention</span></div>' +
-        '</div>' +
-        '<div class="trend-chart">' + chartRows + '</div>' +
-        '<div class="trend-period">Comparing ' + getMonthLabel(prevMonth) + ' → ' + getMonthLabel(currMonth) + '</div>';
+        '<div class="trend-chart">' + chartRows + '</div>';
     }
   }
 
@@ -1756,21 +1790,33 @@ function renderDashboard() {
     }
   }
 
-  // === Overdue Tasks ===
+  // === Attention Board (Important+Past Due first) ===
   var overdueEl = document.getElementById("dashboard-overdue");
   if (overdueEl) {
     var overdueTasks = filteredTasks.filter(function(t) { return isOverdue(t); });
     if (overdueTasks.length === 0) {
       overdueEl.innerHTML = '<div class="empty-state-sm">No tasks need attention</div>';
     } else {
+      // Sort: Important + Past Due first, then other past due
+      overdueTasks.sort(function(a, b) {
+        var aImp = a.weightage === "important" ? 0 : 1;
+        var bImp = b.weightage === "important" ? 0 : 1;
+        if (aImp !== bImp) return aImp - bImp;
+        return new Date(a.dueDate) - new Date(b.dueDate);
+      });
+
       overdueEl.innerHTML = "";
       overdueTasks.forEach(function(task) {
         var assignee = data.members.find(function(m) { return m.id === task.assigneeId; });
+        var isImportant = task.weightage === "important";
         var item = document.createElement("div");
-        item.className = "dashboard-list-item";
+        item.className = "dashboard-list-item" + (isImportant ? " attn-important-item" : "");
         item.innerHTML =
+          (isImportant ? '<div class="attn-icon-wrap"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div>' : '') +
           '<div class="dashboard-item-info">' +
-            '<span class="dashboard-item-name overdue-text">' + escapeHtml(task.title) + '</span>' +
+            '<span class="dashboard-item-name overdue-text">' + escapeHtml(task.title) +
+              (isImportant ? ' <span class="attn-important-tag">Important</span>' : '') +
+            '</span>' +
             '<span class="dashboard-item-detail">' + (assignee ? escapeHtml(assignee.name) : "Unassigned") + ' — Due ' + formatDate(task.dueDate) + '</span>' +
           '</div>' +
           '<span class="status-badge status-overdue">Past Due</span>';
@@ -1864,17 +1910,17 @@ function renderPredictiveInsights() {
   });
 
   // === 2. Structured Support Plan ===
-  // Members in growth zone, red alerts, or declining trends
+  // Members in red zone, red alerts, or declining trends
   var supportNeeded = memberAnalytics.filter(function(ma) {
     return ma.redAlert || ma.zone === "red" || (ma.trend === "falling" && ma.effNet < 0);
   }).sort(function(a, b) { return a.effNet - b.effNet; });
 
   supportNeeded.forEach(function(ma) {
     var reasonParts = [];
-    if (ma.redAlert) reasonParts.push("growth zone for 2+ consecutive months");
+    if (ma.redAlert) reasonParts.push("red zone for 2+ consecutive months");
     if (ma.trend === "falling") reasonParts.push("declining trajectory");
-    if (ma.monthlyWarn) reasonParts.push("multiple growth signals this month");
-    if (reasonParts.length === 0 && ma.zone === "red") reasonParts.push("currently in growth zone");
+    if (ma.monthlyWarn) reasonParts.push("multiple red signals this month");
+    if (reasonParts.length === 0 && ma.zone === "red") reasonParts.push("currently in red zone");
     insights.push({
       type: "support",
       icon: icons.heart,
@@ -1902,7 +1948,7 @@ function renderPredictiveInsights() {
   });
 
   // === 4. Department Attention ===
-  // Roles with negative average net scores or many members in growth zone
+  // Roles with negative average net scores or many members in red zone
   data.roles.forEach(function(role) {
     var roleMembers = memberAnalytics.filter(function(ma) { return ma.member.roleId === role.id; });
     if (roleMembers.length < 2) return;
@@ -1919,7 +1965,7 @@ function renderPredictiveInsights() {
     if (avgNet < 0 || redPct >= 50) {
       var reasons = [];
       if (avgNet < 0) reasons.push("avg net signal " + avgNet.toFixed(1));
-      if (redPct >= 50) reasons.push(redPct + "% of team in growth zone");
+      if (redPct >= 50) reasons.push(redPct + "% of team in red zone");
       insights.push({
         type: "department",
         icon: icons.alert,
@@ -2168,13 +2214,14 @@ function refreshAll() {
   renderRoles();
   renderCategories();
   if (typeof renderReports === "function") renderReports();
+  if (typeof renderCultureSuggestions === "function") renderCultureSuggestions();
 }
 
 // ==================== Demo Data Seeding ====================
 
 function seedDemoData() {
   // Only seed if no data exists or seed version changed
-  var seedVersion = "v3";
+  var seedVersion = "v4";
   if (localStorage.getItem("boss_seed_version") === seedVersion) return;
   localStorage.setItem("boss_seed_version", seedVersion);
 
@@ -2238,17 +2285,17 @@ function seedDemoData() {
     { id: "task_22", title: "Smoke test automation",       description: "Automate smoke tests for staging",   notes: "Covered 12 critical flows", assigneeId: "mem_anita", priority: "medium", dueDate: "2025-01-10", status: "completed", reviewResult: "extraordinary", createdAt: "2025-01-02T09:00:00.000Z" },
     { id: "task_23", title: "Chaos engineering drill",     description: "Run failure injection tests",        notes: "",                          assigneeId: "mem_rohan", priority: "low",    dueDate: "2025-01-28", status: "pending",                                   createdAt: "2025-01-12T09:00:00.000Z" },
     // December 2025 tasks
-    { id: "task_24", title: "Build notification service",   description: "Real-time push notification system",   notes: "Using WebSockets + Redis",         assigneeId: "mem_arjun",  priority: "high",   dueDate: "2025-12-10", status: "completed", reviewResult: "perfect",       createdAt: "2025-12-01T09:00:00.000Z" },
+    { id: "task_24", title: "Build notification service",   description: "Real-time push notification system",   notes: "Using WebSockets + Redis",         assigneeId: "mem_arjun",  priority: "high",   weightage: "important", dueDate: "2025-12-10", status: "completed", reviewResult: "perfect",       createdAt: "2025-12-01T09:00:00.000Z" },
     { id: "task_25", title: "Integration test suite",       description: "Full integration tests for payments",  notes: "Missed 4 edge cases",              assigneeId: "mem_sneha",  priority: "high",   dueDate: "2025-12-12", status: "completed", reviewResult: "below",         createdAt: "2025-12-01T09:00:00.000Z" },
     { id: "task_26", title: "Design system overhaul",       description: "Rebuild component library in Figma",   notes: "Shipped 40+ components",           assigneeId: "mem_meera",  priority: "high",   dueDate: "2025-12-18", status: "completed", reviewResult: "perfect",       createdAt: "2025-12-03T09:00:00.000Z" },
-    { id: "task_27", title: "Kubernetes migration",         description: "Migrate staging to K8s cluster",       notes: "Zero-downtime cutover achieved",   assigneeId: "mem_rohan",  priority: "high",   dueDate: "2025-12-20", status: "completed", reviewResult: "extraordinary", createdAt: "2025-12-05T09:00:00.000Z" },
+    { id: "task_27", title: "Kubernetes migration",         description: "Migrate staging to K8s cluster",       notes: "Zero-downtime cutover achieved",   assigneeId: "mem_rohan",  priority: "high",   weightage: "important", dueDate: "2025-12-20", status: "completed", reviewResult: "extraordinary", createdAt: "2025-12-05T09:00:00.000Z" },
     { id: "task_28", title: "Automated regression suite",   description: "Nightly regression pipeline",          notes: "Covers 85% of critical paths",     assigneeId: "mem_karan",  priority: "medium", dueDate: "2025-12-22", status: "completed", reviewResult: "acceptable",    createdAt: "2025-12-05T09:00:00.000Z" },
     // January 2026 tasks
     { id: "task_29", title: "Landing page redesign",        description: "Redesign marketing landing page",      notes: "Layout broke on Safari/Firefox",   assigneeId: "mem_priya",  priority: "high",   dueDate: "2026-01-08", status: "completed", reviewResult: "below",         createdAt: "2026-01-02T09:00:00.000Z" },
     { id: "task_30", title: "Q2 roadmap planning",          description: "Define Q2 milestones and deliverables", notes: "Aligned with all stakeholders",   assigneeId: "mem_deepa",  priority: "high",   dueDate: "2026-01-12", status: "completed", reviewResult: "perfect",       createdAt: "2026-01-02T09:00:00.000Z" },
     { id: "task_31", title: "Team restructuring plan",      description: "Reorg proposal for scaling teams",     notes: "Board approved same day",          assigneeId: "mem_rahul",  priority: "high",   dueDate: "2026-01-15", status: "completed", reviewResult: "extraordinary", createdAt: "2026-01-03T09:00:00.000Z" },
-    { id: "task_32", title: "Security test framework",      description: "Build OWASP-based test framework",     notes: "Integrated with CI pipeline",      assigneeId: "mem_anita",  priority: "high",   dueDate: "2026-01-18", status: "completed", reviewResult: "perfect",       createdAt: "2026-01-05T09:00:00.000Z" },
-    { id: "task_33", title: "GraphQL API layer",            description: "Add GraphQL gateway over REST APIs",   notes: "",                                 assigneeId: "mem_vikram", priority: "high",   dueDate: "2026-01-25", status: "in-progress",                              createdAt: "2026-01-06T09:00:00.000Z" },
+    { id: "task_32", title: "Security test framework",      description: "Build OWASP-based test framework",     notes: "Integrated with CI pipeline",      assigneeId: "mem_anita",  priority: "high",   weightage: "important", dueDate: "2026-01-18", status: "completed", reviewResult: "perfect",       createdAt: "2026-01-05T09:00:00.000Z" },
+    { id: "task_33", title: "GraphQL API layer",            description: "Add GraphQL gateway over REST APIs",   notes: "",                                 assigneeId: "mem_vikram", priority: "high",   weightage: "important", dueDate: "2026-01-25", status: "in-progress",                              createdAt: "2026-01-06T09:00:00.000Z" },
     // Additional December 2025 tasks (fill gaps)
     { id: "task_34", title: "Brand guideline documentation",  description: "Document updated brand standards for 2026", notes: "Comprehensive and well-organized",  assigneeId: "mem_priya",  priority: "medium", dueDate: "2025-12-15", status: "completed", reviewResult: "perfect",       createdAt: "2025-12-02T09:00:00.000Z" },
     { id: "task_35", title: "Year-end team performance reviews", description: "Conduct and document all team reviews", notes: "Delayed feedback to 3 members",  assigneeId: "mem_rahul",  priority: "high",   dueDate: "2025-12-12", status: "completed", reviewResult: "below",         createdAt: "2025-12-01T09:00:00.000Z" },
@@ -2256,12 +2303,17 @@ function seedDemoData() {
     { id: "task_37", title: "Mobile app test coverage",       description: "Increase test coverage to 90% on mobile app", notes: "Achieved 92% coverage",         assigneeId: "mem_anita",  priority: "high",   dueDate: "2025-12-19", status: "completed", reviewResult: "perfect",       createdAt: "2025-12-04T09:00:00.000Z" },
     { id: "task_38", title: "Annual budget finalization",     description: "Finalize department budgets for 2026",  notes: "Minor discrepancies found late",       assigneeId: "mem_deepa",  priority: "high",   dueDate: "2025-12-22", status: "completed", reviewResult: "perfect",       createdAt: "2025-12-05T09:00:00.000Z" },
     // Additional January 2026 tasks (fill gaps)
-    { id: "task_39", title: "Real-time analytics dashboard",  description: "Build live metrics dashboard with WebSocket updates", notes: "Exceeded performance targets",  assigneeId: "mem_arjun",  priority: "high",   dueDate: "2026-01-15", status: "completed", reviewResult: "extraordinary", createdAt: "2026-01-03T09:00:00.000Z" },
+    { id: "task_39", title: "Real-time analytics dashboard",  description: "Build live metrics dashboard with WebSocket updates", notes: "Exceeded performance targets",  assigneeId: "mem_arjun",  priority: "high",   weightage: "important", dueDate: "2026-01-15", status: "completed", reviewResult: "extraordinary", createdAt: "2026-01-03T09:00:00.000Z" },
     { id: "task_40", title: "Automated deployment testing",   description: "Validate zero-downtime deploy pipeline",   notes: "Missed rollback scenario",          assigneeId: "mem_sneha",  priority: "high",   dueDate: "2026-01-10", status: "completed", reviewResult: "below",         createdAt: "2026-01-02T09:00:00.000Z" },
     { id: "task_41", title: "Mobile app UI overhaul",         description: "Redesign navigation and key screens",      notes: "Shipped with broken gestures and wrong spacing", assigneeId: "mem_meera", priority: "high", dueDate: "2026-01-14", status: "completed", reviewResult: "blunder", createdAt: "2026-01-03T09:00:00.000Z" },
     { id: "task_42", title: "API stress testing report",      description: "Run stress tests and document findings",   notes: "Thorough report with actionable items",          assigneeId: "mem_karan", priority: "medium", dueDate: "2026-01-16", status: "completed", reviewResult: "perfect", createdAt: "2026-01-05T09:00:00.000Z" },
     { id: "task_43", title: "Event-driven architecture POC",  description: "Prototype event sourcing with Kafka",      notes: "Clean implementation, ready for prod",           assigneeId: "mem_rohan", priority: "high",   dueDate: "2026-01-20", status: "completed", reviewResult: "perfect",       createdAt: "2026-01-06T09:00:00.000Z" },
-    { id: "task_44", title: "Infrastructure cost optimization", description: "Reduce cloud spend by 20%",             notes: "Achieved 25% reduction",                         assigneeId: "mem_vikram", priority: "medium", dueDate: "2026-01-22", status: "completed", reviewResult: "perfect",      createdAt: "2026-01-08T09:00:00.000Z" }
+    { id: "task_44", title: "Infrastructure cost optimization", description: "Reduce cloud spend by 20%",             notes: "Achieved 25% reduction",                         assigneeId: "mem_vikram", priority: "medium", dueDate: "2026-01-22", status: "completed", reviewResult: "perfect",      createdAt: "2026-01-08T09:00:00.000Z" },
+    // February 2026 tasks (some overdue for Attention Board demo)
+    { id: "task_45", title: "Client demo preparation",        description: "Prepare demo for enterprise client meeting",    notes: "",  assigneeId: "mem_arjun",  priority: "high",   weightage: "important",     dueDate: "2026-02-05", status: "in-progress", createdAt: "2026-01-28T09:00:00.000Z" },
+    { id: "task_46", title: "Vendor arrangement review",       description: "Review vendor contracts for Q1 renewal",       notes: "",  assigneeId: "mem_deepa",  priority: "high",   weightage: "important",     dueDate: "2026-02-03", status: "pending",     createdAt: "2026-01-25T09:00:00.000Z" },
+    { id: "task_47", title: "Client presentation deck",        description: "Build client presentation deck for demo day",  notes: "",  assigneeId: "mem_priya",  priority: "medium", weightage: "not-important", dueDate: "2026-02-08", status: "in-progress", createdAt: "2026-02-01T09:00:00.000Z" },
+    { id: "task_48", title: "Code review backlog clearance",   description: "Review and merge pending pull requests",       notes: "",  assigneeId: "mem_rohan",  priority: "medium", weightage: "not-important", dueDate: "2026-02-06", status: "pending",     createdAt: "2026-01-29T09:00:00.000Z" }
   ];
 
   // --- Flags ---
