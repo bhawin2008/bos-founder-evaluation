@@ -247,6 +247,22 @@ function openModal(modalId) {
     var alertEl = document.getElementById("task-assignee-alert");
     if (alertEl) { alertEl.style.display = "none"; alertEl.innerHTML = ""; }
   }
+  if (modalId === "review-modal") {
+    populateCategoryDropdown("review-category");
+    var catSec = document.getElementById("review-category-section");
+    if (catSec) catSec.style.display = "none";
+    var submitBtn = document.getElementById("review-submit-btn");
+    if (submitBtn) submitBtn.style.display = "none";
+    var noteEl = document.getElementById("review-note");
+    if (noteEl) noteEl.value = "";
+    var catEl = document.getElementById("review-category");
+    if (catEl) catEl.value = "";
+    // Remove selection highlight from all buttons
+    document.querySelectorAll("#review-modal .flag-option-btn").forEach(function(btn) {
+      btn.classList.remove("selected");
+    });
+    pendingReviewQuality = null;
+  }
   if (modalId === "extraordinary-modal") {
     populateCategoryDropdown("extraordinary-category");
   }
@@ -551,31 +567,71 @@ function toggleTaskStatus(id) {
   }
 }
 
-function submitReview(quality) {
+var pendingReviewQuality = null;
+
+function selectReviewOption(quality) {
+  pendingReviewQuality = quality;
+  // Highlight selected button
+  document.querySelectorAll("#review-modal .flag-option-btn").forEach(function(btn) {
+    btn.classList.remove("selected");
+  });
+  var btnMap = { extraordinary: 0, perfect: 1, none: 2, below: 3, blunder: 4 };
+  var btns = document.querySelectorAll("#review-modal .flag-option-btn");
+  if (btns[btnMap[quality]]) btns[btnMap[quality]].classList.add("selected");
+
+  var catSec = document.getElementById("review-category-section");
+  var submitBtn = document.getElementById("review-submit-btn");
+
+  if (quality === "none") {
+    // No category needed, submit directly
+    if (catSec) catSec.style.display = "none";
+    if (submitBtn) submitBtn.style.display = "none";
+    submitReview();
+  } else {
+    // Show category + note for all signal-generating options
+    if (catSec) catSec.style.display = "block";
+    if (submitBtn) submitBtn.style.display = "inline-flex";
+  }
+}
+
+function submitReview() {
+  var quality = pendingReviewQuality;
+  if (!quality) return;
   var task = data.tasks.find(function(t) { return t.id === pendingReviewTaskId; });
   if (!task) return;
+
+  var category = "";
+  var note = "";
+  var catEl = document.getElementById("review-category");
+  var noteEl = document.getElementById("review-note");
+  if (catEl) category = catEl.value;
+  if (noteEl) note = noteEl.value.trim();
 
   task.status = "completed";
   task.reviewResult = quality;
 
   if (task.assigneeId) {
     if (quality === "extraordinary") {
-      addFlag(task.assigneeId, task.id, "green", 2, "Exceptional contribution: " + task.title, "", "");
+      addFlag(task.assigneeId, task.id, "green", 2, "Exceptional contribution: " + task.title, note, category);
     } else if (quality === "perfect") {
-      addFlag(task.assigneeId, task.id, "green", 1, "Completed with excellence: " + task.title, "", "");
+      addFlag(task.assigneeId, task.id, "green", 1, "Completed with excellence: " + task.title, note, category);
     } else if (quality === "below") {
-      addFlag(task.assigneeId, task.id, "red", 1, "Needs support: " + task.title, "", "");
+      addFlag(task.assigneeId, task.id, "red", 1, "Needs support: " + task.title, note, category);
+    } else if (quality === "blunder") {
+      addFlag(task.assigneeId, task.id, "red", 2, "Blunder: " + task.title, note, category);
     }
   }
 
   saveData(data);
   closeModal("review-modal");
   pendingReviewTaskId = null;
+  pendingReviewQuality = null;
   refreshAll();
 }
 
 function cancelReview() {
   pendingReviewTaskId = null;
+  pendingReviewQuality = null;
   closeModal("review-modal");
 }
 
