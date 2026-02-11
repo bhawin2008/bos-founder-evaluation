@@ -244,7 +244,6 @@ function openModal(modalId) {
   }
   if (modalId === "task-modal") {
     populateMemberDropdown("task-assignee");
-    populateCategoryDropdown("task-category");
     var alertEl = document.getElementById("task-assignee-alert");
     if (alertEl) { alertEl.style.display = "none"; alertEl.innerHTML = ""; }
   }
@@ -331,7 +330,7 @@ function isOverdue(task) {
 function checkOverdueFlags() {
   data.tasks.forEach(function(task) {
     if (isOverdue(task) && task.assigneeId && !task.overdueFlagged) {
-      addFlag(task.assigneeId, task.id, "red", 1, "Past due: " + task.title, "", task.category || "");
+      addFlag(task.assigneeId, task.id, "red", 1, "Past due: " + task.title, "", "");
       task.overdueFlagged = true;
     }
   });
@@ -560,13 +559,12 @@ function submitReview(quality) {
   task.reviewResult = quality;
 
   if (task.assigneeId) {
-    var taskCat = task.category || "";
     if (quality === "extraordinary") {
-      addFlag(task.assigneeId, task.id, "green", 2, "Exceptional contribution: " + task.title, "", taskCat);
+      addFlag(task.assigneeId, task.id, "green", 2, "Exceptional contribution: " + task.title, "", "");
     } else if (quality === "perfect") {
-      addFlag(task.assigneeId, task.id, "green", 1, "Completed with excellence: " + task.title, "", taskCat);
+      addFlag(task.assigneeId, task.id, "green", 1, "Completed with excellence: " + task.title, "", "");
     } else if (quality === "below") {
-      addFlag(task.assigneeId, task.id, "red", 1, "Needs support: " + task.title, "", taskCat);
+      addFlag(task.assigneeId, task.id, "red", 1, "Needs support: " + task.title, "", "");
     }
   }
 
@@ -592,7 +590,7 @@ function openExtraordinary(taskId) {
   pendingExtraordinaryMemberId = null;
   document.getElementById("extraordinary-task-name").textContent = task.title;
   document.getElementById("extraordinary-note").value = "";
-  document.getElementById("extraordinary-category").value = task.category || "";
+  document.getElementById("extraordinary-category").value = "";
   openModal("extraordinary-modal");
 }
 
@@ -650,7 +648,7 @@ function openBlunder(taskId) {
   pendingBlunderMemberId = null;
   document.getElementById("blunder-task-name").textContent = task.title;
   document.getElementById("blunder-note").value = "";
-  document.getElementById("blunder-category").value = task.category || "";
+  document.getElementById("blunder-category").value = "";
   openModal("blunder-modal");
 }
 
@@ -997,8 +995,6 @@ function saveTask(event) {
     priority: document.getElementById("task-priority").value,
     dueDate: document.getElementById("task-due").value,
     status: document.getElementById("task-status").value,
-    category: document.getElementById("task-category").value,
-    keywords: document.getElementById("task-keywords").value.trim(),
     createdAt: editId
       ? (data.tasks.find(function(t) { return t.id === editId; }) || {}).createdAt || new Date().toISOString()
       : new Date().toISOString()
@@ -1029,6 +1025,19 @@ function getCategoryLabel(catId) {
   return cat ? cat.name : catId;
 }
 
+// Extract meaningful keywords from text (title + description)
+function extractKeywords(text) {
+  if (!text) return [];
+  var stopWords = ["the","a","an","is","are","was","were","be","been","being","have","has","had","do","does","did","will","would","shall","should","may","might","must","can","could","and","but","or","nor","not","no","so","if","then","else","when","at","by","for","with","about","against","between","through","during","before","after","above","below","to","from","up","down","in","out","on","off","over","under","again","further","once","here","there","all","each","every","both","few","more","most","other","some","such","than","too","very","just","also","into","of","it","its","this","that","these","those","i","me","my","we","our","you","your","he","him","his","she","her","they","them","their","what","which","who","whom","how","task","need","needs","make","get","new"];
+  var words = text.toLowerCase().replace(/[^a-z0-9\s]/g, " ").split(/\s+/).filter(function(w) {
+    return w.length > 2 && stopWords.indexOf(w) === -1;
+  });
+  // Deduplicate
+  var unique = [];
+  words.forEach(function(w) { if (unique.indexOf(w) === -1) unique.push(w); });
+  return unique;
+}
+
 function checkAssigneeRisk() {
   var alertEl = document.getElementById("task-assignee-alert");
   if (!alertEl) return;
@@ -1036,10 +1045,12 @@ function checkAssigneeRisk() {
   alertEl.innerHTML = "";
 
   var memberId = document.getElementById("task-assignee").value;
-  var category = document.getElementById("task-category").value;
-  var keywords = document.getElementById("task-keywords").value.trim().toLowerCase();
-
   if (!memberId) return;
+
+  // Auto-extract keywords from task title and description
+  var title = document.getElementById("task-title").value || "";
+  var description = document.getElementById("task-description").value || "";
+  var keywords = extractKeywords(title + " " + description);
 
   var warnings = [];
 
@@ -1053,53 +1064,53 @@ function checkAssigneeRisk() {
   });
 
   // Check category-based risk: 2+ red flags in same category this month
-  if (category) {
-    var catCount = 0;
-    memberRedFlags.forEach(function(f) {
-      if (f.category === category) catCount += f.count;
-    });
-    if (catCount >= 2) {
+  // Check all categories that have 2+ signals
+  var catCounts = {};
+  memberRedFlags.forEach(function(f) {
+    if (f.category) {
+      catCounts[f.category] = (catCounts[f.category] || 0) + f.count;
+    }
+  });
+  Object.keys(catCounts).forEach(function(cat) {
+    if (catCounts[cat] >= 2) {
       warnings.push({
         type: "category",
-        text: "This member has <strong>" + catCount + " growth signals</strong> in <strong>" + (getCategoryLabel(category)) + "</strong> this month. Consider support or reassignment."
+        text: "This member has <strong>" + catCounts[cat] + " growth signals</strong> in <strong>" + getCategoryLabel(cat) + "</strong> this month. Consider support or reassignment."
       });
     }
-  }
+  });
 
-  // Check keyword-based risk: match task keywords against red flag task keywords
-  if (keywords) {
-    var inputKeywords = keywords.split(",").map(function(k) { return k.trim().toLowerCase(); }).filter(function(k) { return k.length > 0; });
-    if (inputKeywords.length > 0) {
-      var matchedKeywords = [];
-      memberRedFlags.forEach(function(f) {
-        // Check keywords from the task associated with this flag
-        if (f.taskId) {
-          var flagTask = data.tasks.find(function(t) { return t.id === f.taskId; });
-          if (flagTask && flagTask.keywords) {
-            var flagKeywords = flagTask.keywords.toLowerCase().split(",").map(function(k) { return k.trim(); });
-            inputKeywords.forEach(function(ik) {
-              flagKeywords.forEach(function(fk) {
-                if (ik && fk && (ik === fk || ik.indexOf(fk) !== -1 || fk.indexOf(ik) !== -1)) {
-                  if (matchedKeywords.indexOf(ik) === -1) matchedKeywords.push(ik);
-                }
-              });
+  // Check keyword-based risk: match auto-extracted keywords against red flag task keywords
+  if (keywords.length > 0) {
+    var matchedKeywords = [];
+    memberRedFlags.forEach(function(f) {
+      // Check keywords from the task associated with this flag
+      if (f.taskId) {
+        var flagTask = data.tasks.find(function(t) { return t.id === f.taskId; });
+        if (flagTask) {
+          var flagKeywords = extractKeywords((flagTask.title || "") + " " + (flagTask.description || ""));
+          keywords.forEach(function(ik) {
+            flagKeywords.forEach(function(fk) {
+              if (ik && fk && (ik === fk || ik.indexOf(fk) !== -1 || fk.indexOf(ik) !== -1)) {
+                if (matchedKeywords.indexOf(ik) === -1) matchedKeywords.push(ik);
+              }
             });
-          }
+          });
         }
-        // Also check flag note/reason for keyword matches
-        var flagText = ((f.reason || "") + " " + (f.note || "")).toLowerCase();
-        inputKeywords.forEach(function(ik) {
-          if (ik && flagText.indexOf(ik) !== -1) {
-            if (matchedKeywords.indexOf(ik) === -1) matchedKeywords.push(ik);
-          }
-        });
-      });
-      if (matchedKeywords.length > 0) {
-        warnings.push({
-          type: "keyword",
-          text: "Keyword overlap with recent growth signals: <strong>" + matchedKeywords.join(", ") + "</strong>. This member has struggled with similar work this month."
-        });
       }
+      // Also check flag note/reason for keyword matches
+      var flagText = ((f.reason || "") + " " + (f.note || "")).toLowerCase();
+      keywords.forEach(function(ik) {
+        if (ik && flagText.indexOf(ik) !== -1) {
+          if (matchedKeywords.indexOf(ik) === -1) matchedKeywords.push(ik);
+        }
+      });
+    });
+    if (matchedKeywords.length > 0) {
+      warnings.push({
+        type: "keyword",
+        text: "Keyword overlap with recent growth signals: <strong>" + matchedKeywords.join(", ") + "</strong>. This member has struggled with similar work this month."
+      });
     }
   }
 
@@ -1126,8 +1137,6 @@ function editTask(id) {
   document.getElementById("task-notes").value = task.notes || "";
   populateMemberDropdown("task-assignee");
   document.getElementById("task-assignee").value = task.assigneeId;
-  document.getElementById("task-category").value = task.category || "";
-  document.getElementById("task-keywords").value = task.keywords || "";
   document.getElementById("task-priority").value = task.priority;
   document.getElementById("task-due").value = task.dueDate;
   document.getElementById("task-status").value = task.status;
@@ -1338,15 +1347,10 @@ function renderTasks() {
     actions += '<button class="tt-action-btn tt-action-delete" onclick="deleteTask(\'' + task.id + '\')" title="Delete"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></button>';
 
     var taskMeta = '';
-    if (task.category) {
-      taskMeta += '<span class="tt-category-badge">' + escapeHtml(getCategoryLabel(task.category)) + '</span>';
-    }
-    if (task.keywords) {
-      task.keywords.split(",").forEach(function(kw) {
-        kw = kw.trim();
-        if (kw) taskMeta += '<span class="tt-keyword-badge">' + escapeHtml(kw) + '</span>';
-      });
-    }
+    var autoKeywords = extractKeywords((task.title || "") + " " + (task.description || ""));
+    autoKeywords.forEach(function(kw) {
+      if (kw) taskMeta += '<span class="tt-keyword-badge">' + escapeHtml(kw) + '</span>';
+    });
 
     html += '<tr class="' + rowClass + '">' +
       '<td class="tt-col-title">' +
