@@ -90,6 +90,25 @@ function isFlagInDateRange(flag) {
   return isDateInRange(flagDate);
 }
 
+var presetLabels = { today: "Today", week: "Last Week", month: "Last Month", year: "Last Year", all: "All Time", custom: "Custom" };
+
+function updateDateLabel() {
+  var label = presetLabels[dateRangePreset] || "All Time";
+  if (dateRangePreset === "custom" && dateRangeFrom && dateRangeTo) {
+    label = dateRangeFrom + " — " + dateRangeTo;
+  }
+  document.querySelectorAll(".dr-icon-label").forEach(function(el) { el.textContent = label; });
+}
+
+function toggleDateDropdown(btn) {
+  var wrap = btn.closest(".dr-icon-wrap");
+  var dd = wrap.querySelector(".dr-dropdown");
+  var isOpen = dd.classList.contains("open");
+  // Close all dropdowns first
+  document.querySelectorAll(".dr-dropdown").forEach(function(d) { d.classList.remove("open"); });
+  if (!isOpen) dd.classList.add("open");
+}
+
 function setDatePreset(preset) {
   dateRangePreset = preset;
   // Update button active states
@@ -105,7 +124,10 @@ function setDatePreset(preset) {
     dateRangeTo = "";
     document.querySelectorAll(".dr-from").forEach(function(el) { el.value = ""; });
     document.querySelectorAll(".dr-to").forEach(function(el) { el.value = ""; });
+    // Close dropdown when a non-custom preset is picked
+    document.querySelectorAll(".dr-dropdown").forEach(function(d) { d.classList.remove("open"); });
   }
+  updateDateLabel();
   refreshAll();
 }
 
@@ -118,8 +140,8 @@ function setCustomDateFrom(val) {
   document.querySelectorAll(".dr-custom-inputs").forEach(function(el) {
     el.style.display = "flex";
   });
-  // Sync all from inputs
   document.querySelectorAll(".dr-from").forEach(function(el) { el.value = val; });
+  updateDateLabel();
   refreshAll();
 }
 
@@ -132,8 +154,8 @@ function setCustomDateTo(val) {
   document.querySelectorAll(".dr-custom-inputs").forEach(function(el) {
     el.style.display = "flex";
   });
-  // Sync all to inputs
   document.querySelectorAll(".dr-to").forEach(function(el) { el.value = val; });
+  updateDateLabel();
   refreshAll();
 }
 
@@ -1595,4 +1617,11 @@ function seedDemoData() {
 document.addEventListener("DOMContentLoaded", function() {
   seedDemoData();
   refreshAll();
+
+  // Close date dropdown when clicking outside
+  document.addEventListener("click", function(e) {
+    if (!e.target.closest(".dr-icon-wrap")) {
+      document.querySelectorAll(".dr-dropdown").forEach(function(d) { d.classList.remove("open"); });
+    }
+  });
 });
