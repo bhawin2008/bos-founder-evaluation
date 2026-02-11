@@ -605,6 +605,58 @@ function getTaskFlagIndicator(task) {
   return '<span class="task-flag-indicator">' + parts.join('') + '</span>';
 }
 
+// ==================== Inline Task Updates ====================
+
+function inlineUpdateStatus(taskId, newStatus) {
+  var task = data.tasks.find(function(t) { return t.id === taskId; });
+  if (!task) return;
+
+  // If changing to completed, open the review modal instead
+  if (newStatus === "completed" && task.status !== "completed") {
+    pendingReviewTaskId = taskId;
+    document.getElementById("review-task-name").textContent = task.title;
+    openModal("review-modal");
+    // Reset select to current value since review will handle it
+    renderTasks();
+    return;
+  }
+
+  task.status = newStatus;
+  saveData(data);
+  refreshAll();
+}
+
+function inlineUpdatePriority(taskId, newPriority) {
+  var task = data.tasks.find(function(t) { return t.id === taskId; });
+  if (!task) return;
+  task.priority = newPriority;
+  saveData(data);
+  refreshAll();
+}
+
+function inlineUpdateDueDate(taskId, newDate) {
+  var task = data.tasks.find(function(t) { return t.id === taskId; });
+  if (!task) return;
+  task.dueDate = newDate;
+  saveData(data);
+  refreshAll();
+}
+
+function inlineUpdateAssignee(taskId, newAssigneeId) {
+  var task = data.tasks.find(function(t) { return t.id === taskId; });
+  if (!task) return;
+  task.assigneeId = newAssigneeId;
+  saveData(data);
+  refreshAll();
+}
+
+function inlineUpdateNotes(taskId, el) {
+  var task = data.tasks.find(function(t) { return t.id === taskId; });
+  if (!task) return;
+  task.notes = el.value.trim();
+  saveData(data);
+}
+
 function renderTasks() {
   var container = document.getElementById("tasks-list");
   if (!container) return;
@@ -634,65 +686,112 @@ function renderTasks() {
     return priorityOrder[a.priority] - priorityOrder[b.priority];
   });
 
+  // Build table
+  var table = document.createElement("div");
+  table.className = "task-table-wrap";
+
+  var statusOptions = [
+    { value: "pending", label: "Pending" },
+    { value: "in-progress", label: "In Progress" },
+    { value: "hold", label: "Hold" },
+    { value: "completed", label: "Completed" },
+    { value: "cancelled", label: "Cancelled" }
+  ];
+  var priorityOptions = [
+    { value: "low", label: "Low" },
+    { value: "medium", label: "Medium" },
+    { value: "high", label: "High" }
+  ];
+
+  var html = '<table class="task-table">' +
+    '<thead><tr>' +
+      '<th class="tt-col-title">Task</th>' +
+      '<th class="tt-col-assignee">Assigned To</th>' +
+      '<th class="tt-col-status">Status</th>' +
+      '<th class="tt-col-due">Due Date</th>' +
+      '<th class="tt-col-priority">Priority</th>' +
+      '<th class="tt-col-notes">Notes</th>' +
+      '<th class="tt-col-actions">Actions</th>' +
+    '</tr></thead><tbody>';
+
   filtered.forEach(function(task) {
     var assignee = data.members.find(function(m) { return m.id === task.assigneeId; });
-    var overdueClass = isOverdue(task) ? " task-overdue" : "";
-    var flagIndicator = getTaskFlagIndicator(task);
     var isDone = task.status === "completed";
     var isCancelled = task.status === "cancelled";
-    var isHold = task.status === "hold";
     var isFinished = isDone || isCancelled;
-    var checkboxDisabled = isCancelled || isHold;
-
     var showExtraordinary = isDone && task.assigneeId;
     var showBlunder = isFinished && task.assigneeId;
+    var showComplete = !isDone && task.status !== "cancelled" && task.status !== "hold";
+    var flagIndicator = getTaskFlagIndicator(task);
 
-    var cardClass = "card task-card";
-    if (isDone) cardClass += " task-completed";
-    if (isCancelled) cardClass += " task-cancelled";
-    if (isHold) cardClass += " task-hold";
-    cardClass += overdueClass;
+    var rowClass = "tt-row";
+    if (isDone) rowClass += " tt-row-completed";
+    if (isCancelled) rowClass += " tt-row-cancelled";
+    if (task.status === "hold") rowClass += " tt-row-hold";
+    if (isOverdue(task)) rowClass += " tt-row-overdue";
 
-    var notesHtml = '';
-    if (task.notes) {
-      notesHtml = '<div class="task-notes"><span class="task-notes-label">Notes:</span> ' + escapeHtml(task.notes) + '</div>';
+    // Status select
+    var statusSelect = '<select class="tt-select tt-select-status status-' + task.status + '" onchange="inlineUpdateStatus(\'' + task.id + '\', this.value)">';
+    statusOptions.forEach(function(opt) {
+      statusSelect += '<option value="' + opt.value + '"' + (task.status === opt.value ? ' selected' : '') + '>' + opt.label + '</option>';
+    });
+    statusSelect += '</select>';
+    if (isOverdue(task)) {
+      statusSelect += '<span class="tt-overdue-tag">Overdue</span>';
     }
 
-    var card = document.createElement("div");
-    card.className = cardClass;
-    card.innerHTML =
-      '<div class="card-top">' +
-        '<div class="task-info">' +
-          '<button class="task-checkbox' + (isDone ? " checked" : "") + (isCancelled ? " cancelled" : "") + (isHold ? " on-hold" : "") + (checkboxDisabled ? " disabled" : "") + '"' +
-            (checkboxDisabled ? '' : ' onclick="toggleTaskStatus(\'' + task.id + '\')"') + '>' +
-            (isDone ? "&#10003;" : (isCancelled ? "&#10005;" : (isHold ? "&#9646;&#9646;" : ""))) +
-          '</button>' +
-          '<div>' +
-            '<div class="task-title">' + escapeHtml(task.title) + ' ' + flagIndicator + '</div>' +
-            (task.description ? '<div class="task-desc">' + escapeHtml(task.description) + '</div>' : '') +
-            notesHtml +
-          '</div>' +
-        '</div>' +
-        '<div class="card-actions">' +
-          (showExtraordinary
-            ? '<button class="btn-icon btn-icon-extraordinary" onclick="openExtraordinary(\'' + task.id + '\')" title="Mark Extraordinary (+2 Green)">&#9733;</button>'
-            : '') +
-          (showBlunder
-            ? '<button class="btn-icon btn-icon-blunder" onclick="openBlunder(\'' + task.id + '\')" title="Report Blunder (+3 Red)">&#9873;</button>'
-            : '') +
-          '<button class="btn-icon" onclick="editTask(\'' + task.id + '\')" title="Edit">&#9998;</button>' +
-          '<button class="btn-icon btn-icon-danger" onclick="deleteTask(\'' + task.id + '\')" title="Delete">&#10005;</button>' +
-        '</div>' +
-      '</div>' +
-      '<div class="card-bottom">' +
-        '<span class="priority-badge priority-' + task.priority + '">' + task.priority + '</span>' +
-        '<span class="status-badge status-' + task.status + '">' + formatStatus(task.status) + '</span>' +
-        (isOverdue(task) ? '<span class="status-badge status-overdue">Overdue</span>' : '') +
-        (assignee ? '<span class="card-meta">Assigned to ' + escapeHtml(assignee.name) + '</span>' : '<span class="card-meta">Unassigned</span>') +
-        (task.dueDate ? '<span class="card-meta">Due ' + formatDate(task.dueDate) + '</span>' : '') +
-      '</div>';
-    container.appendChild(card);
+    // Priority select
+    var prioritySelect = '<select class="tt-select tt-select-priority priority-sel-' + task.priority + '" onchange="inlineUpdatePriority(\'' + task.id + '\', this.value)">';
+    priorityOptions.forEach(function(opt) {
+      prioritySelect += '<option value="' + opt.value + '"' + (task.priority === opt.value ? ' selected' : '') + '>' + opt.label + '</option>';
+    });
+    prioritySelect += '</select>';
+
+    // Assignee select
+    var assigneeSelect = '<select class="tt-select tt-select-assignee" onchange="inlineUpdateAssignee(\'' + task.id + '\', this.value)">';
+    assigneeSelect += '<option value="">Unassigned</option>';
+    data.members.forEach(function(m) {
+      assigneeSelect += '<option value="' + m.id + '"' + (task.assigneeId === m.id ? ' selected' : '') + '>' + escapeHtml(m.name) + '</option>';
+    });
+    assigneeSelect += '</select>';
+
+    // Due date input
+    var dueInput = '<input type="date" class="tt-date" value="' + (task.dueDate || '') + '" onchange="inlineUpdateDueDate(\'' + task.id + '\', this.value)">';
+
+    // Notes input
+    var notesInput = '<textarea class="tt-notes" rows="1" placeholder="—" onblur="inlineUpdateNotes(\'' + task.id + '\', this)">' + escapeHtml(task.notes || '') + '</textarea>';
+
+    // Action buttons
+    var actions = '';
+    if (showComplete) {
+      actions += '<button class="tt-action-btn tt-action-complete" onclick="toggleTaskStatus(\'' + task.id + '\')" title="Complete Task">&#10003;</button>';
+    }
+    if (showExtraordinary) {
+      actions += '<button class="tt-action-btn tt-action-green" onclick="openExtraordinary(\'' + task.id + '\')" title="Mark Extraordinary (+2 Green)">&#9733;</button>';
+    }
+    if (showBlunder) {
+      actions += '<button class="tt-action-btn tt-action-red" onclick="openBlunder(\'' + task.id + '\')" title="Report Blunder (+3 Red)">&#9873;</button>';
+    }
+    actions += '<button class="tt-action-btn tt-action-edit" onclick="editTask(\'' + task.id + '\')" title="Edit">&#9998;</button>';
+    actions += '<button class="tt-action-btn tt-action-delete" onclick="deleteTask(\'' + task.id + '\')" title="Delete">&#10005;</button>';
+
+    html += '<tr class="' + rowClass + '">' +
+      '<td class="tt-col-title">' +
+        '<div class="tt-task-name">' + escapeHtml(task.title) + ' ' + flagIndicator + '</div>' +
+        (task.description ? '<div class="tt-task-desc">' + escapeHtml(task.description) + '</div>' : '') +
+      '</td>' +
+      '<td class="tt-col-assignee">' + assigneeSelect + '</td>' +
+      '<td class="tt-col-status">' + statusSelect + '</td>' +
+      '<td class="tt-col-due">' + dueInput + '</td>' +
+      '<td class="tt-col-priority">' + prioritySelect + '</td>' +
+      '<td class="tt-col-notes">' + notesInput + '</td>' +
+      '<td class="tt-col-actions"><div class="tt-actions-wrap">' + actions + '</div></td>' +
+    '</tr>';
   });
+
+  html += '</tbody></table>';
+  table.innerHTML = html;
+  container.appendChild(table);
 }
 
 // ==================== Dashboard ====================

@@ -1612,6 +1612,306 @@ body {
   color: var(--text-secondary);
 }
 
+/* ==================== Task Table ==================== */
+
+.task-table-wrap {
+  overflow-x: auto;
+  border: 1px solid var(--border-color);
+  border-radius: 14px;
+  background: var(--bg-card);
+}
+
+.task-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.88rem;
+}
+
+.task-table thead tr {
+  background: var(--bg-sidebar);
+  border-bottom: 2px solid var(--border-color);
+}
+
+.task-table th {
+  padding: 12px 14px;
+  text-align: left;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+}
+
+.task-table td {
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--border-color);
+  vertical-align: middle;
+}
+
+.task-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.task-table tbody tr:hover {
+  background: var(--bg-card-hover);
+}
+
+/* Column widths */
+.tt-col-title { min-width: 180px; }
+.tt-col-assignee { min-width: 130px; }
+.tt-col-status { min-width: 120px; }
+.tt-col-due { min-width: 130px; }
+.tt-col-priority { min-width: 100px; }
+.tt-col-notes { min-width: 140px; }
+.tt-col-actions { min-width: 140px; white-space: nowrap; }
+
+/* Task name & description in table */
+.tt-task-name {
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: var(--text-primary);
+  line-height: 1.4;
+}
+
+.tt-task-desc {
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+  margin-top: 2px;
+  line-height: 1.4;
+}
+
+/* Row states */
+.tt-row-completed .tt-task-name {
+  text-decoration: line-through;
+  color: var(--text-secondary);
+}
+
+.tt-row-completed .tt-task-desc {
+  text-decoration: line-through;
+}
+
+.tt-row-cancelled .tt-task-name {
+  text-decoration: line-through;
+  color: var(--text-secondary);
+}
+
+.tt-row-cancelled .tt-task-desc {
+  text-decoration: line-through;
+}
+
+.tt-row-hold {
+  border-left: 3px solid var(--accent-yellow);
+}
+
+.tt-row-overdue {
+  border-left: 3px solid var(--accent-red);
+}
+
+/* Inline selects */
+.tt-select {
+  width: 100%;
+  padding: 6px 8px;
+  background: var(--bg-dark);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  color: var(--text-primary);
+  font-size: 0.82rem;
+  font-family: inherit;
+  cursor: pointer;
+  outline: none;
+  transition: border-color 0.2s ease;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.tt-select:focus {
+  border-color: var(--accent-blue);
+}
+
+.tt-select:hover {
+  border-color: var(--text-secondary);
+}
+
+/* Status select coloring */
+.tt-select-status.status-pending {
+  border-color: rgba(136, 136, 160, 0.4);
+  color: var(--text-secondary);
+}
+
+.tt-select-status.status-in-progress {
+  border-color: rgba(74, 108, 247, 0.4);
+  color: var(--accent-blue);
+}
+
+.tt-select-status.status-hold {
+  border-color: rgba(234, 179, 8, 0.4);
+  color: var(--accent-yellow);
+}
+
+.tt-select-status.status-completed {
+  border-color: rgba(34, 197, 94, 0.4);
+  color: var(--accent-green);
+}
+
+.tt-select-status.status-cancelled {
+  border-color: rgba(136, 136, 160, 0.4);
+  color: var(--text-secondary);
+}
+
+/* Priority select coloring */
+.tt-select-priority.priority-sel-low {
+  border-color: rgba(136, 136, 160, 0.3);
+  color: var(--text-secondary);
+}
+
+.tt-select-priority.priority-sel-medium {
+  border-color: rgba(234, 179, 8, 0.4);
+  color: var(--accent-yellow);
+}
+
+.tt-select-priority.priority-sel-high {
+  border-color: rgba(239, 68, 68, 0.4);
+  color: var(--accent-red);
+}
+
+/* Overdue tag */
+.tt-overdue-tag {
+  display: inline-block;
+  margin-top: 4px;
+  padding: 1px 6px;
+  border-radius: 4px;
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  background: rgba(239, 68, 68, 0.15);
+  color: var(--accent-red);
+  animation: pulse-overdue 2s ease-in-out infinite;
+}
+
+/* Date input */
+.tt-date {
+  width: 100%;
+  padding: 6px 8px;
+  background: var(--bg-dark);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  color: var(--text-primary);
+  font-size: 0.82rem;
+  font-family: inherit;
+  outline: none;
+  transition: border-color 0.2s ease;
+}
+
+.tt-date:focus {
+  border-color: var(--accent-blue);
+}
+
+.tt-date:hover {
+  border-color: var(--text-secondary);
+}
+
+/* Notes textarea */
+.tt-notes {
+  width: 100%;
+  padding: 6px 8px;
+  background: var(--bg-dark);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  color: var(--text-primary);
+  font-size: 0.82rem;
+  font-family: inherit;
+  outline: none;
+  resize: vertical;
+  min-height: 32px;
+  transition: border-color 0.2s ease;
+}
+
+.tt-notes:focus {
+  border-color: var(--accent-blue);
+}
+
+.tt-notes:hover {
+  border-color: var(--text-secondary);
+}
+
+.tt-notes::placeholder {
+  color: var(--text-secondary);
+}
+
+/* Action buttons */
+.tt-actions-wrap {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+
+.tt-action-btn {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--border-color);
+  background: transparent;
+  color: var(--text-secondary);
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.8rem;
+  transition: all 0.15s ease;
+}
+
+.tt-action-btn:hover {
+  background: var(--bg-card-hover);
+  color: var(--text-primary);
+  border-color: var(--text-secondary);
+}
+
+.tt-action-complete {
+  color: var(--accent-green);
+  border-color: rgba(34, 197, 94, 0.3);
+}
+
+.tt-action-complete:hover {
+  background: rgba(34, 197, 94, 0.12);
+  color: var(--accent-green);
+  border-color: var(--accent-green);
+}
+
+.tt-action-green {
+  color: var(--accent-green);
+  border-color: rgba(34, 197, 94, 0.3);
+}
+
+.tt-action-green:hover {
+  background: rgba(34, 197, 94, 0.12);
+  color: var(--accent-green);
+  border-color: var(--accent-green);
+}
+
+.tt-action-red {
+  color: var(--accent-red);
+  border-color: rgba(239, 68, 68, 0.3);
+}
+
+.tt-action-red:hover {
+  background: rgba(239, 68, 68, 0.12);
+  color: var(--accent-red);
+  border-color: var(--accent-red);
+}
+
+.tt-action-edit:hover {
+  color: var(--accent-blue);
+  border-color: var(--accent-blue);
+}
+
+.tt-action-delete:hover {
+  background: rgba(239, 68, 68, 0.12);
+  color: var(--accent-red);
+  border-color: var(--accent-red);
+}
+
 /* ==================== Responsive ==================== */
 
 @media (max-width: 900px) {
