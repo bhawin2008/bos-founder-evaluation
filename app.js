@@ -268,10 +268,10 @@ function renderFlagBadge(memberId) {
   var flags = getMemberFlags(memberId);
   var parts = [];
   if (flags.green > 0) {
-    parts.push('<span class="flag-count flag-green-count">&#9873; ' + flags.green + '</span>');
+    parts.push('<span class="flag-count flag-green-count">&#9673; ' + flags.green + '</span>');
   }
   if (flags.red > 0) {
-    parts.push('<span class="flag-count flag-red-count">&#9873; ' + flags.red + '</span>');
+    parts.push('<span class="flag-count flag-red-count">&#9673; ' + flags.red + '</span>');
   }
   if (parts.length === 0) return '';
   return '<span class="flag-badges">' + parts.join('') + '</span>';
@@ -289,7 +289,7 @@ function isOverdue(task) {
 function checkOverdueFlags() {
   data.tasks.forEach(function(task) {
     if (isOverdue(task) && task.assigneeId && !task.overdueFlagged) {
-      addFlag(task.assigneeId, task.id, "red", 1, "Missed deadline: " + task.title);
+      addFlag(task.assigneeId, task.id, "red", 1, "Past due: " + task.title);
       task.overdueFlagged = true;
     }
   });
@@ -377,9 +377,9 @@ function getMemberTrend(memberId) {
 
 function renderTrendBadge(memberId) {
   var trend = getMemberTrend(memberId);
-  if (trend === "rising") return '<span class="trend-badge trend-rising">&#9650; Rising</span>';
-  if (trend === "falling") return '<span class="trend-badge trend-falling">&#9660; Falling</span>';
-  return '<span class="trend-badge trend-flat">&#9644; Flat</span>';
+  if (trend === "rising") return '<span class="trend-badge trend-rising">&#9650; Accelerating</span>';
+  if (trend === "falling") return '<span class="trend-badge trend-falling">&#9660; Needs Attention</span>';
+  return '<span class="trend-badge trend-flat">&#9644; Steady</span>';
 }
 
 // ==================== Red Flag Decay ====================
@@ -476,7 +476,7 @@ function submitLeadership() {
   var reasons = [];
   checks.forEach(function(cb) { reasons.push(cb.getAttribute("data-label")); });
   var note = document.getElementById("leadership-reason").value.trim();
-  var reason = "Leadership Multiplier: " + reasons.join(", ");
+  var reason = "Leadership Signal: " + reasons.join(", ");
   if (note) reason += " — " + note;
 
   // +1 green flag per qualifying criterion
@@ -513,11 +513,11 @@ function submitReview(quality) {
 
   if (task.assigneeId) {
     if (quality === "extraordinary") {
-      addFlag(task.assigneeId, task.id, "green", 2, "Extraordinary result: " + task.title);
+      addFlag(task.assigneeId, task.id, "green", 2, "Exceptional contribution: " + task.title);
     } else if (quality === "perfect") {
-      addFlag(task.assigneeId, task.id, "green", 1, "Completed perfectly: " + task.title);
+      addFlag(task.assigneeId, task.id, "green", 1, "Completed with excellence: " + task.title);
     } else if (quality === "below") {
-      addFlag(task.assigneeId, task.id, "red", 1, "Below expectation: " + task.title);
+      addFlag(task.assigneeId, task.id, "red", 1, "Needs support: " + task.title);
     }
   }
 
@@ -551,7 +551,7 @@ function submitExtraordinary() {
   }
 
   var note = document.getElementById("extraordinary-note").value.trim();
-  var reason = "Extraordinary work on task: " + task.title;
+  var reason = "Exceptional contribution: " + task.title;
   if (note) reason += " — " + note;
 
   addFlag(task.assigneeId, task.id, "green", 2, reason);
@@ -580,7 +580,7 @@ function submitBlunder() {
   }
 
   var note = document.getElementById("blunder-note").value.trim();
-  var reason = "Blunder in task: " + task.title;
+  var reason = "Critical incident: " + task.title;
   if (note) reason += " — " + note;
 
   addFlag(task.assigneeId, task.id, "red", 3, reason);
@@ -596,13 +596,13 @@ function showMemberFlags(memberId) {
   var member = data.members.find(function(m) { return m.id === memberId; });
   if (!member) return;
 
-  document.getElementById("flags-modal-title").textContent = escapeHtml(member.name) + " — Flag History";
+  document.getElementById("flags-modal-title").textContent = escapeHtml(member.name) + " — Signal History";
 
   var flags = getMemberFlags(memberId);
   var eff = getEffectiveFlags(memberId);
   var effNet = eff.green - eff.red;
   var trend = getMemberTrend(memberId);
-  var trendLabel = trend === "rising" ? "&#9650; Rising" : (trend === "falling" ? "&#9660; Falling" : "&#9644; Flat");
+  var trendLabel = trend === "rising" ? "&#9650; Accelerating" : (trend === "falling" ? "&#9660; Needs Attention" : "&#9644; Steady");
   var trendCls = trend === "rising" ? "trend-rising" : (trend === "falling" ? "trend-falling" : "trend-flat");
   var monthlyWarn = getMonthlyRedWarning(memberId);
 
@@ -611,28 +611,28 @@ function showMemberFlags(memberId) {
     '<div class="flags-summary-row">' +
       '<div class="flags-summary-item green">' +
         '<span class="flags-summary-count">' + flags.green + '</span>' +
-        '<span class="flags-summary-label">Green Flags</span>' +
+        '<span class="flags-summary-label">Strength Signals</span>' +
       '</div>' +
       '<div class="flags-summary-item red">' +
         '<span class="flags-summary-count">' + flags.red + (eff.decayActive ? '<span style="font-size:0.5em;opacity:0.7"> → ' + eff.red + '</span>' : '') + '</span>' +
-        '<span class="flags-summary-label">Red Flags' + (eff.decayActive ? ' (decayed)' : '') + '</span>' +
+        '<span class="flags-summary-label">Growth Signals' + (eff.decayActive ? ' (recovered)' : '') + '</span>' +
       '</div>' +
       '<div class="flags-summary-item net ' + (effNet >= 0 ? 'green' : 'red') + '">' +
         '<span class="flags-summary-count">' + (effNet > 0 ? '+' : '') + effNet + '</span>' +
-        '<span class="flags-summary-label">Effective Net</span>' +
+        '<span class="flags-summary-label">Net Signal</span>' +
       '</div>' +
     '</div>' +
     '<div class="flags-meta-row">' +
       '<span class="trend-badge ' + trendCls + '">' + trendLabel + '</span>' +
-      (eff.decayActive ? '<span class="decay-badge">Decay Active (' + eff.cleanStreak + ' clean months → -50% old reds)</span>' : '') +
-      (monthlyWarn ? '<span class="monthly-warning-badge">2+ Red Flags This Month</span>' : '') +
+      (eff.decayActive ? '<span class="decay-badge">Recovery Active (' + eff.cleanStreak + ' clean months → -50% old signals)</span>' : '') +
+      (monthlyWarn ? '<span class="monthly-warning-badge">Attention: 2+ Growth Signals This Month</span>' : '') +
     '</div>';
 
   var historyList = document.getElementById("flags-history-list");
   var flagEntries = getMemberFlagList(memberId);
 
   if (flagEntries.length === 0) {
-    historyList.innerHTML = '<div class="empty-state-sm">No flags recorded yet</div>';
+    historyList.innerHTML = '<div class="empty-state-sm">No signals recorded yet</div>';
   } else {
     historyList.innerHTML = "";
     flagEntries.forEach(function(f) {
@@ -641,7 +641,7 @@ function showMemberFlags(memberId) {
       var dateStr = new Date(f.createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
       item.innerHTML =
         '<div class="flag-history-icon ' + f.color + '">' +
-          '&#9873;' + (f.count > 1 ? ' x' + f.count : '') +
+          '&#9673;' + (f.count > 1 ? ' x' + f.count : '') +
         '</div>' +
         '<div class="flag-history-info">' +
           '<span class="flag-history-reason">' + escapeHtml(f.reason) + '</span>' +
@@ -808,11 +808,11 @@ function renderMembers() {
     var initials = member.name.split(" ").map(function(n) { return n[0]; }).join("").toUpperCase().substring(0, 2);
     var roleColor = role ? role.color : "blue";
     var flagHtml = renderFlagBadge(member.id);
-    var alertHtml = isRedAlert(member.id) ? '<span class="red-alert-badge">RED ALERT</span>' : '';
+    var alertHtml = isRedAlert(member.id) ? '<span class="red-alert-badge">SUPPORT NEEDED</span>' : '';
     var trendHtml = renderTrendBadge(member.id);
-    var warningHtml = getMonthlyRedWarning(member.id) ? '<span class="monthly-warning-badge">2+ RED THIS MONTH</span>' : '';
+    var warningHtml = getMonthlyRedWarning(member.id) ? '<span class="monthly-warning-badge">ATTENTION THIS MONTH</span>' : '';
     var eff = getEffectiveFlags(member.id);
-    var decayHtml = eff.decayActive ? '<span class="decay-badge">Decay Active (-50%)</span>' : '';
+    var decayHtml = eff.decayActive ? '<span class="decay-badge">Recovery Active (-50%)</span>' : '';
 
     var card = document.createElement("div");
     card.className = "card" + (isRedAlert(member.id) ? " card-red-alert" : "") + (getMonthlyRedWarning(member.id) ? " card-monthly-warning" : "");
@@ -826,8 +826,8 @@ function renderMembers() {
           '</div>' +
         '</div>' +
         '<div class="card-actions">' +
-          '<button class="btn-icon btn-icon-leadership" onclick="openLeadership(\'' + member.id + '\')" title="Leadership Multiplier">&#9819;</button>' +
-          '<button class="btn-icon" onclick="showMemberFlags(\'' + member.id + '\')" title="View Flags">&#9873;</button>' +
+          '<button class="btn-icon btn-icon-leadership" onclick="openLeadership(\'' + member.id + '\')" title="Leadership Signal">&#9819;</button>' +
+          '<button class="btn-icon" onclick="showMemberFlags(\'' + member.id + '\')" title="View Signals">&#9673;</button>' +
           '<button class="btn-icon" onclick="editMember(\'' + member.id + '\')" title="Edit">&#9998;</button>' +
           '<button class="btn-icon btn-icon-danger" onclick="deleteMember(\'' + member.id + '\')" title="Delete">&#10005;</button>' +
         '</div>' +
@@ -917,7 +917,7 @@ function getTaskFlagIndicator(task) {
   var parts = [];
   taskFlags.forEach(function(f) {
     for (var i = 0; i < f.count; i++) {
-      parts.push('<span class="task-flag-pip ' + f.color + '">&#9873;</span>');
+      parts.push('<span class="task-flag-pip ' + f.color + '">&#9673;</span>');
     }
   });
   return '<span class="task-flag-indicator">' + parts.join('') + '</span>';
@@ -1057,7 +1057,7 @@ function renderTasks() {
     });
     statusSelect += '</select>';
     if (isOverdue(task)) {
-      statusSelect += '<span class="tt-overdue-tag">Overdue</span>';
+      statusSelect += '<span class="tt-overdue-tag">Past Due</span>';
     }
 
     // Priority select
@@ -1087,10 +1087,10 @@ function renderTasks() {
       actions += '<button class="tt-action-btn tt-action-complete" onclick="toggleTaskStatus(\'' + task.id + '\')" title="Complete Task">&#10003;</button>';
     }
     if (showExtraordinary) {
-      actions += '<button class="tt-action-btn tt-action-green" onclick="openExtraordinary(\'' + task.id + '\')" title="Mark Extraordinary (+2 Green)">&#9733;</button>';
+      actions += '<button class="tt-action-btn tt-action-green" onclick="openExtraordinary(\'' + task.id + '\')" title="Exceptional (+2 Strength)">&#9733;</button>';
     }
     if (showBlunder) {
-      actions += '<button class="tt-action-btn tt-action-red" onclick="openBlunder(\'' + task.id + '\')" title="Report Blunder (+3 Red)">&#9873;</button>';
+      actions += '<button class="tt-action-btn tt-action-red" onclick="openBlunder(\'' + task.id + '\')" title="Log Incident (+3 Growth)">&#9673;</button>';
     }
     actions += '<button class="tt-action-btn tt-action-edit" onclick="editTask(\'' + task.id + '\')" title="Edit">&#9998;</button>';
     actions += '<button class="tt-action-btn tt-action-delete" onclick="deleteTask(\'' + task.id + '\')" title="Delete">&#10005;</button>';
@@ -1131,16 +1131,18 @@ function renderDashboard() {
     else if (f.color === "red") totalRed += f.count;
   });
 
+  // Culture Momentum = net score (strength - growth)
+  var cultureMomentum = totalGreen - totalRed;
+  // Stability Index = ratio of strength to total (higher = more stable)
   var totalFlags = totalGreen + totalRed;
-  var greenPct = totalFlags > 0 ? Math.round((totalGreen / totalFlags) * 100) : 0;
-  var redPct = totalFlags > 0 ? Math.round((totalRed / totalFlags) * 100) : 0;
+  var stabilityIndex = totalFlags > 0 ? Math.round((totalGreen / totalFlags) * 100) : 100;
 
   document.getElementById("stat-members").textContent = data.members.length;
   document.getElementById("stat-tasks").textContent = activeTasks.length;
-  document.getElementById("stat-green-flags").textContent = greenPct + "%";
-  document.getElementById("stat-green-flags-sub").textContent = totalGreen + " flags";
-  document.getElementById("stat-red-flags").textContent = redPct + "%";
-  document.getElementById("stat-red-flags-sub").textContent = totalRed + " flags";
+  document.getElementById("stat-green-flags").textContent = (cultureMomentum > 0 ? "+" : "") + cultureMomentum;
+  document.getElementById("stat-green-flags-sub").textContent = totalGreen + " strength signals";
+  document.getElementById("stat-red-flags").textContent = stabilityIndex + "%";
+  document.getElementById("stat-red-flags-sub").textContent = totalRed + " growth signals";
 
   // === Zone Distribution (uses date-filtered flags) ===
   var zoneDistEl = document.getElementById("dashboard-zone-dist");
@@ -1167,9 +1169,9 @@ function renderDashboard() {
           (rPct > 0 ? '<div class="zone-bar-seg red" style="width:' + rPct + '%">' + rPct + '%</div>' : '') +
         '</div>' +
         '<div class="zone-legend">' +
-          '<span class="zone-legend-item"><span class="zone-dot green"></span> Green ' + greenCount + ' (' + gPct + '%)</span>' +
-          '<span class="zone-legend-item"><span class="zone-dot yellow"></span> Neutral ' + yellowCount + ' (' + yPct + '%)</span>' +
-          '<span class="zone-legend-item"><span class="zone-dot red"></span> Red ' + redCount + ' (' + rPct + '%)</span>' +
+          '<span class="zone-legend-item"><span class="zone-dot green"></span> Thriving ' + greenCount + ' (' + gPct + '%)</span>' +
+          '<span class="zone-legend-item"><span class="zone-dot yellow"></span> Steady ' + yellowCount + ' (' + yPct + '%)</span>' +
+          '<span class="zone-legend-item"><span class="zone-dot red"></span> Growth ' + redCount + ' (' + rPct + '%)</span>' +
         '</div>';
     }
   }
@@ -1228,9 +1230,9 @@ function renderDashboard() {
 
       trendEl.innerHTML =
         '<div class="movement-cards">' +
-          '<div class="movement-card green"><span class="movement-val">' + iPct + '%</span><span class="movement-lbl">Improved</span></div>' +
-          '<div class="movement-card yellow"><span class="movement-val">' + sPct + '%</span><span class="movement-lbl">Stable</span></div>' +
-          '<div class="movement-card red"><span class="movement-val">' + dPct + '%</span><span class="movement-lbl">Declined</span></div>' +
+          '<div class="movement-card green"><span class="movement-val">' + iPct + '%</span><span class="movement-lbl">Accelerating</span></div>' +
+          '<div class="movement-card yellow"><span class="movement-val">' + sPct + '%</span><span class="movement-lbl">Steady</span></div>' +
+          '<div class="movement-card red"><span class="movement-val">' + dPct + '%</span><span class="movement-lbl">Needs Attention</span></div>' +
         '</div>' +
         '<div class="trend-chart">' + chartRows + '</div>' +
         '<div class="trend-period">Comparing ' + getMonthLabel(prevMonth) + ' → ' + getMonthLabel(currMonth) + '</div>';
@@ -1242,7 +1244,7 @@ function renderDashboard() {
   if (alertEl) {
     var alertMembers = data.members.filter(function(m) { return isRedAlert(m.id); });
     if (alertMembers.length === 0) {
-      alertEl.innerHTML = '<div class="empty-state-sm">No red alerts — all clear</div>';
+      alertEl.innerHTML = '<div class="empty-state-sm">No support signals — culture is healthy</div>';
     } else {
       alertEl.innerHTML = "";
       alertMembers.forEach(function(member) {
@@ -1256,9 +1258,9 @@ function renderDashboard() {
           '<div class="avatar avatar-sm red">' + initials + '</div>' +
           '<div class="dashboard-item-info">' +
             '<span class="dashboard-item-name overdue-text">' + escapeHtml(member.name) + '</span>' +
-            '<span class="dashboard-item-detail">Red zone for 2+ consecutive months</span>' +
+            '<span class="dashboard-item-detail">Growth zone for 2+ consecutive months — may need support</span>' +
           '</div>' +
-          '<span class="flag-chip flag-chip-red">&#9873; ' + flags.red + '</span>';
+          '<span class="flag-chip flag-chip-red">&#9673; ' + flags.red + '</span>';
         alertEl.appendChild(item);
       });
     }
@@ -1268,7 +1270,7 @@ function renderDashboard() {
   var heatmapEl = document.getElementById("dashboard-heatmap");
   if (heatmapEl) {
     if (data.roles.length === 0) {
-      heatmapEl.innerHTML = '<div class="empty-state-sm">No roles/departments defined</div>';
+      heatmapEl.innerHTML = '<div class="empty-state-sm">No roles/teams defined</div>';
     } else {
       var html = '<div class="heatmap-grid">';
       data.roles.forEach(function(role) {
@@ -1351,15 +1353,15 @@ function renderDashboard() {
           '<div class="dashboard-item-info">' +
             '<span class="dashboard-item-name">' + escapeHtml(mf.member.name) +
               ' <span class="trend-badge-sm ' + trendCls + '">' + trendIcon + '</span>' +
-              (isRedAlert(mf.member.id) ? ' <span class="red-alert-badge-sm">ALERT</span>' : '') +
-              (getMonthlyRedWarning(mf.member.id) ? ' <span class="monthly-warning-badge-sm">WARN</span>' : '') +
+              (isRedAlert(mf.member.id) ? ' <span class="red-alert-badge-sm">SUPPORT</span>' : '') +
+              (getMonthlyRedWarning(mf.member.id) ? ' <span class="monthly-warning-badge-sm">ATTN</span>' : '') +
               (mf.decayActive ? ' <span class="decay-badge-sm">-50%</span>' : '') +
             '</span>' +
             '<span class="dashboard-item-detail">' + (role ? escapeHtml(role.name) : "No Role") + '</span>' +
           '</div>' +
           '<div class="dashboard-flag-chips">' +
-            '<span class="flag-chip flag-chip-green">&#9873; ' + mf.green + '</span>' +
-            '<span class="flag-chip flag-chip-red">&#9873; ' + mf.red + '</span>' +
+            '<span class="flag-chip flag-chip-green">&#9673; ' + mf.green + '</span>' +
+            '<span class="flag-chip flag-chip-red">&#9673; ' + mf.red + '</span>' +
             '<span class="flag-chip flag-chip-net ' + netClass + '">' + (mf.effNet > 0 ? '+' : '') + mf.effNet + '</span>' +
           '</div>';
         flagStatusEl.appendChild(item);
@@ -1372,7 +1374,7 @@ function renderDashboard() {
   if (overdueEl) {
     var overdueTasks = filteredTasks.filter(function(t) { return isOverdue(t); });
     if (overdueTasks.length === 0) {
-      overdueEl.innerHTML = '<div class="empty-state-sm">No overdue tasks</div>';
+      overdueEl.innerHTML = '<div class="empty-state-sm">No tasks need attention</div>';
     } else {
       overdueEl.innerHTML = "";
       overdueTasks.forEach(function(task) {
@@ -1384,7 +1386,7 @@ function renderDashboard() {
             '<span class="dashboard-item-name overdue-text">' + escapeHtml(task.title) + '</span>' +
             '<span class="dashboard-item-detail">' + (assignee ? escapeHtml(assignee.name) : "Unassigned") + ' — Due ' + formatDate(task.dueDate) + '</span>' +
           '</div>' +
-          '<span class="status-badge status-overdue">Overdue</span>';
+          '<span class="status-badge status-overdue">Past Due</span>';
         overdueEl.appendChild(item);
       });
     }

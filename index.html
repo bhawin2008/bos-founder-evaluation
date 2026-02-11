@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Boss Team Management</title>
+  <title>Culture Signal OS</title>
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -11,8 +11,8 @@
     <!-- Sidebar -->
     <aside class="sidebar">
       <div class="sidebar-header">
-        <h1 class="logo">Boss<span class="logo-accent">Team</span></h1>
-        <p class="logo-tagline">Team Management</p>
+        <h1 class="logo">Culture<span class="logo-accent">Signal</span></h1>
+        <p class="logo-tagline">Culture Signal OS</p>
       </div>
       <nav class="sidebar-nav">
         <button class="nav-item active" data-view="dashboard" onclick="switchView('dashboard')">
@@ -31,7 +31,7 @@
       <div class="sidebar-spacer"></div>
       <nav class="sidebar-nav sidebar-nav-bottom">
         <button class="nav-item" data-view="flagrules" onclick="switchView('flagrules')">
-          <span class="nav-icon">&#9873;</span> Flag Rules
+          <span class="nav-icon">&#9673;</span> Signal Framework
         </button>
       </nav>
     </aside>
@@ -43,7 +43,7 @@
         <div class="view-header">
           <div>
             <h2>Dashboard</h2>
-            <p class="view-subtitle">Team overview at a glance</p>
+            <p class="view-subtitle">Culture health at a glance</p>
           </div>
           <div class="dr-icon-wrap">
             <button class="dr-icon-btn" onclick="toggleDateDropdown(this)" title="Filter by period">&#128197; <span class="dr-icon-label" id="dr-active-label-dash">All Time</span></button>
@@ -76,47 +76,69 @@
             <div class="stat-label">Active Tasks</div>
           </div>
           <div class="stat-card">
-            <div class="stat-value stat-value-green" id="stat-green-flags">0%</div>
-            <div class="stat-label">% in Green</div>
-            <div class="stat-sub" id="stat-green-flags-sub">0 flags</div>
+            <div class="stat-value stat-value-green" id="stat-green-flags">0</div>
+            <div class="stat-label">Culture Momentum</div>
+            <div class="stat-sub" id="stat-green-flags-sub">strength signals</div>
           </div>
           <div class="stat-card">
-            <div class="stat-value stat-value-red" id="stat-red-flags">0%</div>
-            <div class="stat-label">% in Red</div>
-            <div class="stat-sub" id="stat-red-flags-sub">0 flags</div>
+            <div class="stat-value stat-value-amber" id="stat-red-flags">0</div>
+            <div class="stat-label">Stability Index</div>
+            <div class="stat-sub" id="stat-red-flags-sub">growth signals</div>
           </div>
         </div>
 
         <div class="dashboard-sections">
           <div class="dashboard-section">
-            <h3>Zone Distribution</h3>
+            <h3>Culture Health Distribution</h3>
             <div id="dashboard-zone-dist"></div>
           </div>
           <div class="dashboard-section">
-            <h3>Zone Movement Trend</h3>
+            <h3>Culture Momentum Trend</h3>
             <div id="dashboard-trend"></div>
           </div>
         </div>
 
         <div class="dashboard-sections" style="margin-top: 24px;">
           <div class="dashboard-section">
-            <h3>Red Alerts</h3>
+            <h3>Support Signals</h3>
             <div id="dashboard-alerts"></div>
           </div>
           <div class="dashboard-section">
-            <h3>Department Heatmap</h3>
+            <h3>Team Health Map</h3>
             <div id="dashboard-heatmap"></div>
           </div>
         </div>
 
         <div class="dashboard-sections" style="margin-top: 24px;">
           <div class="dashboard-section">
-            <h3>Member Flag Status</h3>
+            <h3>Team Signal Board</h3>
             <div id="dashboard-flag-status"></div>
           </div>
           <div class="dashboard-section">
-            <h3>Overdue Tasks</h3>
+            <h3>Attention Queue</h3>
             <div id="dashboard-overdue"></div>
+          </div>
+        </div>
+
+        <div class="psychology-panel">
+          <h3>Why This Dashboard Looks Different</h3>
+          <div class="psychology-grid">
+            <div class="psychology-item">
+              <div class="psychology-icon">&#9878;</div>
+              <div class="psychology-text"><strong>Psychological Safety</strong> — Leaders under threat see threats everywhere. Calm dashboards produce better decisions. We use warm tones, not alarms.</div>
+            </div>
+            <div class="psychology-item">
+              <div class="psychology-icon">&#9883;</div>
+              <div class="psychology-text"><strong>Signals, Not Judgments</strong> — "Growth signal" instead of "red flag." Language shapes perception. We present data for reflection, not reaction.</div>
+            </div>
+            <div class="psychology-item">
+              <div class="psychology-icon">&#8635;</div>
+              <div class="psychology-text"><strong>Culture Momentum</strong> — Snapshot metrics create anxiety. Trends reveal truth. We measure direction, not position.</div>
+            </div>
+            <div class="psychology-item">
+              <div class="psychology-icon">&#9733;</div>
+              <div class="psychology-text"><strong>Leadership Maturity</strong> — Mature leaders don't need flashing alerts. They need clean signals to make deliberate, accountable decisions.</div>
+            </div>
           </div>
         </div>
       </div>
@@ -182,77 +204,77 @@
         <div id="roles-list" class="card-list"></div>
       </div>
 
-      <!-- Flag Rules View -->
+      <!-- Signal Framework View -->
       <div id="flagrules-view" class="view">
         <div class="view-header">
-          <h2>Flag Rules</h2>
-          <p class="view-subtitle">Performance tracking guidelines</p>
+          <h2>Signal Framework</h2>
+          <p class="view-subtitle">How culture signals are measured and interpreted</p>
         </div>
 
         <div class="rules-section">
-          <h3 class="rules-section-title rules-title-red">Red Flags</h3>
+          <h3 class="rules-section-title rules-title-red">Growth Signals</h3>
           <div class="rules-grid">
             <div class="rule-card rule-card-red">
               <div class="rule-icon-wrap red">
-                <span class="rule-icon">&#9873;</span>
+                <span class="rule-icon">&#9673;</span>
                 <span class="rule-count">x1</span>
               </div>
               <div class="rule-info">
                 <div class="rule-name">Missed Deadline</div>
-                <div class="rule-desc">If a task is not completed by its due date, the assignee automatically receives <strong>1 red flag</strong>. This is detected automatically by the system.</div>
+                <div class="rule-desc">If a task passes its due date, <strong>1 growth signal</strong> is automatically recorded. This surfaces where support or capacity adjustments may be needed.</div>
               </div>
             </div>
             <div class="rule-card rule-card-red">
               <div class="rule-icon-wrap red">
-                <span class="rule-icon">&#9873;</span>
+                <span class="rule-icon">&#9673;</span>
                 <span class="rule-count">x1</span>
               </div>
               <div class="rule-info">
-                <div class="rule-name">Below Expectation</div>
-                <div class="rule-desc">If a task is completed but the result does not meet the expected standard, the assignee receives <strong>1 red flag</strong>. Assigned during task completion review.</div>
+                <div class="rule-name">Needs Support</div>
+                <div class="rule-desc">If a task is completed but the result needs improvement, <strong>1 growth signal</strong> is recorded. This is a coaching cue, not a judgment.</div>
               </div>
             </div>
             <div class="rule-card rule-card-red">
               <div class="rule-icon-wrap red">
-                <span class="rule-icon">&#9873;</span>
+                <span class="rule-icon">&#9673;</span>
                 <span class="rule-count">x3</span>
               </div>
               <div class="rule-info">
-                <div class="rule-name">Blunder</div>
-                <div class="rule-desc">If a person makes a serious mistake or blunder during task progress, they receive <strong>3 red flags</strong>. Can be reported at any time via the flag button on active tasks.</div>
+                <div class="rule-name">Critical Incident</div>
+                <div class="rule-desc">For serious process failures, <strong>3 growth signals</strong> are recorded. This indicates a systemic issue requiring attention, not individual blame.</div>
               </div>
             </div>
           </div>
         </div>
 
         <div class="rules-section">
-          <h3 class="rules-section-title rules-title-green">Green Flags</h3>
+          <h3 class="rules-section-title rules-title-green">Strength Signals</h3>
           <div class="rules-grid">
             <div class="rule-card rule-card-green">
               <div class="rule-icon-wrap green">
-                <span class="rule-icon">&#9873;</span>
+                <span class="rule-icon">&#9673;</span>
                 <span class="rule-count">x1</span>
               </div>
               <div class="rule-info">
-                <div class="rule-name">Completed Perfectly</div>
-                <div class="rule-desc">If a task is completed perfectly and meets all expectations, the assignee receives <strong>1 green flag</strong>. Assigned during task completion review.</div>
+                <div class="rule-name">Completed with Excellence</div>
+                <div class="rule-desc">When a task is completed and meets all expectations, <strong>1 strength signal</strong> is recorded. Recognizes consistent, reliable delivery.</div>
               </div>
             </div>
             <div class="rule-card rule-card-green">
               <div class="rule-icon-wrap green">
-                <span class="rule-icon">&#9873;</span>
+                <span class="rule-icon">&#9673;</span>
                 <span class="rule-count">x2</span>
               </div>
               <div class="rule-info">
-                <div class="rule-name">Extraordinary Result</div>
-                <div class="rule-desc">If a task is completed with an extraordinary result that exceeds expectations, the assignee receives <strong>2 green flags</strong>. Assigned during task completion review.</div>
+                <div class="rule-name">Exceptional Contribution</div>
+                <div class="rule-desc">When work exceeds expectations and creates outsized impact, <strong>2 strength signals</strong> are recorded. Celebrates innovation and initiative.</div>
               </div>
             </div>
           </div>
         </div>
 
         <div class="rules-section">
-          <h3 class="rules-section-title rules-title-blue">Special Rules</h3>
+          <h3 class="rules-section-title rules-title-blue">Culture Mechanics</h3>
           <div class="rules-grid">
             <div class="rule-card rule-card-green">
               <div class="rule-icon-wrap green">
@@ -260,28 +282,28 @@
                 <span class="rule-count">+1ea</span>
               </div>
               <div class="rule-info">
-                <div class="rule-name">Leadership Multiplier</div>
-                <div class="rule-desc">If a person mentors 2+ teammates, helps in cross-team collaboration, or is referenced positively by others, they receive <strong>+1 green flag per qualifying criterion</strong> per month.</div>
-              </div>
-            </div>
-            <div class="rule-card rule-card-red">
-              <div class="rule-icon-wrap red">
-                <span class="rule-icon">&#9888;</span>
-                <span class="rule-count">warn</span>
-              </div>
-              <div class="rule-info">
-                <div class="rule-name">Monthly Red Warning</div>
-                <div class="rule-desc">If a member accumulates <strong>2+ red flags in a single month</strong> (even if net score is still positive), a warning badge is triggered for immediate attention.</div>
+                <div class="rule-name">Leadership Signal</div>
+                <div class="rule-desc">Mentoring, cross-team collaboration, or being positively referenced by peers earns <strong>+1 strength signal per criterion</strong>. Measures leadership maturity, not just output.</div>
               </div>
             </div>
             <div class="rule-card">
-              <div class="rule-icon-wrap" style="background:rgba(74,108,247,0.12);color:var(--accent-blue);">
-                <span class="rule-icon">&#8681;</span>
+              <div class="rule-icon-wrap" style="background:rgba(201,168,76,0.12);color:var(--accent-yellow);">
+                <span class="rule-icon">&#9673;</span>
+                <span class="rule-count">note</span>
+              </div>
+              <div class="rule-info">
+                <div class="rule-name">Monthly Attention Signal</div>
+                <div class="rule-desc"><strong>2+ growth signals in a single month</strong> triggers an attention badge. This is a pattern indicator, not a punishment — it invites a conversation.</div>
+              </div>
+            </div>
+            <div class="rule-card">
+              <div class="rule-icon-wrap" style="background:rgba(91,124,247,0.12);color:var(--accent-blue);">
+                <span class="rule-icon">&#8635;</span>
                 <span class="rule-count">-50%</span>
               </div>
               <div class="rule-info">
-                <div class="rule-name">Red Flag Decay</div>
-                <div class="rule-desc">If no red flags are received for <strong>2 consecutive months</strong>, all previous red flags lose <strong>50% weight</strong>. This rewards sustained improvement and gives members a path to recovery.</div>
+                <div class="rule-name">Signal Recovery</div>
+                <div class="rule-desc"><strong>2 consecutive clean months</strong> (no growth signals) reduces all older growth signals to <strong>50% weight</strong>. Sustained improvement is rewarded with a clean slate path.</div>
               </div>
             </div>
           </div>
@@ -292,31 +314,31 @@
           <div class="rules-how-list">
             <div class="rules-how-item">
               <div class="rules-how-number">1</div>
-              <div class="rules-how-text"><strong>Assign tasks</strong> to team members with a due date.</div>
+              <div class="rules-how-text"><strong>Assign tasks</strong> to team members with clear expectations and due dates.</div>
             </div>
             <div class="rules-how-item">
               <div class="rules-how-number">2</div>
-              <div class="rules-how-text"><strong>Overdue detection</strong> runs automatically. If a task passes its due date, 1 red flag is assigned to the member.</div>
+              <div class="rules-how-text"><strong>Automatic detection</strong> surfaces tasks past due. A growth signal is recorded as a coaching cue.</div>
             </div>
             <div class="rules-how-item">
               <div class="rules-how-number">3</div>
-              <div class="rules-how-text"><strong>Report a blunder</strong> anytime using the flag button on completed/cancelled tasks. This assigns 3 red flags immediately.</div>
+              <div class="rules-how-text"><strong>Log critical incidents</strong> when process failures occur. This captures systemic patterns, not blame.</div>
             </div>
             <div class="rules-how-item">
               <div class="rules-how-number">4</div>
-              <div class="rules-how-text"><strong>Complete a task</strong> by clicking the checkbox. A review modal lets you rate the quality and assign green or red flags.</div>
+              <div class="rules-how-text"><strong>Review completions</strong> thoughtfully. Rate quality to assign strength or growth signals.</div>
             </div>
             <div class="rules-how-item">
               <div class="rules-how-number">5</div>
-              <div class="rules-how-text"><strong>Leadership Multiplier</strong> — use the crown button on member cards to award green flags for mentoring, collaboration, or positive references.</div>
+              <div class="rules-how-text"><strong>Recognize leadership</strong> — use the crown button to acknowledge mentoring, collaboration, and cultural contributions.</div>
             </div>
             <div class="rules-how-item">
               <div class="rules-how-number">6</div>
-              <div class="rules-how-text"><strong>Red Flag Decay</strong> — 2 clean months (no reds) automatically halves old red flag weight. <strong>Monthly Warning</strong> triggers when 2+ reds land in one month.</div>
+              <div class="rules-how-text"><strong>Signal Recovery</strong> — 2 clean months automatically halves old growth signal weight. <strong>Monthly Attention</strong> activates when patterns emerge.</div>
             </div>
             <div class="rules-how-item">
               <div class="rules-how-number">7</div>
-              <div class="rules-how-text"><strong>Track performance</strong> on the Dashboard. Member trends show Rising/Flat/Falling. Red Alerts fire for 2+ consecutive red-zone months.</div>
+              <div class="rules-how-text"><strong>Read the dashboard</strong> with a growth mindset. Trends show Accelerating/Steady/Needs Attention. Support Signals invite conversations, not consequences.</div>
             </div>
           </div>
         </div>
@@ -463,27 +485,27 @@
         <button class="modal-close" onclick="closeModal('review-modal')">&times;</button>
       </div>
       <p class="review-task-name" id="review-task-name"></p>
-      <p class="review-prompt">How was this task completed?</p>
+      <p class="review-prompt">How would you assess this work?</p>
       <div class="flag-options">
         <button class="flag-option-btn green-flag" onclick="submitReview('extraordinary')">
-          <span class="flag-icon green">&#9873;&#9873;</span>
-          <span class="flag-option-label">Extraordinary Result</span>
-          <span class="flag-option-desc">+2 Green Flags</span>
+          <span class="flag-icon green">&#9673;&#9673;</span>
+          <span class="flag-option-label">Exceptional Contribution</span>
+          <span class="flag-option-desc">+2 Strength Signals</span>
         </button>
         <button class="flag-option-btn green-flag" onclick="submitReview('perfect')">
-          <span class="flag-icon green">&#9873;</span>
-          <span class="flag-option-label">Completed Perfectly</span>
-          <span class="flag-option-desc">+1 Green Flag</span>
+          <span class="flag-icon green">&#9673;</span>
+          <span class="flag-option-label">Completed with Excellence</span>
+          <span class="flag-option-desc">+1 Strength Signal</span>
         </button>
         <button class="flag-option-btn neutral-flag" onclick="submitReview('none')">
           <span class="flag-icon neutral">&#10003;</span>
-          <span class="flag-option-label">Completed (No Flag)</span>
+          <span class="flag-option-label">Completed (No Signal)</span>
           <span class="flag-option-desc">Just mark done</span>
         </button>
         <button class="flag-option-btn red-flag" onclick="submitReview('below')">
-          <span class="flag-icon red">&#9873;</span>
-          <span class="flag-option-label">Below Expectation</span>
-          <span class="flag-option-desc">+1 Red Flag</span>
+          <span class="flag-icon red">&#9673;</span>
+          <span class="flag-option-label">Needs Support</span>
+          <span class="flag-option-desc">+1 Growth Signal</span>
         </button>
       </div>
       <div class="form-actions">
@@ -492,55 +514,55 @@
     </div>
   </div>
 
-  <!-- Blunder Flag Modal -->
+  <!-- Critical Incident Modal -->
   <div id="blunder-modal" class="modal-overlay">
     <div class="modal modal-sm">
       <div class="modal-header">
-        <h3>Report Blunder</h3>
+        <h3>Log Critical Incident</h3>
         <button class="modal-close" onclick="closeModal('blunder-modal')">&times;</button>
       </div>
       <p class="review-task-name" id="blunder-task-name"></p>
-      <p class="confirm-text">This will assign <strong style="color: var(--accent-red);">3 red flags</strong> to the assignee for a blunder in task progress.</p>
+      <p class="confirm-text">This will record <strong style="color: var(--accent-red);">3 growth signals</strong> indicating a significant process issue that needs attention.</p>
       <div class="form-group" style="margin-top: 16px;">
-        <label for="blunder-note">Note (optional)</label>
-        <textarea id="blunder-note" rows="2" placeholder="Describe the blunder..."></textarea>
+        <label for="blunder-note">Context (optional)</label>
+        <textarea id="blunder-note" rows="2" placeholder="What happened and what can we learn..."></textarea>
       </div>
       <div class="form-actions">
         <button class="btn-secondary" onclick="closeModal('blunder-modal')">Cancel</button>
-        <button class="btn-danger" onclick="submitBlunder()">Confirm Blunder (3 Red Flags)</button>
+        <button class="btn-danger" onclick="submitBlunder()">Log Incident (3 Growth Signals)</button>
       </div>
     </div>
   </div>
 
-  <!-- Mark Extraordinary Modal -->
+  <!-- Exceptional Contribution Modal -->
   <div id="extraordinary-modal" class="modal-overlay">
     <div class="modal modal-sm">
       <div class="modal-header">
-        <h3>Mark Extraordinary</h3>
+        <h3>Recognize Exceptional Work</h3>
         <button class="modal-close" onclick="closeModal('extraordinary-modal')">&times;</button>
       </div>
       <p class="review-task-name" id="extraordinary-task-name"></p>
-      <p class="confirm-text">This will award <strong style="color: var(--accent-green);">2 green flags</strong> to the assignee for extraordinary work on this task.</p>
+      <p class="confirm-text">This will record <strong style="color: var(--accent-green);">2 strength signals</strong> recognizing exceptional contribution on this task.</p>
       <div class="form-group" style="margin-top: 16px;">
-        <label for="extraordinary-note">Note (optional)</label>
-        <textarea id="extraordinary-note" rows="2" placeholder="What made this extraordinary..."></textarea>
+        <label for="extraordinary-note">What made this exceptional (optional)</label>
+        <textarea id="extraordinary-note" rows="2" placeholder="Describe the impact..."></textarea>
       </div>
       <div class="form-actions">
         <button class="btn-secondary" onclick="closeModal('extraordinary-modal')">Cancel</button>
-        <button class="btn-primary" onclick="submitExtraordinary()">Award 2 Green Flags</button>
+        <button class="btn-primary" onclick="submitExtraordinary()">Record 2 Strength Signals</button>
       </div>
     </div>
   </div>
 
-  <!-- Leadership Multiplier Modal -->
+  <!-- Leadership Signal Modal -->
   <div id="leadership-modal" class="modal-overlay">
     <div class="modal modal-sm">
       <div class="modal-header">
-        <h3>Leadership Multiplier</h3>
+        <h3>Leadership Signal</h3>
         <button class="modal-close" onclick="closeModal('leadership-modal')">&times;</button>
       </div>
       <p class="review-task-name" id="leadership-member-name"></p>
-      <p class="confirm-text">Award green flag(s) for leadership contributions. Check all that apply:</p>
+      <p class="confirm-text">Recognize leadership contributions. Check all that apply:</p>
       <div class="leadership-checks">
         <label class="leadership-check-label">
           <input type="checkbox" class="leadership-check" data-label="Mentored 2+ teammates">
@@ -561,7 +583,7 @@
       </div>
       <div class="form-actions">
         <button class="btn-secondary" onclick="closeModal('leadership-modal')">Cancel</button>
-        <button class="btn-primary" onclick="submitLeadership()">Award Leadership Flags</button>
+        <button class="btn-primary" onclick="submitLeadership()">Record Leadership Signals</button>
       </div>
     </div>
   </div>
@@ -570,7 +592,7 @@
   <div id="flags-modal" class="modal-overlay">
     <div class="modal">
       <div class="modal-header">
-        <h3 id="flags-modal-title">Flag History</h3>
+        <h3 id="flags-modal-title">Signal History</h3>
         <button class="modal-close" onclick="closeModal('flags-modal')">&times;</button>
       </div>
       <div id="flags-summary" class="flags-summary"></div>

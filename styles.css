@@ -5,19 +5,19 @@
 }
 
 :root {
-  --bg-dark: #0a0a0f;
-  --bg-sidebar: #0e0e16;
-  --bg-card: #12121a;
-  --bg-card-hover: #1a1a26;
-  --border-color: #2a2a3a;
-  --text-primary: #f0f0f5;
-  --text-secondary: #8888a0;
-  --accent-blue: #4a6cf7;
-  --accent-blue-hover: #5b7df8;
-  --accent-green: #22c55e;
-  --accent-yellow: #eab308;
-  --accent-red: #ef4444;
-  --accent-purple: #a855f7;
+  --bg-dark: #0a0b10;
+  --bg-sidebar: #0d0e14;
+  --bg-card: #111218;
+  --bg-card-hover: #181924;
+  --border-color: #252638;
+  --text-primary: #e8e8f0;
+  --text-secondary: #7b7b96;
+  --accent-blue: #5b7cf7;
+  --accent-blue-hover: #6b8cf8;
+  --accent-green: #36b5a0;    /* calmer teal — strength signals */
+  --accent-yellow: #c9a84c;   /* muted amber — steady signals */
+  --accent-red: #d4856a;      /* warm coral — growth signals (not alarming) */
+  --accent-purple: #9b7bf7;
 }
 
 body {
@@ -174,7 +174,7 @@ body {
 
 .btn-primary:hover {
   transform: translateY(-1px);
-  box-shadow: 0 6px 20px rgba(74, 108, 247, 0.3);
+  box-shadow: 0 6px 20px rgba(91, 124, 247, 0.25);
 }
 
 .btn-secondary {
@@ -764,14 +764,21 @@ body {
 /* ==================== Stat Value Colors ==================== */
 
 .stat-value-green {
-  background: linear-gradient(135deg, #16a34a, #22c55e) !important;
+  background: linear-gradient(135deg, #2d9e8c, #36b5a0) !important;
   -webkit-background-clip: text !important;
   -webkit-text-fill-color: transparent !important;
   background-clip: text !important;
 }
 
 .stat-value-red {
-  background: linear-gradient(135deg, #dc2626, #ef4444) !important;
+  background: linear-gradient(135deg, #c4785e, #d4856a) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  background-clip: text !important;
+}
+
+.stat-value-amber {
+  background: linear-gradient(135deg, #b89440, #c9a84c) !important;
   -webkit-background-clip: text !important;
   -webkit-text-fill-color: transparent !important;
   background-clip: text !important;
@@ -843,14 +850,13 @@ body {
 /* ==================== Overdue Styles ==================== */
 
 .status-overdue {
-  background: rgba(239, 68, 68, 0.2);
+  background: rgba(212, 133, 106, 0.18);
   color: var(--accent-red);
-  animation: pulse-overdue 2s ease-in-out infinite;
 }
 
 @keyframes pulse-overdue {
   0%, 100% { opacity: 1; }
-  50% { opacity: 0.6; }
+  50% { opacity: 0.85; }
 }
 
 .task-overdue {
@@ -1510,9 +1516,8 @@ body {
   font-weight: 800;
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  background: rgba(239, 68, 68, 0.2);
+  background: rgba(212, 133, 106, 0.15);
   color: var(--accent-red);
-  animation: pulse-overdue 2s ease-in-out infinite;
   vertical-align: middle;
   margin-left: 4px;
 }
@@ -1525,9 +1530,8 @@ body {
   font-weight: 800;
   text-transform: uppercase;
   letter-spacing: 0.3px;
-  background: rgba(239, 68, 68, 0.2);
+  background: rgba(212, 133, 106, 0.15);
   color: var(--accent-red);
-  animation: pulse-overdue 2s ease-in-out infinite;
   vertical-align: middle;
   margin-left: 4px;
 }
@@ -1664,11 +1668,10 @@ body {
   font-weight: 800;
   text-transform: uppercase;
   letter-spacing: 0.3px;
-  background: rgba(234, 179, 8, 0.2);
+  background: rgba(201, 168, 76, 0.15);
   color: var(--accent-yellow);
   vertical-align: middle;
   margin-left: 4px;
-  animation: pulse-overdue 2s ease-in-out infinite;
 }
 
 .monthly-warning-badge-sm {
@@ -2086,9 +2089,8 @@ body {
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.3px;
-  background: rgba(239, 68, 68, 0.15);
+  background: rgba(212, 133, 106, 0.12);
   color: var(--accent-red);
-  animation: pulse-overdue 2s ease-in-out infinite;
 }
 
 /* Date input */
@@ -2211,6 +2213,58 @@ body {
   background: rgba(239, 68, 68, 0.12);
   color: var(--accent-red);
   border-color: var(--accent-red);
+}
+
+/* ==================== Psychology Panel ==================== */
+
+.psychology-panel {
+  background: linear-gradient(135deg, rgba(91, 124, 247, 0.04), rgba(155, 123, 247, 0.04));
+  border: 1px solid rgba(91, 124, 247, 0.15);
+  border-radius: 14px;
+  padding: 24px;
+  margin-top: 24px;
+}
+
+.psychology-panel h3 {
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 16px;
+  color: var(--accent-blue);
+}
+
+.psychology-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.psychology-item {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.psychology-icon {
+  min-width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  font-size: 1rem;
+  background: rgba(91, 124, 247, 0.08);
+  color: var(--accent-blue);
+}
+
+.psychology-text {
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+.psychology-text strong {
+  color: var(--text-primary);
+  font-weight: 600;
 }
 
 /* ==================== Responsive ==================== */
