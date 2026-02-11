@@ -1512,7 +1512,7 @@ function seedDemoData() {
     { id: "mem_anita",  name: "Anita Kapoor",   email: "anita@team.com",  roleId: "role_qa",     status: "active", createdAt: "2024-11-25T09:00:00.000Z" }
   ];
 
-  // --- Tasks (spread across Dec 2024 & Jan 2025) ---
+  // --- Tasks (Dec 2024, Jan 2025, Dec 2025, Jan 2026) ---
   var tasks = [
     // December 2024 tasks
     { id: "task_01", title: "Build login module",          description: "Implement user authentication", notes: "Using JWT tokens",       assigneeId: "mem_arjun",  priority: "high",   dueDate: "2024-12-10", status: "completed", reviewResult: "perfect",       createdAt: "2024-12-01T09:00:00.000Z" },
@@ -1539,7 +1539,19 @@ function seedDemoData() {
     { id: "task_20", title: "CI/CD pipeline setup",        description: "Configure GitHub Actions workflows", notes: "",                          assigneeId: "mem_rohan", priority: "medium", dueDate: "2025-01-20", status: "in-progress",                              createdAt: "2025-01-08T09:00:00.000Z" },
     { id: "task_21", title: "API contract testing",        description: "Write contract tests for all APIs",  notes: "Using Pact framework",     assigneeId: "mem_anita", priority: "high",   dueDate: "2024-12-18", status: "completed", reviewResult: "perfect",       createdAt: "2024-12-04T09:00:00.000Z" },
     { id: "task_22", title: "Smoke test automation",       description: "Automate smoke tests for staging",   notes: "Covered 12 critical flows", assigneeId: "mem_anita", priority: "medium", dueDate: "2025-01-10", status: "completed", reviewResult: "extraordinary", createdAt: "2025-01-02T09:00:00.000Z" },
-    { id: "task_23", title: "Chaos engineering drill",     description: "Run failure injection tests",        notes: "",                          assigneeId: "mem_rohan", priority: "low",    dueDate: "2025-01-28", status: "pending",                                   createdAt: "2025-01-12T09:00:00.000Z" }
+    { id: "task_23", title: "Chaos engineering drill",     description: "Run failure injection tests",        notes: "",                          assigneeId: "mem_rohan", priority: "low",    dueDate: "2025-01-28", status: "pending",                                   createdAt: "2025-01-12T09:00:00.000Z" },
+    // December 2025 tasks
+    { id: "task_24", title: "Build notification service",   description: "Real-time push notification system",   notes: "Using WebSockets + Redis",         assigneeId: "mem_arjun",  priority: "high",   dueDate: "2025-12-10", status: "completed", reviewResult: "perfect",       createdAt: "2025-12-01T09:00:00.000Z" },
+    { id: "task_25", title: "Integration test suite",       description: "Full integration tests for payments",  notes: "Missed 4 edge cases",              assigneeId: "mem_sneha",  priority: "high",   dueDate: "2025-12-12", status: "completed", reviewResult: "below",         createdAt: "2025-12-01T09:00:00.000Z" },
+    { id: "task_26", title: "Design system overhaul",       description: "Rebuild component library in Figma",   notes: "Shipped 40+ components",           assigneeId: "mem_meera",  priority: "high",   dueDate: "2025-12-18", status: "completed", reviewResult: "perfect",       createdAt: "2025-12-03T09:00:00.000Z" },
+    { id: "task_27", title: "Kubernetes migration",         description: "Migrate staging to K8s cluster",       notes: "Zero-downtime cutover achieved",   assigneeId: "mem_rohan",  priority: "high",   dueDate: "2025-12-20", status: "completed", reviewResult: "extraordinary", createdAt: "2025-12-05T09:00:00.000Z" },
+    { id: "task_28", title: "Automated regression suite",   description: "Nightly regression pipeline",          notes: "Covers 85% of critical paths",     assigneeId: "mem_karan",  priority: "medium", dueDate: "2025-12-22", status: "completed", reviewResult: "acceptable",    createdAt: "2025-12-05T09:00:00.000Z" },
+    // January 2026 tasks
+    { id: "task_29", title: "Landing page redesign",        description: "Redesign marketing landing page",      notes: "Layout broke on Safari/Firefox",   assigneeId: "mem_priya",  priority: "high",   dueDate: "2026-01-08", status: "completed", reviewResult: "below",         createdAt: "2026-01-02T09:00:00.000Z" },
+    { id: "task_30", title: "Q2 roadmap planning",          description: "Define Q2 milestones and deliverables", notes: "Aligned with all stakeholders",   assigneeId: "mem_deepa",  priority: "high",   dueDate: "2026-01-12", status: "completed", reviewResult: "perfect",       createdAt: "2026-01-02T09:00:00.000Z" },
+    { id: "task_31", title: "Team restructuring plan",      description: "Reorg proposal for scaling teams",     notes: "Board approved same day",          assigneeId: "mem_rahul",  priority: "high",   dueDate: "2026-01-15", status: "completed", reviewResult: "extraordinary", createdAt: "2026-01-03T09:00:00.000Z" },
+    { id: "task_32", title: "Security test framework",      description: "Build OWASP-based test framework",     notes: "Integrated with CI pipeline",      assigneeId: "mem_anita",  priority: "high",   dueDate: "2026-01-18", status: "completed", reviewResult: "perfect",       createdAt: "2026-01-05T09:00:00.000Z" },
+    { id: "task_33", title: "GraphQL API layer",            description: "Add GraphQL gateway over REST APIs",   notes: "",                                 assigneeId: "mem_vikram", priority: "high",   dueDate: "2026-01-25", status: "in-progress",                              createdAt: "2026-01-06T09:00:00.000Z" }
   ];
 
   // --- Flags ---
@@ -1602,7 +1614,23 @@ function seedDemoData() {
 
     // === Anita (Rising — strong QA contributor) ===
     { id: "flag_31", memberId: "mem_anita", taskId: "task_21", color: "green", count: 1, reason: "Completed perfectly: API contract testing",              createdAt: "2024-12-18T15:00:00.000Z" },
-    { id: "flag_32", memberId: "mem_anita", taskId: "task_22", color: "green", count: 2, reason: "Extraordinary result: Smoke test automation",            createdAt: "2025-01-10T15:00:00.000Z" }
+    { id: "flag_32", memberId: "mem_anita", taskId: "task_22", color: "green", count: 2, reason: "Extraordinary result: Smoke test automation",            createdAt: "2025-01-10T15:00:00.000Z" },
+
+    // === December 2025 Flags ===
+    { id: "flag_33", memberId: "mem_arjun",  taskId: "task_24", color: "green", count: 1, reason: "Completed perfectly: Build notification service",        createdAt: "2025-12-10T15:00:00.000Z" },
+    { id: "flag_34", memberId: "mem_sneha",  taskId: "task_25", color: "red",   count: 1, reason: "Below expectation: Integration test suite",              createdAt: "2025-12-12T15:00:00.000Z" },
+    { id: "flag_35", memberId: "mem_meera",  taskId: "task_26", color: "green", count: 1, reason: "Completed perfectly: Design system overhaul",             createdAt: "2025-12-18T15:00:00.000Z" },
+    { id: "flag_36", memberId: "mem_rohan",  taskId: "task_27", color: "green", count: 2, reason: "Extraordinary result: Kubernetes migration",              createdAt: "2025-12-20T15:00:00.000Z" },
+    { id: "flag_37", memberId: "mem_karan",  taskId: "task_28", color: "green", count: 1, reason: "Completed: Automated regression suite",                   createdAt: "2025-12-22T15:00:00.000Z" },
+    { id: "flag_38", memberId: "mem_deepa",  taskId: null,      color: "red",   count: 1, reason: "Missed quarterly milestone deadline",                     createdAt: "2025-12-28T10:00:00.000Z" },
+
+    // === January 2026 Flags ===
+    { id: "flag_39", memberId: "mem_priya",  taskId: "task_29", color: "red",   count: 1, reason: "Below expectation: Landing page redesign",               createdAt: "2026-01-08T15:00:00.000Z" },
+    { id: "flag_40", memberId: "mem_deepa",  taskId: "task_30", color: "green", count: 1, reason: "Completed perfectly: Q2 roadmap planning",               createdAt: "2026-01-12T15:00:00.000Z" },
+    { id: "flag_41", memberId: "mem_rahul",  taskId: "task_31", color: "green", count: 2, reason: "Extraordinary result: Team restructuring plan",           createdAt: "2026-01-15T15:00:00.000Z" },
+    { id: "flag_42", memberId: "mem_anita",  taskId: "task_32", color: "green", count: 1, reason: "Completed perfectly: Security test framework",            createdAt: "2026-01-18T15:00:00.000Z" },
+    { id: "flag_43", memberId: "mem_arjun",  taskId: null,      color: "red",   count: 1, reason: "Skipped code review for critical hotfix",                 createdAt: "2026-01-20T10:00:00.000Z" },
+    { id: "flag_44", memberId: "mem_sneha",  taskId: null,      color: "green", count: 1, reason: "Improved QA process documentation significantly",         createdAt: "2026-01-22T10:00:00.000Z" }
   ];
 
   data.roles = roles;
