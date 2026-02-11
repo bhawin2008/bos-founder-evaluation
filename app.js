@@ -266,7 +266,7 @@ function getMemberFlagList(memberId) {
   });
 }
 
-function addFlag(memberId, taskId, color, count, reason) {
+function addFlag(memberId, taskId, color, count, reason, note) {
   data.flags.push({
     id: generateId(),
     memberId: memberId,
@@ -274,6 +274,7 @@ function addFlag(memberId, taskId, color, count, reason) {
     color: color,
     count: count,
     reason: reason,
+    note: note || "",
     createdAt: new Date().toISOString()
   });
   saveData(data);
@@ -304,7 +305,7 @@ function isOverdue(task) {
 function checkOverdueFlags() {
   data.tasks.forEach(function(task) {
     if (isOverdue(task) && task.assigneeId && !task.overdueFlagged) {
-      addFlag(task.assigneeId, task.id, "red", 1, "Past due: " + task.title);
+      addFlag(task.assigneeId, task.id, "red", 1, "Past due: " + task.title, "");
       task.overdueFlagged = true;
     }
   });
@@ -499,10 +500,9 @@ function submitLeadership() {
   checks.forEach(function(cb) { reasons.push(cb.getAttribute("data-label")); });
   var note = document.getElementById("leadership-reason").value.trim();
   var reason = "Leadership Signal: " + reasons.join(", ");
-  if (note) reason += " — " + note;
 
   // +1 green flag per qualifying criterion
-  addFlag(memberId, null, "green", checks.length, reason);
+  addFlag(memberId, null, "green", checks.length, reason, note);
 
   closeModal("leadership-modal");
   pendingLeadershipMemberId = null;
@@ -535,11 +535,11 @@ function submitReview(quality) {
 
   if (task.assigneeId) {
     if (quality === "extraordinary") {
-      addFlag(task.assigneeId, task.id, "green", 2, "Exceptional contribution: " + task.title);
+      addFlag(task.assigneeId, task.id, "green", 2, "Exceptional contribution: " + task.title, "");
     } else if (quality === "perfect") {
-      addFlag(task.assigneeId, task.id, "green", 1, "Completed with excellence: " + task.title);
+      addFlag(task.assigneeId, task.id, "green", 1, "Completed with excellence: " + task.title, "");
     } else if (quality === "below") {
-      addFlag(task.assigneeId, task.id, "red", 1, "Needs support: " + task.title);
+      addFlag(task.assigneeId, task.id, "red", 1, "Needs support: " + task.title, "");
     }
   }
 
@@ -556,59 +556,111 @@ function cancelReview() {
 
 // ==================== Mark Extraordinary ====================
 
+var pendingExtraordinaryMemberId = null;
+
 function openExtraordinary(taskId) {
   var task = data.tasks.find(function(t) { return t.id === taskId; });
   if (!task) return;
   pendingExtraordinaryTaskId = taskId;
+  pendingExtraordinaryMemberId = null;
   document.getElementById("extraordinary-task-name").textContent = task.title;
   document.getElementById("extraordinary-note").value = "";
   openModal("extraordinary-modal");
 }
 
+function openExtraordinaryForMember(memberId) {
+  var member = data.members.find(function(m) { return m.id === memberId; });
+  if (!member) return;
+  pendingExtraordinaryMemberId = memberId;
+  pendingExtraordinaryTaskId = null;
+  document.getElementById("extraordinary-task-name").textContent = member.name;
+  document.getElementById("extraordinary-note").value = "";
+  openModal("extraordinary-modal");
+}
+
 function submitExtraordinary() {
-  var task = data.tasks.find(function(t) { return t.id === pendingExtraordinaryTaskId; });
-  if (!task || !task.assigneeId) {
+  var memberId = null;
+  var taskId = null;
+  var contextName = "";
+
+  if (pendingExtraordinaryMemberId) {
+    memberId = pendingExtraordinaryMemberId;
+    var member = data.members.find(function(m) { return m.id === memberId; });
+    contextName = member ? member.name : "member";
+  } else if (pendingExtraordinaryTaskId) {
+    var task = data.tasks.find(function(t) { return t.id === pendingExtraordinaryTaskId; });
+    if (!task || !task.assigneeId) { closeModal("extraordinary-modal"); return; }
+    memberId = task.assigneeId;
+    taskId = task.id;
+    contextName = task.title;
+  } else {
     closeModal("extraordinary-modal");
     return;
   }
 
   var note = document.getElementById("extraordinary-note").value.trim();
-  var reason = "Exceptional contribution: " + task.title;
-  if (note) reason += " — " + note;
+  var reason = "Exceptional contribution: " + contextName;
 
-  addFlag(task.assigneeId, task.id, "green", 2, reason);
+  addFlag(memberId, taskId, "green", 2, reason, note);
 
   closeModal("extraordinary-modal");
   pendingExtraordinaryTaskId = null;
+  pendingExtraordinaryMemberId = null;
   refreshAll();
 }
 
 // ==================== Blunder ====================
 
+var pendingBlunderMemberId = null;
+
 function openBlunder(taskId) {
   var task = data.tasks.find(function(t) { return t.id === taskId; });
   if (!task) return;
   pendingBlunderTaskId = taskId;
+  pendingBlunderMemberId = null;
   document.getElementById("blunder-task-name").textContent = task.title;
   document.getElementById("blunder-note").value = "";
   openModal("blunder-modal");
 }
 
+function openBlunderForMember(memberId) {
+  var member = data.members.find(function(m) { return m.id === memberId; });
+  if (!member) return;
+  pendingBlunderMemberId = memberId;
+  pendingBlunderTaskId = null;
+  document.getElementById("blunder-task-name").textContent = member.name;
+  document.getElementById("blunder-note").value = "";
+  openModal("blunder-modal");
+}
+
 function submitBlunder() {
-  var task = data.tasks.find(function(t) { return t.id === pendingBlunderTaskId; });
-  if (!task || !task.assigneeId) {
+  var memberId = null;
+  var taskId = null;
+  var contextName = "";
+
+  if (pendingBlunderMemberId) {
+    memberId = pendingBlunderMemberId;
+    var member = data.members.find(function(m) { return m.id === memberId; });
+    contextName = member ? member.name : "member";
+  } else if (pendingBlunderTaskId) {
+    var task = data.tasks.find(function(t) { return t.id === pendingBlunderTaskId; });
+    if (!task || !task.assigneeId) { closeModal("blunder-modal"); return; }
+    memberId = task.assigneeId;
+    taskId = task.id;
+    contextName = task.title;
+  } else {
     closeModal("blunder-modal");
     return;
   }
 
   var note = document.getElementById("blunder-note").value.trim();
-  var reason = "Critical incident: " + task.title;
-  if (note) reason += " — " + note;
+  var reason = "Critical incident: " + contextName;
 
-  addFlag(task.assigneeId, task.id, "red", 3, reason);
+  addFlag(memberId, taskId, "red", 3, reason, note);
 
   closeModal("blunder-modal");
   pendingBlunderTaskId = null;
+  pendingBlunderMemberId = null;
   refreshAll();
 }
 
@@ -661,12 +713,14 @@ function showMemberFlags(memberId) {
       var item = document.createElement("div");
       item.className = "flag-history-item";
       var dateStr = new Date(f.createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+      var noteHtml = f.note ? '<span class="flag-history-note">' + escapeHtml(f.note) + '</span>' : '';
       item.innerHTML =
         '<div class="flag-history-icon ' + f.color + '">' +
           icons.dot + (f.count > 1 ? ' x' + f.count : '') +
         '</div>' +
         '<div class="flag-history-info">' +
           '<span class="flag-history-reason">' + escapeHtml(f.reason) + '</span>' +
+          noteHtml +
           '<span class="flag-history-date">' + dateStr + '</span>' +
         '</div>';
       historyList.appendChild(item);
@@ -829,36 +883,67 @@ function renderMembers() {
     }).length;
     var initials = member.name.split(" ").map(function(n) { return n[0]; }).join("").toUpperCase().substring(0, 2);
     var roleColor = role ? role.color : "blue";
-    var flagHtml = renderFlagBadge(member.id);
-    var alertHtml = isRedAlert(member.id) ? '<span class="red-alert-badge">SUPPORT NEEDED</span>' : '';
-    var trendHtml = renderTrendBadge(member.id);
-    var warningHtml = getMonthlyRedWarning(member.id) ? '<span class="monthly-warning-badge">ATTENTION THIS MONTH</span>' : '';
     var eff = getEffectiveFlags(member.id);
+    var effNet = eff.green - eff.red;
+    var zone = getMemberZone(member.id);
+    var trendHtml = renderTrendBadge(member.id);
+    var alertHtml = isRedAlert(member.id) ? '<span class="red-alert-badge">SUPPORT NEEDED</span>' : '';
+    var warningHtml = getMonthlyRedWarning(member.id) ? '<span class="monthly-warning-badge">ATTENTION THIS MONTH</span>' : '';
     var decayHtml = eff.decayActive ? '<span class="decay-badge">Recovery Active (-50%)</span>' : '';
 
+    var netClass = effNet > 0 ? "net-positive" : (effNet < 0 ? "net-negative" : "net-neutral");
+    var zoneClass = zone === "green" ? "zone-green" : (zone === "red" ? "zone-red" : "zone-orange");
+
     var card = document.createElement("div");
-    card.className = "card" + (isRedAlert(member.id) ? " card-red-alert" : "") + (getMonthlyRedWarning(member.id) ? " card-monthly-warning" : "");
+    card.className = "member-card" + (isRedAlert(member.id) ? " card-red-alert" : "") + (getMonthlyRedWarning(member.id) ? " card-monthly-warning" : "");
     card.innerHTML =
-      '<div class="card-top">' +
-        '<div class="member-info">' +
+      '<div class="member-card-header">' +
+        '<div class="member-card-left">' +
           '<div class="avatar ' + roleColor + '">' + initials + '</div>' +
-          '<div>' +
-            '<div class="member-name">' + escapeHtml(member.name) + ' ' + flagHtml + ' ' + trendHtml + ' ' + alertHtml + ' ' + warningHtml + '</div>' +
+          '<div class="member-card-identity">' +
+            '<div class="member-name">' + escapeHtml(member.name) + '</div>' +
             '<div class="member-email">' + escapeHtml(member.email) + '</div>' +
           '</div>' +
         '</div>' +
-        '<div class="card-actions">' +
-          '<button class="btn-icon btn-icon-leadership" onclick="openLeadership(\'' + member.id + '\')" title="Leadership Signal">' + icons.crown + '</button>' +
-          '<button class="btn-icon" onclick="showMemberFlags(\'' + member.id + '\')" title="View Signals"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></button>' +
+        '<div class="member-card-net ' + netClass + '">' +
+          '<span class="member-card-net-value">' + (effNet > 0 ? '+' : '') + effNet + '</span>' +
+          '<span class="member-card-net-label">Net Score <span class="net-info-icon" title="Net Score = Green Signals minus Red Signals. Positive means more strengths recorded. Negative indicates growth areas. This number uses effective weights (with recovery decay applied)."><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg></span></span>' +
+        '</div>' +
+      '</div>' +
+      '<div class="member-card-badges">' +
+        trendHtml + ' ' + alertHtml + ' ' + warningHtml + ' ' + decayHtml +
+      '</div>' +
+      '<div class="member-card-stats">' +
+        '<div class="member-stat">' +
+          '<span class="member-stat-value stat-green">' + eff.green + '</span>' +
+          '<span class="member-stat-label">Green</span>' +
+        '</div>' +
+        '<div class="member-stat">' +
+          '<span class="member-stat-value stat-red">' + eff.red + '</span>' +
+          '<span class="member-stat-label">Red</span>' +
+        '</div>' +
+        '<div class="member-stat">' +
+          '<span class="member-stat-value">' + taskCount + '</span>' +
+          '<span class="member-stat-label">Tasks</span>' +
+        '</div>' +
+        '<div class="member-stat">' +
+          '<div class="member-zone-dot ' + zoneClass + '"></div>' +
+          '<span class="member-stat-label">' + (zone === "green" ? "Green" : (zone === "red" ? "Red" : "Orange")) + ' Zone</span>' +
+        '</div>' +
+      '</div>' +
+      '<div class="member-card-meta">' +
+        '<div class="role-badge ' + roleColor + '">' + (role ? escapeHtml(role.name) : "No Role") + '</div>' +
+        '<span class="status-badge status-' + member.status + '">' + formatStatus(member.status) + '</span>' +
+      '</div>' +
+      '<div class="member-card-actions">' +
+        '<button class="member-action-btn member-action-green" onclick="openExtraordinaryForMember(\'' + member.id + '\')" title="Recognize Exceptional Work (+2 Green Signals)">' + icons.star + ' Recognize</button>' +
+        '<button class="member-action-btn member-action-red" onclick="openBlunderForMember(\'' + member.id + '\')" title="Log Critical Incident (+3 Red Signals)">' + icons.alert + ' Log Incident</button>' +
+        '<button class="member-action-btn member-action-leadership" onclick="openLeadership(\'' + member.id + '\')" title="Leadership Signal">' + icons.crown + ' Leadership</button>' +
+        '<div class="member-card-icons">' +
+          '<button class="btn-icon" onclick="showMemberFlags(\'' + member.id + '\')" title="View Signal History"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></button>' +
           '<button class="btn-icon" onclick="editMember(\'' + member.id + '\')" title="Edit"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>' +
           '<button class="btn-icon btn-icon-danger" onclick="deleteMember(\'' + member.id + '\')" title="Delete"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></button>' +
         '</div>' +
-      '</div>' +
-      '<div class="card-bottom">' +
-        '<div class="role-badge ' + roleColor + '">' + (role ? escapeHtml(role.name) : "No Role") + '</div>' +
-        '<span class="status-badge status-' + member.status + '">' + formatStatus(member.status) + '</span>' +
-        '<span class="card-meta">' + taskCount + ' active task' + (taskCount !== 1 ? 's' : '') + '</span>' +
-        decayHtml +
       '</div>';
     container.appendChild(card);
   });
