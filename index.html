@@ -44,6 +44,25 @@
           <h2>Dashboard</h2>
           <p class="view-subtitle">Team overview at a glance</p>
         </div>
+
+        <!-- Date Range Filter -->
+        <div class="date-range-bar">
+          <span class="dr-label">Period:</span>
+          <div class="dr-presets">
+            <button class="dr-preset-btn" data-preset="today" onclick="setDatePreset('today')">Today</button>
+            <button class="dr-preset-btn" data-preset="week" onclick="setDatePreset('week')">Last Week</button>
+            <button class="dr-preset-btn" data-preset="month" onclick="setDatePreset('month')">Last Month</button>
+            <button class="dr-preset-btn" data-preset="year" onclick="setDatePreset('year')">Last Year</button>
+            <button class="dr-preset-btn active" data-preset="all" onclick="setDatePreset('all')">All Time</button>
+            <button class="dr-preset-btn" data-preset="custom" onclick="setDatePreset('custom')">Custom</button>
+          </div>
+          <div class="dr-custom-inputs" style="display:none;">
+            <input type="date" class="dr-from" placeholder="From" onchange="setCustomDateFrom(this.value)">
+            <span class="dr-sep">to</span>
+            <input type="date" class="dr-to" placeholder="To" onchange="setCustomDateTo(this.value)">
+          </div>
+        </div>
+
         <div class="stats-grid">
           <div class="stat-card">
             <div class="stat-value" id="stat-members">0</div>
@@ -117,6 +136,25 @@
           <h2>Tasks</h2>
           <button class="btn-primary" onclick="openModal('task-modal')">+ Add Task</button>
         </div>
+
+        <!-- Date Range Filter -->
+        <div class="date-range-bar">
+          <span class="dr-label">Period:</span>
+          <div class="dr-presets">
+            <button class="dr-preset-btn" data-preset="today" onclick="setDatePreset('today')">Today</button>
+            <button class="dr-preset-btn" data-preset="week" onclick="setDatePreset('week')">Last Week</button>
+            <button class="dr-preset-btn" data-preset="month" onclick="setDatePreset('month')">Last Month</button>
+            <button class="dr-preset-btn" data-preset="year" onclick="setDatePreset('year')">Last Year</button>
+            <button class="dr-preset-btn active" data-preset="all" onclick="setDatePreset('all')">All Time</button>
+            <button class="dr-preset-btn" data-preset="custom" onclick="setDatePreset('custom')">Custom</button>
+          </div>
+          <div class="dr-custom-inputs" style="display:none;">
+            <input type="date" class="dr-from" placeholder="From" onchange="setCustomDateFrom(this.value)">
+            <span class="dr-sep">to</span>
+            <input type="date" class="dr-to" placeholder="To" onchange="setCustomDateTo(this.value)">
+          </div>
+        </div>
+
         <div class="task-filters">
           <button class="filter-btn active" data-filter="all" onclick="filterTasks('all')">All</button>
           <button class="filter-btn" data-filter="pending" onclick="filterTasks('pending')">Pending</button>

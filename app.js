@@ -24,6 +24,148 @@ var pendingReviewTaskId = null;
 var pendingBlunderTaskId = null;
 var pendingExtraordinaryTaskId = null;
 
+// ==================== Date Range Filter ====================
+
+var dateRangePreset = "all";
+var dateRangeFrom = "";
+var dateRangeTo = "";
+
+function getDateRangeBounds() {
+  if (dateRangePreset === "custom") {
+    return { from: dateRangeFrom || null, to: dateRangeTo || null };
+  }
+  if (dateRangePreset === "all") {
+    return { from: null, to: null };
+  }
+
+  var today = new Date();
+  today.setHours(23, 59, 59, 999);
+  var from = new Date();
+  from.setHours(0, 0, 0, 0);
+
+  if (dateRangePreset === "today") {
+    // from is already today start
+  } else if (dateRangePreset === "week") {
+    from.setDate(from.getDate() - 7);
+  } else if (dateRangePreset === "month") {
+    from.setMonth(from.getMonth() - 1);
+  } else if (dateRangePreset === "year") {
+    from.setFullYear(from.getFullYear() - 1);
+  }
+
+  var yf = from.getFullYear();
+  var mf = String(from.getMonth() + 1).padStart(2, "0");
+  var df = String(from.getDate()).padStart(2, "0");
+  var yt = today.getFullYear();
+  var mt = String(today.getMonth() + 1).padStart(2, "0");
+  var dt = String(today.getDate()).padStart(2, "0");
+
+  return { from: yf + "-" + mf + "-" + df, to: yt + "-" + mt + "-" + dt };
+}
+
+function isDateInRange(dateStr) {
+  if (!dateStr) return true;
+  var bounds = getDateRangeBounds();
+  if (!bounds.from && !bounds.to) return true;
+  if (bounds.from && dateStr < bounds.from) return false;
+  if (bounds.to && dateStr > bounds.to) return false;
+  return true;
+}
+
+function isTaskInDateRange(task) {
+  var bounds = getDateRangeBounds();
+  if (!bounds.from && !bounds.to) return true;
+  // Match by due date OR creation date
+  var dueMatch = task.dueDate ? isDateInRange(task.dueDate) : false;
+  var createdDate = task.createdAt ? task.createdAt.substring(0, 10) : "";
+  var createMatch = createdDate ? isDateInRange(createdDate) : false;
+  // If no due date, use creation date; otherwise use due date
+  return task.dueDate ? dueMatch : createMatch;
+}
+
+function isFlagInDateRange(flag) {
+  var bounds = getDateRangeBounds();
+  if (!bounds.from && !bounds.to) return true;
+  var flagDate = flag.createdAt ? flag.createdAt.substring(0, 10) : "";
+  return isDateInRange(flagDate);
+}
+
+function setDatePreset(preset) {
+  dateRangePreset = preset;
+  // Update button active states
+  document.querySelectorAll(".dr-preset-btn").forEach(function(btn) {
+    btn.classList.toggle("active", btn.getAttribute("data-preset") === preset);
+  });
+  // Show/hide custom inputs
+  document.querySelectorAll(".dr-custom-inputs").forEach(function(el) {
+    el.style.display = preset === "custom" ? "flex" : "none";
+  });
+  if (preset !== "custom") {
+    dateRangeFrom = "";
+    dateRangeTo = "";
+    document.querySelectorAll(".dr-from").forEach(function(el) { el.value = ""; });
+    document.querySelectorAll(".dr-to").forEach(function(el) { el.value = ""; });
+  }
+  refreshAll();
+}
+
+function setCustomDateFrom(val) {
+  dateRangeFrom = val;
+  dateRangePreset = "custom";
+  document.querySelectorAll(".dr-preset-btn").forEach(function(btn) {
+    btn.classList.toggle("active", btn.getAttribute("data-preset") === "custom");
+  });
+  document.querySelectorAll(".dr-custom-inputs").forEach(function(el) {
+    el.style.display = "flex";
+  });
+  // Sync all from inputs
+  document.querySelectorAll(".dr-from").forEach(function(el) { el.value = val; });
+  refreshAll();
+}
+
+function setCustomDateTo(val) {
+  dateRangeTo = val;
+  dateRangePreset = "custom";
+  document.querySelectorAll(".dr-preset-btn").forEach(function(btn) {
+    btn.classList.toggle("active", btn.getAttribute("data-preset") === "custom");
+  });
+  document.querySelectorAll(".dr-custom-inputs").forEach(function(el) {
+    el.style.display = "flex";
+  });
+  // Sync all to inputs
+  document.querySelectorAll(".dr-to").forEach(function(el) { el.value = val; });
+  refreshAll();
+}
+
+// Filtered data getters that respect date range
+function getFilteredFlags() {
+  return data.flags.filter(function(f) { return isFlagInDateRange(f); });
+}
+
+function getFilteredTasks() {
+  return data.tasks.filter(function(t) { return isTaskInDateRange(t); });
+}
+
+function getMemberFlagsFiltered(memberId) {
+  var red = 0;
+  var green = 0;
+  getFilteredFlags().forEach(function(f) {
+    if (f.memberId === memberId) {
+      if (f.color === "red") red += f.count;
+      else if (f.color === "green") green += f.count;
+    }
+  });
+  return { red: red, green: green };
+}
+
+function getMemberZoneFiltered(memberId) {
+  var f = getMemberFlagsFiltered(memberId);
+  var net = f.green - f.red;
+  if (net > 0) return "green";
+  if (net < 0) return "red";
+  return "yellow";
+}
+
 // ==================== Navigation ====================
 
 function switchView(viewName) {
@@ -663,6 +805,8 @@ function renderTasks() {
   container.innerHTML = "";
 
   var filtered = data.tasks.filter(function(t) {
+    // Date range filter first
+    if (!isTaskInDateRange(t)) return false;
     if (currentFilter === "all") return true;
     if (currentFilter === "overdue") return isOverdue(t);
     return t.status === currentFilter;
@@ -797,13 +941,16 @@ function renderTasks() {
 // ==================== Dashboard ====================
 
 function renderDashboard() {
-  var activeTasks = data.tasks.filter(function(t) {
+  var filteredTasks = getFilteredTasks();
+  var filteredFlags = getFilteredFlags();
+
+  var activeTasks = filteredTasks.filter(function(t) {
     return t.status !== "completed" && t.status !== "cancelled";
   });
 
   var totalGreen = 0;
   var totalRed = 0;
-  data.flags.forEach(function(f) {
+  filteredFlags.forEach(function(f) {
     if (f.color === "green") totalGreen += f.count;
     else if (f.color === "red") totalRed += f.count;
   });
@@ -819,7 +966,7 @@ function renderDashboard() {
   document.getElementById("stat-red-flags").textContent = redPct + "%";
   document.getElementById("stat-red-flags-sub").textContent = totalRed + " flags";
 
-  // === Zone Distribution ===
+  // === Zone Distribution (uses date-filtered flags) ===
   var zoneDistEl = document.getElementById("dashboard-zone-dist");
   if (zoneDistEl) {
     if (data.members.length === 0) {
@@ -827,7 +974,7 @@ function renderDashboard() {
     } else {
       var greenCount = 0, yellowCount = 0, redCount = 0;
       data.members.forEach(function(m) {
-        var z = getMemberZone(m.id);
+        var z = getMemberZoneFiltered(m.id);
         if (z === "green") greenCount++;
         else if (z === "red") redCount++;
         else yellowCount++;
@@ -957,7 +1104,7 @@ function renderDashboard() {
         var totalNet = 0;
         var gCount = 0, rCount = 0;
         roleMembers.forEach(function(m) {
-          var f = getMemberFlags(m.id);
+          var f = getMemberFlagsFiltered(m.id);
           totalNet += (f.green - f.red);
           gCount += f.green;
           rCount += f.red;
@@ -976,7 +1123,7 @@ function renderDashboard() {
       if (unassigned.length > 0) {
         var uNet = 0, uG = 0, uR = 0;
         unassigned.forEach(function(m) {
-          var f = getMemberFlags(m.id);
+          var f = getMemberFlagsFiltered(m.id);
           uNet += (f.green - f.red);
           uG += f.green;
           uR += f.red;
@@ -1002,7 +1149,7 @@ function renderDashboard() {
       flagStatusEl.innerHTML = '<div class="empty-state-sm">No members yet</div>';
     } else {
       var memberFlagData = data.members.map(function(m) {
-        var flags = getMemberFlags(m.id);
+        var flags = getMemberFlagsFiltered(m.id);
         return { member: m, green: flags.green, red: flags.red, net: flags.green - flags.red };
       }).sort(function(a, b) { return b.net - a.net; });
 
@@ -1038,7 +1185,7 @@ function renderDashboard() {
   // === Overdue Tasks ===
   var overdueEl = document.getElementById("dashboard-overdue");
   if (overdueEl) {
-    var overdueTasks = data.tasks.filter(function(t) { return isOverdue(t); });
+    var overdueTasks = filteredTasks.filter(function(t) { return isOverdue(t); });
     if (overdueTasks.length === 0) {
       overdueEl.innerHTML = '<div class="empty-state-sm">No overdue tasks</div>';
     } else {

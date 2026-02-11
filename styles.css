@@ -1612,6 +1612,92 @@ body {
   color: var(--text-secondary);
 }
 
+/* ==================== Date Range Filter ==================== */
+
+.date-range-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.dr-label {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  white-space: nowrap;
+}
+
+.dr-presets {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.dr-preset-btn {
+  padding: 6px 14px;
+  border: 1px solid var(--border-color);
+  background: transparent;
+  color: var(--text-secondary);
+  border-radius: 8px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  font-family: inherit;
+  white-space: nowrap;
+}
+
+.dr-preset-btn:hover {
+  border-color: var(--text-secondary);
+  color: var(--text-primary);
+}
+
+.dr-preset-btn.active {
+  background: rgba(74, 108, 247, 0.12);
+  border-color: var(--accent-blue);
+  color: var(--accent-blue);
+  font-weight: 600;
+}
+
+.dr-custom-inputs {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.dr-custom-inputs input[type="date"] {
+  padding: 6px 10px;
+  background: var(--bg-dark);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  color: var(--text-primary);
+  font-size: 0.82rem;
+  font-family: inherit;
+  outline: none;
+  transition: border-color 0.2s ease;
+}
+
+.dr-custom-inputs input[type="date"]:focus {
+  border-color: var(--accent-blue);
+}
+
+.dr-custom-inputs input[type="date"]:hover {
+  border-color: var(--text-secondary);
+}
+
+.dr-sep {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
 /* ==================== Task Table ==================== */
 
 .task-table-wrap {
