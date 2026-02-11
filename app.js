@@ -1,3 +1,18 @@
+// ==================== SVG Icon Helpers ====================
+
+var icons = {
+  arrowUp: '<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg>',
+  arrowDown: '<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/></svg>',
+  minus: '<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"/></svg>',
+  dot: '<svg width="8" height="8" viewBox="0 0 8 8"><circle cx="4" cy="4" r="3.5" fill="currentColor"/></svg>',
+  crown: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 4l3 12h14l3-12-5 4-5-4-5 4-1 0z"/><path d="M5 16h14v2H5z"/></svg>',
+  heart: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>',
+  refresh: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>',
+  alert: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>',
+  star: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>',
+  shuffle: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 3 21 3 21 8"/><line x1="4" y1="20" x2="21" y2="3"/><polyline points="21 16 21 21 16 21"/><line x1="15" y1="15" x2="21" y2="21"/><line x1="4" y1="4" x2="9" y2="9"/></svg>'
+};
+
 // ==================== Data Store ====================
 
 function loadData() {
@@ -268,10 +283,10 @@ function renderFlagBadge(memberId) {
   var flags = getMemberFlags(memberId);
   var parts = [];
   if (flags.green > 0) {
-    parts.push('<span class="flag-count flag-green-count">&#9673; ' + flags.green + '</span>');
+    parts.push('<span class="flag-count flag-green-count">' + icons.dot + ' ' + flags.green + '</span>');
   }
   if (flags.red > 0) {
-    parts.push('<span class="flag-count flag-red-count">&#9673; ' + flags.red + '</span>');
+    parts.push('<span class="flag-count flag-red-count">' + icons.dot + ' ' + flags.red + '</span>');
   }
   if (parts.length === 0) return '';
   return '<span class="flag-badges">' + parts.join('') + '</span>';
@@ -384,9 +399,9 @@ function getMemberTrend(memberId) {
 
 function renderTrendBadge(memberId) {
   var trend = getMemberTrend(memberId);
-  if (trend === "rising") return '<span class="trend-badge trend-rising">&#9650; Accelerating</span>';
-  if (trend === "falling") return '<span class="trend-badge trend-falling">&#9660; Needs Attention</span>';
-  return '<span class="trend-badge trend-flat">&#9644; Steady</span>';
+  if (trend === "rising") return '<span class="trend-badge trend-rising">' + icons.arrowUp + ' Accelerating</span>';
+  if (trend === "falling") return '<span class="trend-badge trend-falling">' + icons.arrowDown + ' Needs Attention</span>';
+  return '<span class="trend-badge trend-flat">' + icons.minus + ' Steady</span>';
 }
 
 // ==================== Red Flag Decay ====================
@@ -609,7 +624,7 @@ function showMemberFlags(memberId) {
   var eff = getEffectiveFlags(memberId);
   var effNet = eff.green - eff.red;
   var trend = getMemberTrend(memberId);
-  var trendLabel = trend === "rising" ? "&#9650; Accelerating" : (trend === "falling" ? "&#9660; Needs Attention" : "&#9644; Steady");
+  var trendLabel = trend === "rising" ? (icons.arrowUp + " Accelerating") : (trend === "falling" ? (icons.arrowDown + " Needs Attention") : (icons.minus + " Steady"));
   var trendCls = trend === "rising" ? "trend-rising" : (trend === "falling" ? "trend-falling" : "trend-flat");
   var monthlyWarn = getMonthlyRedWarning(memberId);
 
@@ -618,11 +633,11 @@ function showMemberFlags(memberId) {
     '<div class="flags-summary-row">' +
       '<div class="flags-summary-item green">' +
         '<span class="flags-summary-count">' + flags.green + '</span>' +
-        '<span class="flags-summary-label">Strength Signals</span>' +
+        '<span class="flags-summary-label">Green Signals</span>' +
       '</div>' +
       '<div class="flags-summary-item red">' +
         '<span class="flags-summary-count">' + flags.red + (eff.decayActive ? '<span style="font-size:0.5em;opacity:0.7"> → ' + eff.red + '</span>' : '') + '</span>' +
-        '<span class="flags-summary-label">Growth Signals' + (eff.decayActive ? ' (recovered)' : '') + '</span>' +
+        '<span class="flags-summary-label">Red Signals' + (eff.decayActive ? ' (recovered)' : '') + '</span>' +
       '</div>' +
       '<div class="flags-summary-item net ' + (effNet >= 0 ? 'green' : 'red') + '">' +
         '<span class="flags-summary-count">' + (effNet > 0 ? '+' : '') + effNet + '</span>' +
@@ -648,7 +663,7 @@ function showMemberFlags(memberId) {
       var dateStr = new Date(f.createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
       item.innerHTML =
         '<div class="flag-history-icon ' + f.color + '">' +
-          '&#9673;' + (f.count > 1 ? ' x' + f.count : '') +
+          icons.dot + (f.count > 1 ? ' x' + f.count : '') +
         '</div>' +
         '<div class="flag-history-info">' +
           '<span class="flag-history-reason">' + escapeHtml(f.reason) + '</span>' +
@@ -725,8 +740,8 @@ function renderRoles() {
       '<div class="card-top">' +
         '<div class="role-badge ' + role.color + '">' + escapeHtml(role.name) + '</div>' +
         '<div class="card-actions">' +
-          '<button class="btn-icon" onclick="editRole(\'' + role.id + '\')" title="Edit">&#9998;</button>' +
-          '<button class="btn-icon btn-icon-danger" onclick="deleteRole(\'' + role.id + '\')" title="Delete">&#10005;</button>' +
+          '<button class="btn-icon" onclick="editRole(\'' + role.id + '\')" title="Edit"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>' +
+          '<button class="btn-icon btn-icon-danger" onclick="deleteRole(\'' + role.id + '\')" title="Delete"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></button>' +
         '</div>' +
       '</div>' +
       '<p class="card-desc">' + (role.description ? escapeHtml(role.description) : "No description") + '</p>' +
@@ -833,10 +848,10 @@ function renderMembers() {
           '</div>' +
         '</div>' +
         '<div class="card-actions">' +
-          '<button class="btn-icon btn-icon-leadership" onclick="openLeadership(\'' + member.id + '\')" title="Leadership Signal">&#9819;</button>' +
-          '<button class="btn-icon" onclick="showMemberFlags(\'' + member.id + '\')" title="View Signals">&#9673;</button>' +
-          '<button class="btn-icon" onclick="editMember(\'' + member.id + '\')" title="Edit">&#9998;</button>' +
-          '<button class="btn-icon btn-icon-danger" onclick="deleteMember(\'' + member.id + '\')" title="Delete">&#10005;</button>' +
+          '<button class="btn-icon btn-icon-leadership" onclick="openLeadership(\'' + member.id + '\')" title="Leadership Signal">' + icons.crown + '</button>' +
+          '<button class="btn-icon" onclick="showMemberFlags(\'' + member.id + '\')" title="View Signals"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></button>' +
+          '<button class="btn-icon" onclick="editMember(\'' + member.id + '\')" title="Edit"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>' +
+          '<button class="btn-icon btn-icon-danger" onclick="deleteMember(\'' + member.id + '\')" title="Delete"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></button>' +
         '</div>' +
       '</div>' +
       '<div class="card-bottom">' +
@@ -924,7 +939,7 @@ function getTaskFlagIndicator(task) {
   var parts = [];
   taskFlags.forEach(function(f) {
     for (var i = 0; i < f.count; i++) {
-      parts.push('<span class="task-flag-pip ' + f.color + '">&#9673;</span>');
+      parts.push('<span class="task-flag-pip ' + f.color + '">' + icons.dot + '</span>');
     }
   });
   return '<span class="task-flag-indicator">' + parts.join('') + '</span>';
@@ -1091,16 +1106,16 @@ function renderTasks() {
     // Action buttons
     var actions = '';
     if (showComplete) {
-      actions += '<button class="tt-action-btn tt-action-complete" onclick="toggleTaskStatus(\'' + task.id + '\')" title="Complete Task">&#10003;</button>';
+      actions += '<button class="tt-action-btn tt-action-complete" onclick="toggleTaskStatus(\'' + task.id + '\')" title="Complete Task"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></button>';
     }
     if (showExtraordinary) {
-      actions += '<button class="tt-action-btn tt-action-green" onclick="openExtraordinary(\'' + task.id + '\')" title="Exceptional (+2 Strength)">&#9733;</button>';
+      actions += '<button class="tt-action-btn tt-action-green" onclick="openExtraordinary(\'' + task.id + '\')" title="Exceptional (+2 Strength)">' + icons.star + '</button>';
     }
     if (showBlunder) {
-      actions += '<button class="tt-action-btn tt-action-red" onclick="openBlunder(\'' + task.id + '\')" title="Log Incident (+3 Growth)">&#9673;</button>';
+      actions += '<button class="tt-action-btn tt-action-red" onclick="openBlunder(\'' + task.id + '\')" title="Log Incident (+3 Growth)">' + icons.alert + '</button>';
     }
-    actions += '<button class="tt-action-btn tt-action-edit" onclick="editTask(\'' + task.id + '\')" title="Edit">&#9998;</button>';
-    actions += '<button class="tt-action-btn tt-action-delete" onclick="deleteTask(\'' + task.id + '\')" title="Delete">&#10005;</button>';
+    actions += '<button class="tt-action-btn tt-action-edit" onclick="editTask(\'' + task.id + '\')" title="Edit"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>';
+    actions += '<button class="tt-action-btn tt-action-delete" onclick="deleteTask(\'' + task.id + '\')" title="Delete"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></button>';
 
     html += '<tr class="' + rowClass + '">' +
       '<td class="tt-col-title">' +
@@ -1176,9 +1191,9 @@ function renderDashboard() {
           (rPct > 0 ? '<div class="zone-bar-seg red" style="width:' + rPct + '%">' + rPct + '%</div>' : '') +
         '</div>' +
         '<div class="zone-legend">' +
-          '<span class="zone-legend-item"><span class="zone-dot green"></span> Thriving ' + greenCount + ' (' + gPct + '%)</span>' +
-          '<span class="zone-legend-item"><span class="zone-dot yellow"></span> Steady ' + yellowCount + ' (' + yPct + '%)</span>' +
-          '<span class="zone-legend-item"><span class="zone-dot red"></span> Growth ' + redCount + ' (' + rPct + '%)</span>' +
+          '<span class="zone-legend-item"><span class="zone-dot green"></span> Green Zone ' + greenCount + ' (' + gPct + '%)</span>' +
+          '<span class="zone-legend-item"><span class="zone-dot yellow"></span> Orange Zone ' + yellowCount + ' (' + yPct + '%)</span>' +
+          '<span class="zone-legend-item"><span class="zone-dot red"></span> Red Zone ' + redCount + ' (' + rPct + '%)</span>' +
         '</div>';
     }
   }
@@ -1267,7 +1282,7 @@ function renderDashboard() {
             '<span class="dashboard-item-name overdue-text">' + escapeHtml(member.name) + '</span>' +
             '<span class="dashboard-item-detail">Growth zone for 2+ consecutive months — may need support</span>' +
           '</div>' +
-          '<span class="flag-chip flag-chip-red">&#9673; ' + flags.red + '</span>';
+          '<span class="flag-chip flag-chip-red">' + icons.dot + ' ' + flags.red + '</span>';
         alertEl.appendChild(item);
       });
     }
@@ -1349,7 +1364,7 @@ function renderDashboard() {
         var alertCls = isRedAlert(mf.member.id) ? " alert-item" : "";
         var warnCls = getMonthlyRedWarning(mf.member.id) ? " monthly-warn-item" : "";
         var trend = getMemberTrend(mf.member.id);
-        var trendIcon = trend === "rising" ? "&#9650;" : (trend === "falling" ? "&#9660;" : "&#9644;");
+        var trendIcon = trend === "rising" ? icons.arrowUp : (trend === "falling" ? icons.arrowDown : icons.minus);
         var trendCls = trend === "rising" ? "trend-rising" : (trend === "falling" ? "trend-falling" : "trend-flat");
 
         var item = document.createElement("div");
@@ -1367,8 +1382,8 @@ function renderDashboard() {
             '<span class="dashboard-item-detail">' + (role ? escapeHtml(role.name) : "No Role") + '</span>' +
           '</div>' +
           '<div class="dashboard-flag-chips">' +
-            '<span class="flag-chip flag-chip-green">&#9673; ' + mf.green + '</span>' +
-            '<span class="flag-chip flag-chip-red">&#9673; ' + mf.red + '</span>' +
+            '<span class="flag-chip flag-chip-green">' + icons.dot + ' ' + mf.green + '</span>' +
+            '<span class="flag-chip flag-chip-red">' + icons.dot + ' ' + mf.red + '</span>' +
             '<span class="flag-chip flag-chip-net ' + netClass + '">' + (mf.effNet > 0 ? '+' : '') + mf.effNet + '</span>' +
           '</div>';
         flagStatusEl.appendChild(item);
@@ -1459,7 +1474,7 @@ function renderPredictiveInsights() {
     if (!ma.hasLeadershipFlag) {
       insights.push({
         type: "leadership",
-        icon: "&#9819;",
+        icon: icons.crown,
         tag: "Leadership Training",
         text: "Consider <strong>" + escapeHtml(ma.member.name) + "</strong> for leadership development",
         reason: "Net +" + ma.effNet + " (" + trendLabel + "). Strong performer without formal leadership recognition yet. Investing here amplifies culture."
@@ -1467,7 +1482,7 @@ function renderPredictiveInsights() {
     } else {
       insights.push({
         type: "leadership",
-        icon: "&#9819;",
+        icon: icons.crown,
         tag: "Deepen Leadership",
         text: "Continue investing in <strong>" + escapeHtml(ma.member.name) + "</strong>'s leadership growth",
         reason: "Net +" + ma.effNet + " (" + trendLabel + "). Already shows leadership qualities — consider expanded mentorship scope or cross-team ownership."
@@ -1489,7 +1504,7 @@ function renderPredictiveInsights() {
     if (reasonParts.length === 0 && ma.zone === "red") reasonParts.push("currently in growth zone");
     insights.push({
       type: "support",
-      icon: "&#9829;",
+      icon: icons.heart,
       tag: "Needs Support Plan",
       text: "<strong>" + escapeHtml(ma.member.name) + "</strong> would benefit from a structured support conversation",
       reason: capitalizeFirst(reasonParts.join(", ")) + ". Net signal: " + ma.effNet + ". A 1:1 to understand blockers could shift this trajectory."
@@ -1506,7 +1521,7 @@ function renderPredictiveInsights() {
     var trendLabel = ma.trend === "falling" ? "declining" : (ma.trend === "rising" ? "improving" : "persistent");
     insights.push({
       type: "realign",
-      icon: "&#8634;",
+      icon: icons.shuffle,
       tag: "Consider Role Realignment",
       text: "Evaluate whether <strong>" + escapeHtml(ma.member.name) + "</strong>'s current role is the right fit",
       reason: trendLabel.charAt(0).toUpperCase() + trendLabel.slice(1) + " pattern (net " + ma.effNet + ") in " + escapeHtml(ma.roleName) + " role. This may indicate a skills-to-role mismatch rather than a performance issue."
@@ -1534,7 +1549,7 @@ function renderPredictiveInsights() {
       if (redPct >= 50) reasons.push(redPct + "% of team in growth zone");
       insights.push({
         type: "department",
-        icon: "&#9888;",
+        icon: icons.alert,
         tag: "Team Attention",
         text: "The <strong>" + escapeHtml(role.name) + "</strong> team needs focused attention",
         reason: capitalizeFirst(reasons.join(". ")) + ". Review workload distribution, tooling, or process clarity within this group."
@@ -1553,7 +1568,7 @@ function renderPredictiveInsights() {
     var trendLabel = ma.trend === "rising" ? "accelerating" : (ma.trend === "falling" ? "watch closely" : "steady");
     insights.push({
       type: "retain",
-      icon: "&#9733;",
+      icon: icons.star,
       tag: burnoutRisk ? "Retention + Burnout Risk" : "Key Contributor",
       text: "<strong>" + escapeHtml(ma.member.name) + "</strong> is a culture anchor — " + (burnoutRisk ? "watch for overload" : "invest in their growth"),
       reason: "Net +" + ma.effNet + ", " + trendLabel + ", " + ma.activeTasks + " active task" + (ma.activeTasks !== 1 ? "s" : "") + ". " +
@@ -1570,7 +1585,7 @@ function renderPredictiveInsights() {
   recoveryCandidates.forEach(function(ma) {
     insights.push({
       type: "leadership",
-      icon: "&#8635;",
+      icon: icons.refresh,
       tag: "Recovery Success",
       text: "<strong>" + escapeHtml(ma.member.name) + "</strong> has recovered — acknowledge the turnaround",
       reason: "Signal recovery active after 2+ clean months. Net signal now +" + ma.effNet + ". Public acknowledgment reinforces the behavior you want to see repeated."

@@ -3,7 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Culture Signal OS</title>
+  <title>GOR Framework — Culture Intelligence</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -11,27 +14,27 @@
     <!-- Sidebar -->
     <aside class="sidebar">
       <div class="sidebar-header">
-        <h1 class="logo">Culture<span class="logo-accent">Signal</span></h1>
-        <p class="logo-tagline">Culture Signal OS</p>
+        <h1 class="logo">GOR<span class="logo-accent">Framework</span></h1>
+        <p class="logo-tagline">Culture Intelligence Console</p>
       </div>
       <nav class="sidebar-nav">
         <button class="nav-item active" data-view="dashboard" onclick="switchView('dashboard')">
-          <span class="nav-icon">&#9632;</span> Dashboard
+          <span class="nav-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg></span> Dashboard
         </button>
         <button class="nav-item" data-view="members" onclick="switchView('members')">
-          <span class="nav-icon">&#9679;</span> Members
+          <span class="nav-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span> Members
         </button>
         <button class="nav-item" data-view="tasks" onclick="switchView('tasks')">
-          <span class="nav-icon">&#9654;</span> Tasks
+          <span class="nav-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></span> Tasks
         </button>
         <button class="nav-item" data-view="roles" onclick="switchView('roles')">
-          <span class="nav-icon">&#9733;</span> Roles
+          <span class="nav-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></span> Roles
         </button>
       </nav>
       <div class="sidebar-spacer"></div>
       <nav class="sidebar-nav sidebar-nav-bottom">
         <button class="nav-item" data-view="flagrules" onclick="switchView('flagrules')">
-          <span class="nav-icon">&#9673;</span> Signal Framework
+          <span class="nav-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg></span> Signal Framework
         </button>
       </nav>
     </aside>
@@ -46,7 +49,7 @@
             <p class="view-subtitle">Culture health at a glance</p>
           </div>
           <div class="dr-icon-wrap">
-            <button class="dr-icon-btn" onclick="toggleDateDropdown(this)" title="Filter by period">&#128197; <span class="dr-icon-label" id="dr-active-label-dash">All Time</span></button>
+            <button class="dr-icon-btn" onclick="toggleDateDropdown(this)" title="Filter by period"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> <span class="dr-icon-label" id="dr-active-label-dash">All Time</span></button>
             <div class="dr-dropdown">
               <div class="dr-dropdown-title">Period</div>
               <div class="dr-presets">
@@ -130,19 +133,19 @@
           <h3>Why This Dashboard Looks Different</h3>
           <div class="psychology-grid">
             <div class="psychology-item">
-              <div class="psychology-icon">&#9878;</div>
+              <div class="psychology-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
               <div class="psychology-text"><strong>Psychological Safety</strong> — Leaders under threat see threats everywhere. Calm dashboards produce better decisions. We use warm tones, not alarms.</div>
             </div>
             <div class="psychology-item">
-              <div class="psychology-icon">&#9883;</div>
+              <div class="psychology-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg></div>
               <div class="psychology-text"><strong>Signals, Not Judgments</strong> — "Growth signal" instead of "red flag." Language shapes perception. We present data for reflection, not reaction.</div>
             </div>
             <div class="psychology-item">
-              <div class="psychology-icon">&#8635;</div>
+              <div class="psychology-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div>
               <div class="psychology-text"><strong>Culture Momentum</strong> — Snapshot metrics create anxiety. Trends reveal truth. We measure direction, not position.</div>
             </div>
             <div class="psychology-item">
-              <div class="psychology-icon">&#9733;</div>
+              <div class="psychology-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg></div>
               <div class="psychology-text"><strong>Leadership Maturity</strong> — Mature leaders don't need flashing alerts. They need clean signals to make deliberate, accountable decisions.</div>
             </div>
           </div>
@@ -167,7 +170,7 @@
           <h2>Tasks</h2>
           <div class="view-header-right">
             <div class="dr-icon-wrap">
-              <button class="dr-icon-btn" onclick="toggleDateDropdown(this)" title="Filter by period">&#128197; <span class="dr-icon-label" id="dr-active-label-task">All Time</span></button>
+              <button class="dr-icon-btn" onclick="toggleDateDropdown(this)" title="Filter by period"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> <span class="dr-icon-label" id="dr-active-label-task">All Time</span></button>
               <div class="dr-dropdown">
                 <div class="dr-dropdown-title">Period</div>
                 <div class="dr-presets">
@@ -189,7 +192,7 @@
           </div>
         </div>
 
-        <div class="task-filters">
+        <div class="filter-bar">
           <button class="filter-btn active" data-filter="all" onclick="filterTasks('all')">All</button>
           <button class="filter-btn" data-filter="pending" onclick="filterTasks('pending')">Pending</button>
           <button class="filter-btn" data-filter="in-progress" onclick="filterTasks('in-progress')">In Progress</button>
@@ -222,7 +225,7 @@
           <div class="rules-grid">
             <div class="rule-card rule-card-red">
               <div class="rule-icon-wrap red">
-                <span class="rule-icon">&#9673;</span>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
                 <span class="rule-count">x1</span>
               </div>
               <div class="rule-info">
@@ -232,7 +235,7 @@
             </div>
             <div class="rule-card rule-card-red">
               <div class="rule-icon-wrap red">
-                <span class="rule-icon">&#9673;</span>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
                 <span class="rule-count">x1</span>
               </div>
               <div class="rule-info">
@@ -242,7 +245,7 @@
             </div>
             <div class="rule-card rule-card-red">
               <div class="rule-icon-wrap red">
-                <span class="rule-icon">&#9673;</span>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
                 <span class="rule-count">x3</span>
               </div>
               <div class="rule-info">
@@ -258,7 +261,7 @@
           <div class="rules-grid">
             <div class="rule-card rule-card-green">
               <div class="rule-icon-wrap green">
-                <span class="rule-icon">&#9673;</span>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
                 <span class="rule-count">x1</span>
               </div>
               <div class="rule-info">
@@ -268,7 +271,7 @@
             </div>
             <div class="rule-card rule-card-green">
               <div class="rule-icon-wrap green">
-                <span class="rule-icon">&#9673;</span>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
                 <span class="rule-count">x2</span>
               </div>
               <div class="rule-info">
@@ -284,7 +287,7 @@
           <div class="rules-grid">
             <div class="rule-card rule-card-green">
               <div class="rule-icon-wrap green">
-                <span class="rule-icon">&#9819;</span>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
                 <span class="rule-count">+1ea</span>
               </div>
               <div class="rule-info">
@@ -293,8 +296,8 @@
               </div>
             </div>
             <div class="rule-card">
-              <div class="rule-icon-wrap" style="background:rgba(201,168,76,0.12);color:var(--accent-yellow);">
-                <span class="rule-icon">&#9673;</span>
+              <div class="rule-icon-wrap" style="background:var(--zone-o-bg);color:var(--zone-o);">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
                 <span class="rule-count">note</span>
               </div>
               <div class="rule-info">
@@ -303,8 +306,8 @@
               </div>
             </div>
             <div class="rule-card">
-              <div class="rule-icon-wrap" style="background:rgba(91,124,247,0.12);color:var(--accent-blue);">
-                <span class="rule-icon">&#8635;</span>
+              <div class="rule-icon-wrap" style="background:var(--accent-light);color:var(--accent);">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
                 <span class="rule-count">-50%</span>
               </div>
               <div class="rule-info">
@@ -494,22 +497,22 @@
       <p class="review-prompt">How would you assess this work?</p>
       <div class="flag-options">
         <button class="flag-option-btn green-flag" onclick="submitReview('extraordinary')">
-          <span class="flag-icon green">&#9673;&#9673;</span>
+          <span class="flag-icon green"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></span>
           <span class="flag-option-label">Exceptional Contribution</span>
           <span class="flag-option-desc">+2 Strength Signals</span>
         </button>
         <button class="flag-option-btn green-flag" onclick="submitReview('perfect')">
-          <span class="flag-icon green">&#9673;</span>
+          <span class="flag-icon green"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></span>
           <span class="flag-option-label">Completed with Excellence</span>
           <span class="flag-option-desc">+1 Strength Signal</span>
         </button>
         <button class="flag-option-btn neutral-flag" onclick="submitReview('none')">
-          <span class="flag-icon neutral">&#10003;</span>
+          <span class="flag-icon neutral"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
           <span class="flag-option-label">Completed (No Signal)</span>
           <span class="flag-option-desc">Just mark done</span>
         </button>
         <button class="flag-option-btn red-flag" onclick="submitReview('below')">
-          <span class="flag-icon red">&#9673;</span>
+          <span class="flag-icon red"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></span>
           <span class="flag-option-label">Needs Support</span>
           <span class="flag-option-desc">+1 Growth Signal</span>
         </button>
