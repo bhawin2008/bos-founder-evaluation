@@ -1485,7 +1485,9 @@ function seedDemoData() {
     { id: "mem_vikram", name: "Vikram Singh",   email: "vikram@team.com", roleId: "role_dev",    status: "active", createdAt: "2024-11-20T09:00:00.000Z" },
     { id: "mem_meera",  name: "Meera Iyer",     email: "meera@team.com",  roleId: "role_design", status: "active", createdAt: "2024-11-20T09:00:00.000Z" },
     { id: "mem_karan",  name: "Karan Malhotra", email: "karan@team.com",  roleId: "role_qa",     status: "active", createdAt: "2024-11-20T09:00:00.000Z" },
-    { id: "mem_deepa",  name: "Deepa Nair",     email: "deepa@team.com",  roleId: "role_mgr",    status: "active", createdAt: "2024-11-20T09:00:00.000Z" }
+    { id: "mem_deepa",  name: "Deepa Nair",     email: "deepa@team.com",  roleId: "role_mgr",    status: "active", createdAt: "2024-11-20T09:00:00.000Z" },
+    { id: "mem_rohan",  name: "Rohan Desai",    email: "rohan@team.com",  roleId: "role_dev",    status: "active", createdAt: "2024-11-25T09:00:00.000Z" },
+    { id: "mem_anita",  name: "Anita Kapoor",   email: "anita@team.com",  roleId: "role_qa",     status: "active", createdAt: "2024-11-25T09:00:00.000Z" }
   ];
 
   // --- Tasks (spread across Dec 2024 & Jan 2025) ---
@@ -1509,7 +1511,13 @@ function seedDemoData() {
     { id: "task_15", title: "Performance benchmarks",      description: "Run and document benchmarks",  notes: "Great improvement shown",  assigneeId: "mem_karan", priority: "medium", dueDate: "2025-01-22", status: "completed", reviewResult: "extraordinary", createdAt: "2025-01-06T09:00:00.000Z" },
     { id: "task_16", title: "Stakeholder presentation",    description: "Prepare Q1 kickoff slides",    notes: "Feedback was lukewarm",   assigneeId: "mem_deepa",  priority: "high",   dueDate: "2025-01-14", status: "completed", reviewResult: "below",         createdAt: "2025-01-04T09:00:00.000Z" },
     { id: "task_17", title: "Security audit",              description: "Conduct security review",      notes: "",                        assigneeId: "mem_arjun",  priority: "high",   dueDate: "2025-01-25", status: "in-progress",                              createdAt: "2025-01-10T09:00:00.000Z" },
-    { id: "task_18", title: "User feedback analysis",      description: "Analyze Q4 user survey data",  notes: "Key insights documented", assigneeId: "mem_priya",  priority: "low",    dueDate: "2025-01-28", status: "hold",                                     createdAt: "2025-01-08T09:00:00.000Z" }
+    { id: "task_18", title: "User feedback analysis",      description: "Analyze Q4 user survey data",  notes: "Key insights documented", assigneeId: "mem_priya",  priority: "low",    dueDate: "2025-01-28", status: "hold",                                     createdAt: "2025-01-08T09:00:00.000Z" },
+    // Rohan & Anita tasks
+    { id: "task_19", title: "Microservice refactor",       description: "Break monolith into microservices", notes: "Started with auth service", assigneeId: "mem_rohan", priority: "high",   dueDate: "2025-01-15", status: "completed", reviewResult: "perfect",       createdAt: "2025-01-03T09:00:00.000Z" },
+    { id: "task_20", title: "CI/CD pipeline setup",        description: "Configure GitHub Actions workflows", notes: "",                          assigneeId: "mem_rohan", priority: "medium", dueDate: "2025-01-20", status: "in-progress",                              createdAt: "2025-01-08T09:00:00.000Z" },
+    { id: "task_21", title: "API contract testing",        description: "Write contract tests for all APIs",  notes: "Using Pact framework",     assigneeId: "mem_anita", priority: "high",   dueDate: "2024-12-18", status: "completed", reviewResult: "perfect",       createdAt: "2024-12-04T09:00:00.000Z" },
+    { id: "task_22", title: "Smoke test automation",       description: "Automate smoke tests for staging",   notes: "Covered 12 critical flows", assigneeId: "mem_anita", priority: "medium", dueDate: "2025-01-10", status: "completed", reviewResult: "extraordinary", createdAt: "2025-01-02T09:00:00.000Z" },
+    { id: "task_23", title: "Chaos engineering drill",     description: "Run failure injection tests",        notes: "",                          assigneeId: "mem_rohan", priority: "low",    dueDate: "2025-01-28", status: "pending",                                   createdAt: "2025-01-12T09:00:00.000Z" }
   ];
 
   // --- Flags ---
@@ -1564,7 +1572,15 @@ function seedDemoData() {
     { id: "flag_25", memberId: "mem_deepa", taskId: "task_08", color: "green", count: 1, reason: "Completed perfectly: Budget review meeting",       createdAt: "2024-12-19T15:00:00.000Z" },
     { id: "flag_26", memberId: "mem_deepa", taskId: null,      color: "green", count: 1, reason: "Leadership Multiplier: Cross-team collaboration",  createdAt: "2024-12-28T10:00:00.000Z" },
     { id: "flag_27", memberId: "mem_deepa", taskId: "task_16", color: "red",   count: 1, reason: "Below expectation: Stakeholder presentation",     createdAt: "2025-01-14T15:00:00.000Z" },
-    { id: "flag_28", memberId: "mem_deepa", taskId: null,      color: "red",   count: 1, reason: "Failed to communicate project delays to stakeholders", createdAt: "2025-01-26T10:00:00.000Z" }
+    { id: "flag_28", memberId: "mem_deepa", taskId: null,      color: "red",   count: 1, reason: "Failed to communicate project delays to stakeholders", createdAt: "2025-01-26T10:00:00.000Z" },
+
+    // === Rohan (Rising — solid performer) ===
+    { id: "flag_29", memberId: "mem_rohan", taskId: "task_19", color: "green", count: 1, reason: "Completed perfectly: Microservice refactor",            createdAt: "2025-01-15T15:00:00.000Z" },
+    { id: "flag_30", memberId: "mem_rohan", taskId: null,      color: "green", count: 1, reason: "Leadership Multiplier: Mentored 2+ teammates",          createdAt: "2025-01-20T10:00:00.000Z" },
+
+    // === Anita (Rising — strong QA contributor) ===
+    { id: "flag_31", memberId: "mem_anita", taskId: "task_21", color: "green", count: 1, reason: "Completed perfectly: API contract testing",              createdAt: "2024-12-18T15:00:00.000Z" },
+    { id: "flag_32", memberId: "mem_anita", taskId: "task_22", color: "green", count: 2, reason: "Extraordinary result: Smoke test automation",            createdAt: "2025-01-10T15:00:00.000Z" }
   ];
 
   data.roles = roles;
