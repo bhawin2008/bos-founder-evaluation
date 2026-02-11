@@ -1581,9 +1581,10 @@ function renderDashboard() {
       var dPct = Math.round((declined / mTotal) * 100);
       var sPct = Math.round((stable / mTotal) * 100);
 
-      // Build trend chart (last up to 6 months)
+      // Build vertical bar chart (last up to 6 months)
       var chartMonths = months.slice(-6);
-      var chartRows = '';
+      var tot = data.members.length;
+      var chartCols = '';
       chartMonths.forEach(function(mo) {
         var g = 0, y = 0, r = 0;
         data.members.forEach(function(m) {
@@ -1592,23 +1593,27 @@ function renderDashboard() {
           else if (z === "red") r++;
           else y++;
         });
-        var tot = data.members.length;
-        var gW = Math.round((g / tot) * 100);
-        var yW = Math.round((y / tot) * 100);
-        var rW = Math.round((r / tot) * 100);
-        chartRows +=
-          '<div class="trend-row">' +
-            '<span class="trend-label">' + getMonthLabel(mo) + '</span>' +
-            '<div class="trend-bar">' +
-              (gW > 0 ? '<div class="zone-bar-seg green" style="width:' + gW + '%"></div>' : '') +
-              (yW > 0 ? '<div class="zone-bar-seg yellow" style="width:' + yW + '%"></div>' : '') +
-              (rW > 0 ? '<div class="zone-bar-seg red" style="width:' + rW + '%"></div>' : '') +
+        var gPct = Math.round((g / tot) * 100);
+        var yPct = Math.round((y / tot) * 100);
+        var rPct = Math.round((r / tot) * 100);
+        chartCols +=
+          '<div class="vbar-col">' +
+            '<div class="vbar-stack">' +
+              (rPct > 0 ? '<div class="vbar-seg vbar-red" style="height:' + rPct + '%" title="Red ' + rPct + '%"><span class="vbar-val">' + rPct + '%</span></div>' : '') +
+              (yPct > 0 ? '<div class="vbar-seg vbar-orange" style="height:' + yPct + '%" title="Orange ' + yPct + '%"><span class="vbar-val">' + yPct + '%</span></div>' : '') +
+              (gPct > 0 ? '<div class="vbar-seg vbar-green" style="height:' + gPct + '%" title="Green ' + gPct + '%"><span class="vbar-val">' + gPct + '%</span></div>' : '') +
             '</div>' +
+            '<span class="vbar-label">' + getMonthLabel(mo) + '</span>' +
           '</div>';
       });
 
       trendEl.innerHTML =
-        '<div class="trend-chart">' + chartRows + '</div>';
+        '<div class="vbar-chart">' + chartCols + '</div>' +
+        '<div class="vbar-legend">' +
+          '<span class="vbar-legend-item"><span class="vbar-legend-dot vbar-green"></span>Green</span>' +
+          '<span class="vbar-legend-item"><span class="vbar-legend-dot vbar-orange"></span>Orange</span>' +
+          '<span class="vbar-legend-item"><span class="vbar-legend-dot vbar-red"></span>Red</span>' +
+        '</div>';
     }
   }
 
@@ -2049,11 +2054,13 @@ function renderPredictiveInsights() {
   el.innerHTML = "";
   insights.forEach(function(ins) {
     var card = document.createElement("div");
-    card.className = "insight-card";
+    card.className = "insight-card insight-card-type-" + ins.type;
     card.innerHTML =
-      '<div class="insight-icon ' + ins.type + '">' + ins.icon + '</div>' +
-      '<div class="insight-body">' +
+      '<div class="insight-card-header">' +
+        '<div class="insight-icon ' + ins.type + '">' + ins.icon + '</div>' +
         '<div class="insight-tag ' + ins.type + '">' + ins.tag + '</div>' +
+      '</div>' +
+      '<div class="insight-card-body">' +
         '<div class="insight-text">' + ins.text + '</div>' +
         '<div class="insight-reason">' + ins.reason + '</div>' +
       '</div>';
