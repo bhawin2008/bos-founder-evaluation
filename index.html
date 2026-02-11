@@ -27,6 +27,9 @@
         <button class="nav-item" data-view="roles" onclick="switchView('roles')">
           <span class="nav-icon">&#9733;</span> Roles
         </button>
+        <button class="nav-item" data-view="analytics" onclick="switchView('analytics')">
+          <span class="nav-icon">&#9650;</span> Analytics
+        </button>
       </nav>
     </aside>
 
@@ -103,6 +106,127 @@
           <button class="btn-primary" onclick="openModal('role-modal')">+ Add Role</button>
         </div>
         <div id="roles-list" class="card-list"></div>
+      </div>
+
+      <!-- Analytics View -->
+      <div id="analytics-view" class="view">
+        <div class="view-header">
+          <h2>Analytics</h2>
+          <p class="view-subtitle">Month-over-month team performance trends</p>
+        </div>
+
+        <!-- Summary comparison cards -->
+        <div class="analytics-comparison">
+          <div class="analytics-month-card">
+            <div class="analytics-month-label">December 2025</div>
+            <div class="analytics-month-stats">
+              <div class="analytics-mini-stat">
+                <span class="analytics-mini-value" id="dec-total">0</span>
+                <span class="analytics-mini-label">Tasks Created</span>
+              </div>
+              <div class="analytics-mini-stat">
+                <span class="analytics-mini-value" id="dec-completed">0</span>
+                <span class="analytics-mini-label">Completed</span>
+              </div>
+              <div class="analytics-mini-stat">
+                <span class="analytics-mini-value" id="dec-rate">0%</span>
+                <span class="analytics-mini-label">Completion Rate</span>
+              </div>
+            </div>
+          </div>
+          <div class="analytics-vs">vs</div>
+          <div class="analytics-month-card">
+            <div class="analytics-month-label">January 2026</div>
+            <div class="analytics-month-stats">
+              <div class="analytics-mini-stat">
+                <span class="analytics-mini-value" id="jan-total">0</span>
+                <span class="analytics-mini-label">Tasks Created</span>
+              </div>
+              <div class="analytics-mini-stat">
+                <span class="analytics-mini-value" id="jan-completed">0</span>
+                <span class="analytics-mini-label">Completed</span>
+              </div>
+              <div class="analytics-mini-stat">
+                <span class="analytics-mini-value" id="jan-rate">0%</span>
+                <span class="analytics-mini-label">Completion Rate</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Trend indicators -->
+        <div class="analytics-trends">
+          <div class="trend-card">
+            <div class="trend-title">Task Volume Trend</div>
+            <div class="trend-value" id="trend-volume">--</div>
+          </div>
+          <div class="trend-card">
+            <div class="trend-title">Completion Rate Trend</div>
+            <div class="trend-value" id="trend-completion">--</div>
+          </div>
+          <div class="trend-card">
+            <div class="trend-title">High Priority Tasks Trend</div>
+            <div class="trend-value" id="trend-high-priority">--</div>
+          </div>
+          <div class="trend-card">
+            <div class="trend-title">Avg Tasks per Member</div>
+            <div class="trend-value" id="trend-avg-tasks">--</div>
+          </div>
+        </div>
+
+        <!-- Charts section -->
+        <div class="analytics-charts">
+          <!-- Tasks by status comparison -->
+          <div class="analytics-chart-card">
+            <h3>Tasks by Status</h3>
+            <div class="chart-legend">
+              <span class="legend-item"><span class="legend-dot dec-color"></span> Dec 2025</span>
+              <span class="legend-item"><span class="legend-dot jan-color"></span> Jan 2026</span>
+            </div>
+            <div id="chart-status" class="bar-chart"></div>
+          </div>
+
+          <!-- Tasks by priority comparison -->
+          <div class="analytics-chart-card">
+            <h3>Tasks by Priority</h3>
+            <div class="chart-legend">
+              <span class="legend-item"><span class="legend-dot dec-color"></span> Dec 2025</span>
+              <span class="legend-item"><span class="legend-dot jan-color"></span> Jan 2026</span>
+            </div>
+            <div id="chart-priority" class="bar-chart"></div>
+          </div>
+        </div>
+
+        <!-- Member performance table -->
+        <div class="analytics-chart-card analytics-full-width">
+          <h3>Member Performance - Month over Month</h3>
+          <div class="analytics-table-wrap">
+            <table class="analytics-table">
+              <thead>
+                <tr>
+                  <th>Member</th>
+                  <th>Role</th>
+                  <th>Dec Tasks</th>
+                  <th>Dec Completed</th>
+                  <th>Jan Tasks</th>
+                  <th>Jan Completed</th>
+                  <th>Trend</th>
+                </tr>
+              </thead>
+              <tbody id="member-performance-body"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Task completion timeline -->
+        <div class="analytics-chart-card analytics-full-width">
+          <h3>Weekly Task Completion Timeline</h3>
+          <div class="chart-legend">
+            <span class="legend-item"><span class="legend-dot dec-color"></span> Dec 2025</span>
+            <span class="legend-item"><span class="legend-dot jan-color"></span> Jan 2026</span>
+          </div>
+          <div id="chart-timeline" class="timeline-chart"></div>
+        </div>
       </div>
     </main>
   </div>
