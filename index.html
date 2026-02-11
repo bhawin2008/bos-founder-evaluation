@@ -403,6 +403,26 @@
     </div>
   </div>
 
+  <!-- Mark Extraordinary Modal -->
+  <div id="extraordinary-modal" class="modal-overlay">
+    <div class="modal modal-sm">
+      <div class="modal-header">
+        <h3>Mark Extraordinary</h3>
+        <button class="modal-close" onclick="closeModal('extraordinary-modal')">&times;</button>
+      </div>
+      <p class="review-task-name" id="extraordinary-task-name"></p>
+      <p class="confirm-text">This will award <strong style="color: var(--accent-green);">2 green flags</strong> to the assignee for extraordinary work on this task.</p>
+      <div class="form-group" style="margin-top: 16px;">
+        <label for="extraordinary-note">Note (optional)</label>
+        <textarea id="extraordinary-note" rows="2" placeholder="What made this extraordinary..."></textarea>
+      </div>
+      <div class="form-actions">
+        <button class="btn-secondary" onclick="closeModal('extraordinary-modal')">Cancel</button>
+        <button class="btn-primary" onclick="submitExtraordinary()">Award 2 Green Flags</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Member Flags Modal -->
   <div id="flags-modal" class="modal-overlay">
     <div class="modal">

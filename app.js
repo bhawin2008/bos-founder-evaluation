@@ -22,6 +22,7 @@ var pendingDeleteType = null;
 var pendingDeleteId = null;
 var pendingReviewTaskId = null;
 var pendingBlunderTaskId = null;
+var pendingExtraordinaryTaskId = null;
 
 // ==================== Navigation ====================
 
@@ -176,6 +177,35 @@ function submitReview(quality) {
 function cancelReview() {
   pendingReviewTaskId = null;
   closeModal("review-modal");
+}
+
+// ==================== Mark Extraordinary ====================
+
+function openExtraordinary(taskId) {
+  var task = data.tasks.find(function(t) { return t.id === taskId; });
+  if (!task) return;
+  pendingExtraordinaryTaskId = taskId;
+  document.getElementById("extraordinary-task-name").textContent = task.title;
+  document.getElementById("extraordinary-note").value = "";
+  openModal("extraordinary-modal");
+}
+
+function submitExtraordinary() {
+  var task = data.tasks.find(function(t) { return t.id === pendingExtraordinaryTaskId; });
+  if (!task || !task.assigneeId) {
+    closeModal("extraordinary-modal");
+    return;
+  }
+
+  var note = document.getElementById("extraordinary-note").value.trim();
+  var reason = "Extraordinary work on task: " + task.title;
+  if (note) reason += " — " + note;
+
+  addFlag(task.assigneeId, task.id, "green", 2, reason);
+
+  closeModal("extraordinary-modal");
+  pendingExtraordinaryTaskId = null;
+  refreshAll();
 }
 
 // ==================== Blunder ====================
@@ -568,7 +598,8 @@ function renderTasks() {
         '</div>' +
         '<div class="card-actions">' +
           (task.status !== "completed" && task.assigneeId
-            ? '<button class="btn-icon btn-icon-blunder" onclick="openBlunder(\'' + task.id + '\')" title="Report Blunder">&#9873;</button>'
+            ? '<button class="btn-icon btn-icon-extraordinary" onclick="openExtraordinary(\'' + task.id + '\')" title="Mark Extraordinary (+2 Green)">&#9733;</button>' +
+              '<button class="btn-icon btn-icon-blunder" onclick="openBlunder(\'' + task.id + '\')" title="Report Blunder (+3 Red)">&#9873;</button>'
             : '') +
           '<button class="btn-icon" onclick="editTask(\'' + task.id + '\')" title="Edit">&#9998;</button>' +
           '<button class="btn-icon btn-icon-danger" onclick="deleteTask(\'' + task.id + '\')" title="Delete">&#10005;</button>' +
