@@ -413,9 +413,29 @@
         </div>
         <div class="form-group">
           <label for="task-assignee">Assignee</label>
-          <select id="task-assignee" required>
+          <select id="task-assignee" required onchange="checkAssigneeRisk()">
             <option value="">Select a member</option>
           </select>
+        </div>
+        <div id="task-assignee-alert" class="task-assignee-alert" style="display:none;"></div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="task-category">Category</label>
+            <select id="task-category" onchange="checkAssigneeRisk()">
+              <option value="">No category</option>
+              <option value="people">People</option>
+              <option value="system">System</option>
+              <option value="emotions">Emotions</option>
+              <option value="skills">Skills</option>
+              <option value="domain">Domain</option>
+              <option value="management">Management</option>
+              <option value="other">Other</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="task-keywords">Keywords</label>
+            <input type="text" id="task-keywords" placeholder="e.g. api, design, review" oninput="checkAssigneeRisk()">
+          </div>
         </div>
         <div class="form-group">
           <label for="task-priority">Priority</label>
@@ -533,6 +553,19 @@
       <p class="review-task-name" id="blunder-task-name"></p>
       <p class="confirm-text">This will record <strong style="color: var(--accent-red);">3 growth signals</strong> indicating a significant process issue that needs attention.</p>
       <div class="form-group" style="margin-top: 16px;">
+        <label for="blunder-category">Category</label>
+        <select id="blunder-category">
+          <option value="">Select category...</option>
+          <option value="people">People</option>
+          <option value="system">System</option>
+          <option value="emotions">Emotions</option>
+          <option value="skills">Skills</option>
+          <option value="domain">Domain</option>
+          <option value="management">Management</option>
+          <option value="other">Other</option>
+        </select>
+      </div>
+      <div class="form-group">
         <label for="blunder-note">Context (optional)</label>
         <textarea id="blunder-note" rows="2" placeholder="What happened and what can we learn..."></textarea>
       </div>
@@ -553,6 +586,19 @@
       <p class="review-task-name" id="extraordinary-task-name"></p>
       <p class="confirm-text">This will record <strong style="color: var(--accent-green);">2 strength signals</strong> recognizing exceptional contribution on this task.</p>
       <div class="form-group" style="margin-top: 16px;">
+        <label for="extraordinary-category">Category</label>
+        <select id="extraordinary-category">
+          <option value="">Select category...</option>
+          <option value="people">People</option>
+          <option value="system">System</option>
+          <option value="emotions">Emotions</option>
+          <option value="skills">Skills</option>
+          <option value="domain">Domain</option>
+          <option value="management">Management</option>
+          <option value="other">Other</option>
+        </select>
+      </div>
+      <div class="form-group">
         <label for="extraordinary-note">What made this exceptional (optional)</label>
         <textarea id="extraordinary-note" rows="2" placeholder="Describe the impact..."></textarea>
       </div>

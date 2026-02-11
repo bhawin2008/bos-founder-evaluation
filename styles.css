@@ -2452,6 +2452,107 @@ select {
 }
 
 /* ======================================================================
+   CATEGORY & KEYWORD BADGES
+   ====================================================================== */
+
+.flag-category-badge {
+  display: inline-block;
+  padding: 1px 7px;
+  border-radius: 3px;
+  font-size: 0.62rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  background: var(--accent-light);
+  color: var(--accent);
+  margin-left: 6px;
+  vertical-align: middle;
+}
+
+.tt-task-tags {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+  margin-top: 3px;
+}
+
+.tt-category-badge {
+  display: inline-block;
+  padding: 1px 6px;
+  border-radius: 3px;
+  font-size: 0.6rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  background: var(--accent-light);
+  color: var(--accent);
+}
+
+.tt-keyword-badge {
+  display: inline-block;
+  padding: 1px 6px;
+  border-radius: 3px;
+  font-size: 0.6rem;
+  font-weight: 500;
+  background: var(--bg-subtle);
+  color: var(--text-secondary);
+  border: 1px solid var(--border-light);
+}
+
+/* ======================================================================
+   ASSIGNEE RISK ALERT
+   ====================================================================== */
+
+.task-assignee-alert {
+  display: flex;
+  gap: var(--sp-3);
+  align-items: flex-start;
+  padding: var(--sp-3) var(--sp-4);
+  margin-bottom: var(--sp-4);
+  border-radius: var(--radius-md);
+  background: var(--zone-o-bg);
+  border: 1px solid var(--zone-o-border);
+  animation: fadeIn 300ms var(--ease);
+}
+
+.assignee-alert-icon {
+  color: var(--zone-o);
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.assignee-alert-icon svg { display: block; }
+
+.assignee-alert-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.assignee-alert-title {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--zone-o);
+  margin-bottom: 2px;
+}
+
+.assignee-alert-msg {
+  font-size: 0.78rem;
+  color: var(--text-primary);
+  line-height: 1.5;
+  margin-bottom: 4px;
+}
+
+.assignee-alert-msg strong {
+  font-weight: 700;
+}
+
+.assignee-alert-note {
+  font-size: 0.68rem;
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+/* ======================================================================
    RESPONSIVE
    ====================================================================== */
 

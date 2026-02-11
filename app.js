@@ -228,6 +228,8 @@ function openModal(modalId) {
   }
   if (modalId === "task-modal") {
     populateMemberDropdown("task-assignee");
+    var alertEl = document.getElementById("task-assignee-alert");
+    if (alertEl) { alertEl.style.display = "none"; alertEl.innerHTML = ""; }
   }
 }
 
@@ -266,7 +268,7 @@ function getMemberFlagList(memberId) {
   });
 }
 
-function addFlag(memberId, taskId, color, count, reason, note) {
+function addFlag(memberId, taskId, color, count, reason, note, category) {
   data.flags.push({
     id: generateId(),
     memberId: memberId,
@@ -275,6 +277,7 @@ function addFlag(memberId, taskId, color, count, reason, note) {
     count: count,
     reason: reason,
     note: note || "",
+    category: category || "",
     createdAt: new Date().toISOString()
   });
   saveData(data);
@@ -305,7 +308,7 @@ function isOverdue(task) {
 function checkOverdueFlags() {
   data.tasks.forEach(function(task) {
     if (isOverdue(task) && task.assigneeId && !task.overdueFlagged) {
-      addFlag(task.assigneeId, task.id, "red", 1, "Past due: " + task.title, "");
+      addFlag(task.assigneeId, task.id, "red", 1, "Past due: " + task.title, "", task.category || "");
       task.overdueFlagged = true;
     }
   });
@@ -534,12 +537,13 @@ function submitReview(quality) {
   task.reviewResult = quality;
 
   if (task.assigneeId) {
+    var taskCat = task.category || "";
     if (quality === "extraordinary") {
-      addFlag(task.assigneeId, task.id, "green", 2, "Exceptional contribution: " + task.title, "");
+      addFlag(task.assigneeId, task.id, "green", 2, "Exceptional contribution: " + task.title, "", taskCat);
     } else if (quality === "perfect") {
-      addFlag(task.assigneeId, task.id, "green", 1, "Completed with excellence: " + task.title, "");
+      addFlag(task.assigneeId, task.id, "green", 1, "Completed with excellence: " + task.title, "", taskCat);
     } else if (quality === "below") {
-      addFlag(task.assigneeId, task.id, "red", 1, "Needs support: " + task.title, "");
+      addFlag(task.assigneeId, task.id, "red", 1, "Needs support: " + task.title, "", taskCat);
     }
   }
 
@@ -565,6 +569,7 @@ function openExtraordinary(taskId) {
   pendingExtraordinaryMemberId = null;
   document.getElementById("extraordinary-task-name").textContent = task.title;
   document.getElementById("extraordinary-note").value = "";
+  document.getElementById("extraordinary-category").value = task.category || "";
   openModal("extraordinary-modal");
 }
 
@@ -575,6 +580,7 @@ function openExtraordinaryForMember(memberId) {
   pendingExtraordinaryTaskId = null;
   document.getElementById("extraordinary-task-name").textContent = member.name;
   document.getElementById("extraordinary-note").value = "";
+  document.getElementById("extraordinary-category").value = "";
   openModal("extraordinary-modal");
 }
 
@@ -599,9 +605,10 @@ function submitExtraordinary() {
   }
 
   var note = document.getElementById("extraordinary-note").value.trim();
+  var category = document.getElementById("extraordinary-category").value;
   var reason = "Exceptional contribution: " + contextName;
 
-  addFlag(memberId, taskId, "green", 2, reason, note);
+  addFlag(memberId, taskId, "green", 2, reason, note, category);
 
   closeModal("extraordinary-modal");
   pendingExtraordinaryTaskId = null;
@@ -620,6 +627,7 @@ function openBlunder(taskId) {
   pendingBlunderMemberId = null;
   document.getElementById("blunder-task-name").textContent = task.title;
   document.getElementById("blunder-note").value = "";
+  document.getElementById("blunder-category").value = task.category || "";
   openModal("blunder-modal");
 }
 
@@ -630,6 +638,7 @@ function openBlunderForMember(memberId) {
   pendingBlunderTaskId = null;
   document.getElementById("blunder-task-name").textContent = member.name;
   document.getElementById("blunder-note").value = "";
+  document.getElementById("blunder-category").value = "";
   openModal("blunder-modal");
 }
 
@@ -654,9 +663,10 @@ function submitBlunder() {
   }
 
   var note = document.getElementById("blunder-note").value.trim();
+  var category = document.getElementById("blunder-category").value;
   var reason = "Critical incident: " + contextName;
 
-  addFlag(memberId, taskId, "red", 3, reason, note);
+  addFlag(memberId, taskId, "red", 3, reason, note, category);
 
   closeModal("blunder-modal");
   pendingBlunderTaskId = null;
@@ -714,12 +724,13 @@ function showMemberFlags(memberId) {
       item.className = "flag-history-item";
       var dateStr = new Date(f.createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
       var noteHtml = f.note ? '<span class="flag-history-note">' + escapeHtml(f.note) + '</span>' : '';
+      var catHtml = f.category ? '<span class="flag-category-badge">' + escapeHtml(categoryLabels[f.category] || f.category) + '</span>' : '';
       item.innerHTML =
         '<div class="flag-history-icon ' + f.color + '">' +
           icons.dot + (f.count > 1 ? ' x' + f.count : '') +
         '</div>' +
         '<div class="flag-history-info">' +
-          '<span class="flag-history-reason">' + escapeHtml(f.reason) + '</span>' +
+          '<span class="flag-history-reason">' + escapeHtml(f.reason) + catHtml + '</span>' +
           noteHtml +
           '<span class="flag-history-date">' + dateStr + '</span>' +
         '</div>';
@@ -963,6 +974,8 @@ function saveTask(event) {
     priority: document.getElementById("task-priority").value,
     dueDate: document.getElementById("task-due").value,
     status: document.getElementById("task-status").value,
+    category: document.getElementById("task-category").value,
+    keywords: document.getElementById("task-keywords").value.trim(),
     createdAt: editId
       ? (data.tasks.find(function(t) { return t.id === editId; }) || {}).createdAt || new Date().toISOString()
       : new Date().toISOString()
@@ -985,6 +998,101 @@ function saveTask(event) {
   refreshAll();
 }
 
+// ==================== Assignee Risk Alert ====================
+
+var categoryLabels = {
+  people: "People", system: "System", emotions: "Emotions",
+  skills: "Skills", domain: "Domain", management: "Management", other: "Other"
+};
+
+function checkAssigneeRisk() {
+  var alertEl = document.getElementById("task-assignee-alert");
+  if (!alertEl) return;
+  alertEl.style.display = "none";
+  alertEl.innerHTML = "";
+
+  var memberId = document.getElementById("task-assignee").value;
+  var category = document.getElementById("task-category").value;
+  var keywords = document.getElementById("task-keywords").value.trim().toLowerCase();
+
+  if (!memberId) return;
+
+  var warnings = [];
+
+  // Get current month key
+  var now = new Date();
+  var currentMonthKey = now.getFullYear() + "-" + String(now.getMonth() + 1).padStart(2, "0");
+
+  // Get red flags for this member in current month
+  var memberRedFlags = data.flags.filter(function(f) {
+    return f.memberId === memberId && f.color === "red" && getMonthKey(f.createdAt) === currentMonthKey;
+  });
+
+  // Check category-based risk: 2+ red flags in same category this month
+  if (category) {
+    var catCount = 0;
+    memberRedFlags.forEach(function(f) {
+      if (f.category === category) catCount += f.count;
+    });
+    if (catCount >= 2) {
+      warnings.push({
+        type: "category",
+        text: "This member has <strong>" + catCount + " growth signals</strong> in <strong>" + (categoryLabels[category] || category) + "</strong> this month. Consider support or reassignment."
+      });
+    }
+  }
+
+  // Check keyword-based risk: match task keywords against red flag task keywords
+  if (keywords) {
+    var inputKeywords = keywords.split(",").map(function(k) { return k.trim().toLowerCase(); }).filter(function(k) { return k.length > 0; });
+    if (inputKeywords.length > 0) {
+      var matchedKeywords = [];
+      memberRedFlags.forEach(function(f) {
+        // Check keywords from the task associated with this flag
+        if (f.taskId) {
+          var flagTask = data.tasks.find(function(t) { return t.id === f.taskId; });
+          if (flagTask && flagTask.keywords) {
+            var flagKeywords = flagTask.keywords.toLowerCase().split(",").map(function(k) { return k.trim(); });
+            inputKeywords.forEach(function(ik) {
+              flagKeywords.forEach(function(fk) {
+                if (ik && fk && (ik === fk || ik.indexOf(fk) !== -1 || fk.indexOf(ik) !== -1)) {
+                  if (matchedKeywords.indexOf(ik) === -1) matchedKeywords.push(ik);
+                }
+              });
+            });
+          }
+        }
+        // Also check flag note/reason for keyword matches
+        var flagText = ((f.reason || "") + " " + (f.note || "")).toLowerCase();
+        inputKeywords.forEach(function(ik) {
+          if (ik && flagText.indexOf(ik) !== -1) {
+            if (matchedKeywords.indexOf(ik) === -1) matchedKeywords.push(ik);
+          }
+        });
+      });
+      if (matchedKeywords.length > 0) {
+        warnings.push({
+          type: "keyword",
+          text: "Keyword overlap with recent growth signals: <strong>" + matchedKeywords.join(", ") + "</strong>. This member has struggled with similar work this month."
+        });
+      }
+    }
+  }
+
+  if (warnings.length > 0) {
+    var html = '<div class="assignee-alert-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div>';
+    html += '<div class="assignee-alert-content">';
+    html += '<div class="assignee-alert-title">Risk Pattern Detected</div>';
+    warnings.forEach(function(w) {
+      html += '<div class="assignee-alert-msg">' + w.text + '</div>';
+    });
+    html += '<div class="assignee-alert-note">You can still assign this task — this is an awareness signal.</div>';
+    html += '</div>';
+    alertEl.innerHTML = html;
+    alertEl.style.display = "flex";
+  }
+}
+
 function editTask(id) {
   var task = data.tasks.find(function(t) { return t.id === id; });
   if (!task) return;
@@ -994,11 +1102,14 @@ function editTask(id) {
   document.getElementById("task-notes").value = task.notes || "";
   populateMemberDropdown("task-assignee");
   document.getElementById("task-assignee").value = task.assigneeId;
+  document.getElementById("task-category").value = task.category || "";
+  document.getElementById("task-keywords").value = task.keywords || "";
   document.getElementById("task-priority").value = task.priority;
   document.getElementById("task-due").value = task.dueDate;
   document.getElementById("task-status").value = task.status;
   document.getElementById("task-modal-title").textContent = "Edit Task";
   openModal("task-modal");
+  checkAssigneeRisk();
 }
 
 function deleteTask(id) {
@@ -1202,9 +1313,21 @@ function renderTasks() {
     actions += '<button class="tt-action-btn tt-action-edit" onclick="editTask(\'' + task.id + '\')" title="Edit"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>';
     actions += '<button class="tt-action-btn tt-action-delete" onclick="deleteTask(\'' + task.id + '\')" title="Delete"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></button>';
 
+    var taskMeta = '';
+    if (task.category) {
+      taskMeta += '<span class="tt-category-badge">' + escapeHtml(categoryLabels[task.category] || task.category) + '</span>';
+    }
+    if (task.keywords) {
+      task.keywords.split(",").forEach(function(kw) {
+        kw = kw.trim();
+        if (kw) taskMeta += '<span class="tt-keyword-badge">' + escapeHtml(kw) + '</span>';
+      });
+    }
+
     html += '<tr class="' + rowClass + '">' +
       '<td class="tt-col-title">' +
         '<div class="tt-task-name">' + escapeHtml(task.title) + ' ' + flagIndicator + '</div>' +
+        (taskMeta ? '<div class="tt-task-tags">' + taskMeta + '</div>' : '') +
         (task.description ? '<div class="tt-task-desc">' + escapeHtml(task.description) + '</div>' : '') +
       '</td>' +
       '<td class="tt-col-assignee">' + assigneeSelect + '</td>' +
