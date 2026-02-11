@@ -2154,8 +2154,10 @@ function refreshAll() {
 // ==================== Demo Data Seeding ====================
 
 function seedDemoData() {
-  // Only seed if no data exists
-  if (data.members.length > 0 || data.roles.length > 0) return;
+  // Only seed if no data exists or seed version changed
+  var seedVersion = "v3";
+  if (localStorage.getItem("boss_seed_version") === seedVersion) return;
+  localStorage.setItem("boss_seed_version", seedVersion);
 
   // --- Roles ---
   var roles = [
@@ -2227,7 +2229,20 @@ function seedDemoData() {
     { id: "task_30", title: "Q2 roadmap planning",          description: "Define Q2 milestones and deliverables", notes: "Aligned with all stakeholders",   assigneeId: "mem_deepa",  priority: "high",   dueDate: "2026-01-12", status: "completed", reviewResult: "perfect",       createdAt: "2026-01-02T09:00:00.000Z" },
     { id: "task_31", title: "Team restructuring plan",      description: "Reorg proposal for scaling teams",     notes: "Board approved same day",          assigneeId: "mem_rahul",  priority: "high",   dueDate: "2026-01-15", status: "completed", reviewResult: "extraordinary", createdAt: "2026-01-03T09:00:00.000Z" },
     { id: "task_32", title: "Security test framework",      description: "Build OWASP-based test framework",     notes: "Integrated with CI pipeline",      assigneeId: "mem_anita",  priority: "high",   dueDate: "2026-01-18", status: "completed", reviewResult: "perfect",       createdAt: "2026-01-05T09:00:00.000Z" },
-    { id: "task_33", title: "GraphQL API layer",            description: "Add GraphQL gateway over REST APIs",   notes: "",                                 assigneeId: "mem_vikram", priority: "high",   dueDate: "2026-01-25", status: "in-progress",                              createdAt: "2026-01-06T09:00:00.000Z" }
+    { id: "task_33", title: "GraphQL API layer",            description: "Add GraphQL gateway over REST APIs",   notes: "",                                 assigneeId: "mem_vikram", priority: "high",   dueDate: "2026-01-25", status: "in-progress",                              createdAt: "2026-01-06T09:00:00.000Z" },
+    // Additional December 2025 tasks (fill gaps)
+    { id: "task_34", title: "Brand guideline documentation",  description: "Document updated brand standards for 2026", notes: "Comprehensive and well-organized",  assigneeId: "mem_priya",  priority: "medium", dueDate: "2025-12-15", status: "completed", reviewResult: "perfect",       createdAt: "2025-12-02T09:00:00.000Z" },
+    { id: "task_35", title: "Year-end team performance reviews", description: "Conduct and document all team reviews", notes: "Delayed feedback to 3 members",  assigneeId: "mem_rahul",  priority: "high",   dueDate: "2025-12-12", status: "completed", reviewResult: "below",         createdAt: "2025-12-01T09:00:00.000Z" },
+    { id: "task_36", title: "Database performance tuning",    description: "Optimize slow queries and indexing strategy", notes: "Reduced avg query time by 60%", assigneeId: "mem_vikram", priority: "high",   dueDate: "2025-12-16", status: "completed", reviewResult: "extraordinary", createdAt: "2025-12-03T09:00:00.000Z" },
+    { id: "task_37", title: "Mobile app test coverage",       description: "Increase test coverage to 90% on mobile app", notes: "Achieved 92% coverage",         assigneeId: "mem_anita",  priority: "high",   dueDate: "2025-12-19", status: "completed", reviewResult: "perfect",       createdAt: "2025-12-04T09:00:00.000Z" },
+    { id: "task_38", title: "Annual budget finalization",     description: "Finalize department budgets for 2026",  notes: "Minor discrepancies found late",       assigneeId: "mem_deepa",  priority: "high",   dueDate: "2025-12-22", status: "completed", reviewResult: "perfect",       createdAt: "2025-12-05T09:00:00.000Z" },
+    // Additional January 2026 tasks (fill gaps)
+    { id: "task_39", title: "Real-time analytics dashboard",  description: "Build live metrics dashboard with WebSocket updates", notes: "Exceeded performance targets",  assigneeId: "mem_arjun",  priority: "high",   dueDate: "2026-01-15", status: "completed", reviewResult: "extraordinary", createdAt: "2026-01-03T09:00:00.000Z" },
+    { id: "task_40", title: "Automated deployment testing",   description: "Validate zero-downtime deploy pipeline",   notes: "Missed rollback scenario",          assigneeId: "mem_sneha",  priority: "high",   dueDate: "2026-01-10", status: "completed", reviewResult: "below",         createdAt: "2026-01-02T09:00:00.000Z" },
+    { id: "task_41", title: "Mobile app UI overhaul",         description: "Redesign navigation and key screens",      notes: "Shipped with broken gestures and wrong spacing", assigneeId: "mem_meera", priority: "high", dueDate: "2026-01-14", status: "completed", reviewResult: "blunder", createdAt: "2026-01-03T09:00:00.000Z" },
+    { id: "task_42", title: "API stress testing report",      description: "Run stress tests and document findings",   notes: "Thorough report with actionable items",          assigneeId: "mem_karan", priority: "medium", dueDate: "2026-01-16", status: "completed", reviewResult: "perfect", createdAt: "2026-01-05T09:00:00.000Z" },
+    { id: "task_43", title: "Event-driven architecture POC",  description: "Prototype event sourcing with Kafka",      notes: "Clean implementation, ready for prod",           assigneeId: "mem_rohan", priority: "high",   dueDate: "2026-01-20", status: "completed", reviewResult: "perfect",       createdAt: "2026-01-06T09:00:00.000Z" },
+    { id: "task_44", title: "Infrastructure cost optimization", description: "Reduce cloud spend by 20%",             notes: "Achieved 25% reduction",                         assigneeId: "mem_vikram", priority: "medium", dueDate: "2026-01-22", status: "completed", reviewResult: "perfect",      createdAt: "2026-01-08T09:00:00.000Z" }
   ];
 
   // --- Flags ---
@@ -2306,7 +2321,30 @@ function seedDemoData() {
     { id: "flag_41", memberId: "mem_rahul",  taskId: "task_31", color: "green", count: 2, reason: "Extraordinary result: Team restructuring plan",           createdAt: "2026-01-15T15:00:00.000Z" },
     { id: "flag_42", memberId: "mem_anita",  taskId: "task_32", color: "green", count: 1, reason: "Completed perfectly: Security test framework",            createdAt: "2026-01-18T15:00:00.000Z" },
     { id: "flag_43", memberId: "mem_arjun",  taskId: null,      color: "red",   count: 1, reason: "Skipped code review for critical hotfix",                 createdAt: "2026-01-20T10:00:00.000Z" },
-    { id: "flag_44", memberId: "mem_sneha",  taskId: null,      color: "green", count: 1, reason: "Improved QA process documentation significantly",         createdAt: "2026-01-22T10:00:00.000Z" }
+    { id: "flag_44", memberId: "mem_sneha",  taskId: null,      color: "green", count: 1, reason: "Improved QA process documentation significantly",         createdAt: "2026-01-22T10:00:00.000Z" },
+
+    // === Additional December 2025 Flags (fill gaps) ===
+    { id: "flag_45", memberId: "mem_priya",  taskId: "task_34", color: "green", count: 1, reason: "Completed with excellence: Brand guideline documentation",    note: "Very thorough and well-structured",  category: "cat_domain",     createdAt: "2025-12-15T15:00:00.000Z" },
+    { id: "flag_46", memberId: "mem_rahul",  taskId: "task_35", color: "red",   count: 1, reason: "Needs support: Year-end team performance reviews",            note: "Delayed feedback to 3 members",      category: "cat_management", createdAt: "2025-12-12T15:00:00.000Z" },
+    { id: "flag_47", memberId: "mem_vikram", taskId: "task_36", color: "green", count: 2, reason: "Exceptional contribution: Database performance tuning",        note: "60% latency reduction",              category: "cat_skill",      createdAt: "2025-12-16T15:00:00.000Z" },
+    { id: "flag_48", memberId: "mem_anita",  taskId: "task_37", color: "green", count: 1, reason: "Completed with excellence: Mobile app test coverage",          note: "Exceeded 90% target",                category: "cat_skill",      createdAt: "2025-12-19T15:00:00.000Z" },
+    { id: "flag_49", memberId: "mem_deepa",  taskId: "task_38", color: "green", count: 1, reason: "Completed with excellence: Annual budget finalization",         note: "",                                   category: "cat_management", createdAt: "2025-12-22T15:00:00.000Z" },
+    { id: "flag_50", memberId: "mem_rahul",  taskId: null,      color: "green", count: 1, reason: "Leadership Multiplier: Cross-team collaboration on year-end goals", note: "",                              category: "cat_people",     createdAt: "2025-12-28T10:00:00.000Z" },
+    { id: "flag_51", memberId: "mem_sneha",  taskId: null,      color: "red",   count: 1, reason: "Missed regression test deadline for release 4.2",               note: "Tests delivered 2 days late",        category: "cat_sop",        createdAt: "2025-12-20T10:00:00.000Z" },
+    { id: "flag_52", memberId: "mem_priya",  taskId: null,      color: "red",   count: 1, reason: "Delivered mockups with outdated design tokens",                  note: "Had to redo 5 screens",             category: "cat_skill",      createdAt: "2025-12-22T10:00:00.000Z" },
+
+    // === Additional January 2026 Flags (fill gaps) ===
+    { id: "flag_53", memberId: "mem_arjun",  taskId: "task_39", color: "green", count: 2, reason: "Exceptional contribution: Real-time analytics dashboard",       note: "Exceeded all performance targets",    category: "cat_skill",      createdAt: "2026-01-15T15:00:00.000Z" },
+    { id: "flag_54", memberId: "mem_sneha",  taskId: "task_40", color: "red",   count: 1, reason: "Needs support: Automated deployment testing",                   note: "Missed rollback scenario",            category: "cat_sop",        createdAt: "2026-01-10T15:00:00.000Z" },
+    { id: "flag_55", memberId: "mem_meera",  taskId: "task_41", color: "red",   count: 2, reason: "Blunder: Mobile app UI overhaul",                               note: "Broken gestures and wrong spacing shipped", category: "cat_skill", createdAt: "2026-01-14T15:00:00.000Z" },
+    { id: "flag_56", memberId: "mem_karan",  taskId: "task_42", color: "green", count: 1, reason: "Completed with excellence: API stress testing report",           note: "Thorough and actionable",             category: "cat_domain",     createdAt: "2026-01-16T15:00:00.000Z" },
+    { id: "flag_57", memberId: "mem_rohan",  taskId: "task_43", color: "green", count: 1, reason: "Completed with excellence: Event-driven architecture POC",       note: "Clean implementation",                category: "cat_skill",      createdAt: "2026-01-20T15:00:00.000Z" },
+    { id: "flag_58", memberId: "mem_vikram", taskId: "task_44", color: "green", count: 1, reason: "Completed with excellence: Infrastructure cost optimization",    note: "Achieved 25% cost reduction",         category: "cat_domain",     createdAt: "2026-01-22T15:00:00.000Z" },
+    { id: "flag_59", memberId: "mem_meera",  taskId: null,      color: "red",   count: 1, reason: "Repeated accessibility issues in handoff to dev",                note: "Third time this quarter",             category: "cat_sop",        createdAt: "2026-01-25T10:00:00.000Z" },
+    { id: "flag_60", memberId: "mem_rohan",  taskId: null,      color: "green", count: 1, reason: "Leadership Multiplier: Mentored 2 junior devs on event systems", note: "",                                    category: "cat_people",     createdAt: "2026-01-28T10:00:00.000Z" },
+    { id: "flag_61", memberId: "mem_karan",  taskId: null,      color: "green", count: 1, reason: "Leadership Multiplier: Cross-team collaboration on perf testing", note: "",                                   category: "cat_people",     createdAt: "2026-01-28T10:00:00.000Z" },
+    { id: "flag_62", memberId: "mem_priya",  taskId: null,      color: "red",   count: 1, reason: "Handoff to dev had incomplete responsive specs",                 note: "Missing tablet breakpoints",          category: "cat_skill",      createdAt: "2026-01-22T10:00:00.000Z" },
+    { id: "flag_63", memberId: "mem_rahul",  taskId: null,      color: "green", count: 1, reason: "Leadership Multiplier: Positively referenced by 3 team leads",   note: "",                                    category: "cat_people",     createdAt: "2026-01-26T10:00:00.000Z" }
   ];
 
   data.roles = roles;
