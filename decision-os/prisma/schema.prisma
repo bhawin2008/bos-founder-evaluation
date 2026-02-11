@@ -1,0 +1,55 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model Decision {
+  id              String   @id @default(cuid())
+  title           String
+  category        String   // CAREER, FINANCE, RELATIONSHIP, HEALTH, BUSINESS, EDUCATION, LIFESTYLE, OTHER
+  decisionType    String   // ONE_WAY, TWO_WAY
+  deadline        DateTime?
+  urgencyNote     String   @default("")
+  doNothing30Days String   @default("")
+  emotionState    String   @default("") // calm, fear, anger, guilt, ego, excitement, anxiety
+
+  reasonsFor      String   @default("[]") // JSON array
+  reasonsAgainst  String   @default("[]") // JSON array
+
+  factsKnown      String   @default("")
+  assumptions     String   @default("")
+
+  bestCase        String   @default("")
+  worstCase       String   @default("")
+  likelyOutcome   String   @default("")
+
+  costMoney       Int      @default(0) // 0-10
+  costTime        Int      @default(0) // 0-10
+  costEnergy      Int      @default(0) // 0-10
+  costReputation  Int      @default(0) // 0-10
+
+  valuesTop3      String   @default("[]") // JSON array
+  identityMatch   String   @default("")
+  proudIn1Year    String   @default("UNSURE") // YES, NO, UNSURE
+
+  options         String   @default("{}") // JSON { a, b, c }
+
+  scores          String   @default("{}") // JSON scores object
+  weightedScore   Float    @default(0)
+  verdict         String   @default("") // DO, DONT, WAIT, TEST
+  confidence      Int      @default(0) // 0-100
+  redFlags        String   @default("[]") // JSON array
+  counselorNotes  String   @default("")
+  nextSteps       String   @default("{}") // JSON
+  experimentPlan  String   @default("{}") // JSON
+
+  status          String   @default("draft") // draft, final
+  calmCheck       String   @default("{}") // JSON { hungry, tired, angry, lonely }
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
