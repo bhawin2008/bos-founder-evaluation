@@ -232,11 +232,11 @@ h1, h2, h3, h4 { color: var(--text-heading); font-weight: 600; }
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: var(--sp-6);
+  margin-bottom: var(--sp-4);
 }
 
 .view-header h2 {
-  font-size: 1.5rem;
+  font-size: 1.3rem;
   font-weight: 700;
   letter-spacing: -0.025em;
 }
@@ -354,15 +354,15 @@ h1, h2, h3, h4 { color: var(--text-heading); font-weight: 600; }
 .stats-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: var(--sp-4);
-  margin-bottom: var(--sp-6);
+  gap: var(--sp-3);
+  margin-bottom: var(--sp-4);
 }
 
 .stat-card {
   background: var(--bg-card);
   border: 1px solid var(--border-color);
-  border-radius: var(--radius-lg);
-  padding: var(--sp-5);
+  border-radius: var(--radius-md);
+  padding: var(--sp-4);
   transition: all var(--duration) var(--ease);
 }
 
@@ -372,7 +372,7 @@ h1, h2, h3, h4 { color: var(--text-heading); font-weight: 600; }
 }
 
 .stat-value {
-  font-size: 1.75rem;
+  font-size: 1.5rem;
   font-weight: 700;
   letter-spacing: -0.03em;
   color: var(--text-heading);
@@ -405,21 +405,22 @@ h1, h2, h3, h4 { color: var(--text-heading); font-weight: 600; }
 .dashboard-sections {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: var(--sp-4);
+  gap: var(--sp-3);
+  margin-bottom: var(--sp-3);
 }
 
 .dashboard-section {
   background: var(--bg-card);
   border: 1px solid var(--border-color);
-  border-radius: var(--radius-lg);
-  padding: var(--sp-5);
+  border-radius: var(--radius-md);
+  padding: var(--sp-4);
 }
 
 .dashboard-section h3 {
-  font-size: 0.82rem;
+  font-size: 0.78rem;
   font-weight: 600;
   color: var(--text-heading);
-  margin-bottom: var(--sp-4);
+  margin-bottom: var(--sp-3);
   text-transform: uppercase;
   letter-spacing: 0.04em;
 }
@@ -478,8 +479,8 @@ h1, h2, h3, h4 { color: var(--text-heading); font-weight: 600; }
   gap: var(--sp-3);
 }
 .zone-card-box {
-  border-radius: var(--radius-md);
-  padding: var(--sp-4) var(--sp-5);
+  border-radius: var(--radius-sm);
+  padding: var(--sp-3) var(--sp-4);
   text-align: center;
   border: 1px solid var(--border-light);
   transition: box-shadow var(--duration) var(--ease);
@@ -489,7 +490,7 @@ h1, h2, h3, h4 { color: var(--text-heading); font-weight: 600; }
 .zone-card-orange { border-left: 3px solid var(--zone-o); background: var(--zone-o-bg); }
 .zone-card-red { border-left: 3px solid var(--zone-r); background: var(--zone-r-bg); }
 .zone-card-count {
-  font-size: 1.5rem;
+  font-size: 1.3rem;
   font-weight: 800;
   line-height: 1;
   margin-bottom: 2px;
@@ -666,9 +667,9 @@ h1, h2, h3, h4 { color: var(--text-heading); font-weight: 600; }
 .dashboard-list-item {
   display: flex;
   align-items: center;
-  gap: var(--sp-3);
-  padding: var(--sp-3);
-  border-radius: var(--radius-md);
+  gap: var(--sp-2);
+  padding: var(--sp-2) var(--sp-3);
+  border-radius: var(--radius-sm);
   transition: background var(--duration) var(--ease);
 }
 
@@ -2315,12 +2316,13 @@ h1, h2, h3, h4 { color: var(--text-heading); font-weight: 600; }
 .insights-panel {
   background: var(--bg-card);
   border: 1px solid var(--border-color);
-  border-radius: var(--radius-lg);
-  padding: var(--sp-6);
+  border-radius: var(--radius-md);
+  padding: var(--sp-4) var(--sp-5);
+  margin-bottom: var(--sp-3);
 }
 
 .insights-title {
-  font-size: 0.95rem;
+  font-size: 0.88rem;
   font-weight: 700;
   color: var(--text-heading);
   margin-bottom: 2px;
@@ -2328,15 +2330,15 @@ h1, h2, h3, h4 { color: var(--text-heading); font-weight: 600; }
 }
 
 .insights-subtitle {
-  font-size: 0.75rem;
+  font-size: 0.72rem;
   color: var(--text-muted);
-  margin-bottom: var(--sp-5);
+  margin-bottom: var(--sp-3);
 }
 
 .insights-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: var(--sp-4);
+  gap: var(--sp-3);
 }
 
 .insight-card {
@@ -2438,9 +2440,9 @@ h1, h2, h3, h4 { color: var(--text-heading); font-weight: 600; }
 .psychology-panel {
   background: var(--bg-subtle);
   border: 1px solid var(--border-color);
-  border-radius: var(--radius-lg);
-  padding: var(--sp-6);
-  margin-top: var(--sp-6);
+  border-radius: var(--radius-md);
+  padding: var(--sp-4) var(--sp-5);
+  margin-top: var(--sp-3);
 }
 
 .psychology-panel h3 {

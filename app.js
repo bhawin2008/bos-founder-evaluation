@@ -2250,7 +2250,6 @@ function refreshAll() {
   renderRoles();
   renderCategories();
   if (typeof renderReports === "function") renderReports();
-  if (typeof renderCultureSuggestions === "function") renderCultureSuggestions();
 }
 
 // ==================== Demo Data Seeding ====================
