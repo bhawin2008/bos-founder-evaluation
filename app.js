@@ -2149,6 +2149,7 @@ function refreshAll() {
   renderTasks();
   renderRoles();
   renderCategories();
+  if (typeof renderReports === "function") renderReports();
 }
 
 // ==================== Demo Data Seeding ====================
