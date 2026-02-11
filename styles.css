@@ -852,6 +852,32 @@ h1, h2, h3, h4 { color: var(--text-heading); font-weight: 600; }
   margin-left: 4px;
 }
 
+/* ---- Section Header Row (title + action on same line) ---- */
+.section-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-3);
+}
+.section-header-row h3 { margin: 0; }
+
+.attn-view-more {
+  background: none;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  padding: 4px 12px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--accent);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background var(--duration) var(--ease), border-color var(--duration) var(--ease);
+}
+.attn-view-more:hover {
+  background: var(--accent-light);
+  border-color: var(--accent);
+}
+
 /* ======================================================================
    SIGNAL BADGES (was flag badges/counts)
    ====================================================================== */

@@ -1790,10 +1790,13 @@ function renderDashboard() {
     }
   }
 
-  // === Attention Board (Important+Past Due first) ===
+  // === Attention Board (Important+Past Due first, max 5 collapsed) ===
   var overdueEl = document.getElementById("dashboard-overdue");
+  var viewMoreBtn = document.getElementById("attn-view-more-btn");
   if (overdueEl) {
     var overdueTasks = filteredTasks.filter(function(t) { return isOverdue(t); });
+    if (viewMoreBtn) viewMoreBtn.style.display = "none";
+
     if (overdueTasks.length === 0) {
       overdueEl.innerHTML = '<div class="empty-state-sm">No tasks need attention</div>';
     } else {
@@ -1805,8 +1808,20 @@ function renderDashboard() {
         return new Date(a.dueDate) - new Date(b.dueDate);
       });
 
+      var attnLimit = 5;
+      var isExpanded = overdueEl.dataset.expanded === "true";
+      var visibleTasks = isExpanded ? overdueTasks : overdueTasks.slice(0, attnLimit);
+
+      // Show View More button if more than 5
+      if (overdueTasks.length > attnLimit && viewMoreBtn) {
+        viewMoreBtn.style.display = "";
+        viewMoreBtn.textContent = isExpanded
+          ? "View Less"
+          : "View More (" + (overdueTasks.length - attnLimit) + ")";
+      }
+
       overdueEl.innerHTML = "";
-      overdueTasks.forEach(function(task) {
+      visibleTasks.forEach(function(task) {
         var assignee = data.members.find(function(m) { return m.id === task.assigneeId; });
         var isImportant = task.weightage === "important";
         var item = document.createElement("div");
@@ -1824,6 +1839,13 @@ function renderDashboard() {
       });
     }
   }
+}
+
+function toggleAttentionBoard() {
+  var el = document.getElementById("dashboard-overdue");
+  if (!el) return;
+  el.dataset.expanded = el.dataset.expanded === "true" ? "false" : "true";
+  renderDashboard();
 }
 
 // ==================== Predictive Insights ====================
