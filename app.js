@@ -1373,21 +1373,19 @@ function renderDashboard() {
     }
   }
 
-  // === Department Heatmap ===
+  // === Department Health Map (Pie Chart) ===
   var heatmapEl = document.getElementById("dashboard-heatmap");
   if (heatmapEl) {
     if (data.roles.length === 0) {
       heatmapEl.innerHTML = '<div class="empty-state-sm">No roles/teams defined</div>';
     } else {
-      var html = '<div class="heatmap-grid">';
+      var deptData = [];
+      var pieColors = ['#4F46E5', '#059669', '#D97706', '#B91C1C', '#7C3AED', '#0891B2', '#DC2626', '#059669'];
+      var colorIdx = 0;
       data.roles.forEach(function(role) {
         var roleMembers = data.members.filter(function(m) { return m.roleId === role.id; });
-        if (roleMembers.length === 0) {
-          html += '<div class="heatmap-cell neutral"><div class="heatmap-dept">' + escapeHtml(role.name) + '</div><div class="heatmap-val">No members</div></div>';
-          return;
-        }
-        var totalNet = 0;
-        var gCount = 0, rCount = 0;
+        if (roleMembers.length === 0) return;
+        var totalNet = 0, gCount = 0, rCount = 0;
         roleMembers.forEach(function(m) {
           var f = getMemberFlagsFiltered(m.id);
           totalNet += (f.green - f.red);
@@ -1395,14 +1393,10 @@ function renderDashboard() {
           rCount += f.red;
         });
         var avgNet = totalNet / roleMembers.length;
-        var heatClass = avgNet > 0 ? "green" : (avgNet < 0 ? "red" : "neutral");
-        html += '<div class="heatmap-cell ' + heatClass + '">' +
-          '<div class="heatmap-dept">' + escapeHtml(role.name) + '</div>' +
-          '<div class="heatmap-val">' + (avgNet > 0 ? '+' : '') + avgNet.toFixed(1) + ' avg</div>' +
-          '<div class="heatmap-detail">' + roleMembers.length + ' members · ' + gCount + 'G / ' + rCount + 'R</div>' +
-        '</div>';
+        var health = avgNet > 0 ? "green" : (avgNet < 0 ? "red" : "neutral");
+        deptData.push({ name: role.name, count: roleMembers.length, avgNet: avgNet, health: health, green: gCount, red: rCount, color: pieColors[colorIdx % pieColors.length] });
+        colorIdx++;
       });
-
       // Unassigned
       var unassigned = data.members.filter(function(m) { return !m.roleId; });
       if (unassigned.length > 0) {
@@ -1414,20 +1408,54 @@ function renderDashboard() {
           uR += f.red;
         });
         var uAvg = uNet / unassigned.length;
-        var uClass = uAvg > 0 ? "green" : (uAvg < 0 ? "red" : "neutral");
-        html += '<div class="heatmap-cell ' + uClass + '">' +
-          '<div class="heatmap-dept">Unassigned</div>' +
-          '<div class="heatmap-val">' + (uAvg > 0 ? '+' : '') + uAvg.toFixed(1) + ' avg</div>' +
-          '<div class="heatmap-detail">' + unassigned.length + ' members · ' + uG + 'G / ' + uR + 'R</div>' +
-        '</div>';
+        deptData.push({ name: "Unassigned", count: unassigned.length, avgNet: uAvg, health: uAvg > 0 ? "green" : (uAvg < 0 ? "red" : "neutral"), green: uG, red: uR, color: pieColors[colorIdx % pieColors.length] });
       }
 
-      html += '</div>';
-      heatmapEl.innerHTML = html;
+      // Build SVG pie chart
+      var totalMembers = deptData.reduce(function(s, d) { return s + d.count; }, 0);
+      if (totalMembers === 0) {
+        heatmapEl.innerHTML = '<div class="empty-state-sm">No members assigned</div>';
+      } else {
+        var svgSize = 180;
+        var cx = svgSize / 2, cy = svgSize / 2, radius = 70;
+        var startAngle = -Math.PI / 2;
+        var paths = '';
+        deptData.forEach(function(d) {
+          var sliceAngle = (d.count / totalMembers) * 2 * Math.PI;
+          var endAngle = startAngle + sliceAngle;
+          var largeArc = sliceAngle > Math.PI ? 1 : 0;
+          var x1 = cx + radius * Math.cos(startAngle);
+          var y1 = cy + radius * Math.sin(startAngle);
+          var x2 = cx + radius * Math.cos(endAngle);
+          var y2 = cy + radius * Math.sin(endAngle);
+          if (deptData.length === 1) {
+            paths += '<circle cx="' + cx + '" cy="' + cy + '" r="' + radius + '" fill="' + d.color + '" />';
+          } else {
+            paths += '<path d="M' + cx + ',' + cy + ' L' + x1.toFixed(2) + ',' + y1.toFixed(2) + ' A' + radius + ',' + radius + ' 0 ' + largeArc + ',1 ' + x2.toFixed(2) + ',' + y2.toFixed(2) + ' Z" fill="' + d.color + '" />';
+          }
+          startAngle = endAngle;
+        });
+
+        var pieSvg = '<svg viewBox="0 0 ' + svgSize + ' ' + svgSize + '" class="pie-chart-svg">' + paths + '</svg>';
+        var legendHtml = '<div class="pie-legend">';
+        deptData.forEach(function(d) {
+          var healthDot = d.health === "green" ? "zone-green" : (d.health === "red" ? "zone-red" : "zone-orange");
+          legendHtml += '<div class="pie-legend-item">' +
+            '<span class="pie-legend-color" style="background:' + d.color + '"></span>' +
+            '<span class="pie-legend-name">' + escapeHtml(d.name) + '</span>' +
+            '<span class="pie-legend-count">' + d.count + '</span>' +
+            '<span class="member-zone-dot ' + healthDot + '"></span>' +
+            '<span class="pie-legend-score">' + (d.avgNet > 0 ? '+' : '') + d.avgNet.toFixed(1) + '</span>' +
+          '</div>';
+        });
+        legendHtml += '</div>';
+
+        heatmapEl.innerHTML = '<div class="pie-chart-wrap">' + pieSvg + legendHtml + '</div>';
+      }
     }
   }
 
-  // === Member Flag Status ===
+  // === Member Flag Status (with Zone Tabs) ===
   var flagStatusEl = document.getElementById("dashboard-flag-status");
   if (flagStatusEl) {
     if (data.members.length === 0) {
@@ -1437,42 +1465,69 @@ function renderDashboard() {
         var flags = getMemberFlagsFiltered(m.id);
         var eff = getEffectiveFlags(m.id);
         var effNet = eff.green - eff.red;
-        return { member: m, green: flags.green, red: flags.red, net: flags.green - flags.red, effNet: effNet, decayActive: eff.decayActive };
+        var zone = getMemberZoneFiltered(m.id);
+        return { member: m, green: flags.green, red: flags.red, net: flags.green - flags.red, effNet: effNet, decayActive: eff.decayActive, zone: zone };
       }).sort(function(a, b) { return b.effNet - a.effNet; });
 
-      flagStatusEl.innerHTML = "";
-      memberFlagData.forEach(function(mf) {
-        var initials = mf.member.name.split(" ").map(function(n) { return n[0]; }).join("").toUpperCase().substring(0, 2);
-        var role = data.roles.find(function(r) { return r.id === mf.member.roleId; });
-        var roleColor = role ? role.color : "blue";
-        var netClass = mf.effNet > 0 ? "green" : (mf.effNet < 0 ? "red" : "neutral");
-        var alertCls = isRedAlert(mf.member.id) ? " alert-item" : "";
-        var warnCls = getMonthlyRedWarning(mf.member.id) ? " monthly-warn-item" : "";
-        var trend = getMemberTrend(mf.member.id);
-        var trendIcon = trend === "rising" ? icons.arrowUp : (trend === "falling" ? icons.arrowDown : icons.minus);
-        var trendCls = trend === "rising" ? "trend-rising" : (trend === "falling" ? "trend-falling" : "trend-flat");
+      var greenMembers = memberFlagData.filter(function(mf) { return mf.zone === "green"; });
+      var orangeMembers = memberFlagData.filter(function(mf) { return mf.zone === "yellow"; });
+      var redMembers = memberFlagData.filter(function(mf) { return mf.zone === "red"; });
 
-        var item = document.createElement("div");
-        item.className = "dashboard-list-item clickable" + alertCls + warnCls;
-        item.onclick = function() { showMemberFlags(mf.member.id); };
-        item.innerHTML =
-          '<div class="avatar avatar-sm ' + roleColor + '">' + initials + '</div>' +
-          '<div class="dashboard-item-info">' +
-            '<span class="dashboard-item-name">' + escapeHtml(mf.member.name) +
-              ' <span class="trend-badge-sm ' + trendCls + '">' + trendIcon + '</span>' +
-              (isRedAlert(mf.member.id) ? ' <span class="red-alert-badge-sm">SUPPORT</span>' : '') +
-              (getMonthlyRedWarning(mf.member.id) ? ' <span class="monthly-warning-badge-sm">ATTN</span>' : '') +
-              (mf.decayActive ? ' <span class="decay-badge-sm">-50%</span>' : '') +
-            '</span>' +
-            '<span class="dashboard-item-detail">' + (role ? escapeHtml(role.name) : "No Role") + '</span>' +
-          '</div>' +
-          '<div class="dashboard-flag-chips">' +
-            '<span class="flag-chip flag-chip-green">' + icons.dot + ' ' + mf.green + '</span>' +
-            '<span class="flag-chip flag-chip-red">' + icons.dot + ' ' + mf.red + '</span>' +
-            '<span class="flag-chip flag-chip-net ' + netClass + '">' + (mf.effNet > 0 ? '+' : '') + mf.effNet + '</span>' +
-          '</div>';
-        flagStatusEl.appendChild(item);
-      });
+      var activeTab = (flagStatusEl.dataset.activeTab) || "green";
+
+      var tabsHtml =
+        '<div class="signal-board-tabs">' +
+          '<button class="signal-tab signal-tab-green' + (activeTab === "green" ? " active" : "") + '" onclick="switchSignalTab(\'green\')">' +
+            '<span class="signal-tab-dot zone-green"></span> Green <span class="signal-tab-count">' + greenMembers.length + '</span>' +
+          '</button>' +
+          '<button class="signal-tab signal-tab-orange' + (activeTab === "orange" ? " active" : "") + '" onclick="switchSignalTab(\'orange\')">' +
+            '<span class="signal-tab-dot zone-orange"></span> Orange <span class="signal-tab-count">' + orangeMembers.length + '</span>' +
+          '</button>' +
+          '<button class="signal-tab signal-tab-red' + (activeTab === "red" ? " active" : "") + '" onclick="switchSignalTab(\'red\')">' +
+            '<span class="signal-tab-dot zone-red"></span> Red <span class="signal-tab-count">' + redMembers.length + '</span>' +
+          '</button>' +
+        '</div>';
+
+      var tabMembers = activeTab === "red" ? redMembers : (activeTab === "orange" ? orangeMembers : greenMembers);
+
+      var listHtml = '';
+      if (tabMembers.length === 0) {
+        listHtml = '<div class="empty-state-sm">No members in this zone</div>';
+      } else {
+        tabMembers.forEach(function(mf) {
+          var initials = mf.member.name.split(" ").map(function(n) { return n[0]; }).join("").toUpperCase().substring(0, 2);
+          var role = data.roles.find(function(r) { return r.id === mf.member.roleId; });
+          var roleColor = role ? role.color : "blue";
+          var netClass = mf.effNet > 0 ? "green" : (mf.effNet < 0 ? "red" : "neutral");
+          var alertCls = isRedAlert(mf.member.id) ? " alert-item" : "";
+          var warnCls = getMonthlyRedWarning(mf.member.id) ? " monthly-warn-item" : "";
+          var trend = getMemberTrend(mf.member.id);
+          var trendIcon = trend === "rising" ? icons.arrowUp : (trend === "falling" ? icons.arrowDown : icons.minus);
+          var trendCls = trend === "rising" ? "trend-rising" : (trend === "falling" ? "trend-falling" : "trend-flat");
+
+          listHtml +=
+            '<div class="dashboard-list-item clickable' + alertCls + warnCls + '" onclick="showMemberFlags(\'' + mf.member.id + '\')">' +
+              '<div class="avatar avatar-sm ' + roleColor + '">' + initials + '</div>' +
+              '<div class="dashboard-item-info">' +
+                '<span class="dashboard-item-name">' + escapeHtml(mf.member.name) +
+                  ' <span class="trend-badge-sm ' + trendCls + '">' + trendIcon + '</span>' +
+                  (isRedAlert(mf.member.id) ? ' <span class="red-alert-badge-sm">SUPPORT</span>' : '') +
+                  (getMonthlyRedWarning(mf.member.id) ? ' <span class="monthly-warning-badge-sm">ATTN</span>' : '') +
+                  (mf.decayActive ? ' <span class="decay-badge-sm">-50%</span>' : '') +
+                '</span>' +
+                '<span class="dashboard-item-detail">' + (role ? escapeHtml(role.name) : "No Role") + '</span>' +
+              '</div>' +
+              '<div class="dashboard-flag-chips">' +
+                '<span class="flag-chip flag-chip-green">' + icons.dot + ' ' + mf.green + '</span>' +
+                '<span class="flag-chip flag-chip-red">' + icons.dot + ' ' + mf.red + '</span>' +
+                '<span class="flag-chip flag-chip-net ' + netClass + '">' + (mf.effNet > 0 ? '+' : '') + mf.effNet + '</span>' +
+              '</div>' +
+            '</div>';
+        });
+      }
+
+      flagStatusEl.dataset.activeTab = activeTab;
+      flagStatusEl.innerHTML = tabsHtml + '<div class="signal-board-list">' + listHtml + '</div>';
     }
   }
 
@@ -1501,6 +1556,14 @@ function renderDashboard() {
 }
 
 // ==================== Predictive Insights ====================
+
+function switchSignalTab(tab) {
+  var el = document.getElementById("dashboard-flag-status");
+  if (el) {
+    el.dataset.activeTab = tab;
+    renderDashboard();
+  }
+}
 
 function renderPredictiveInsights() {
   var el = document.getElementById("dashboard-insights");

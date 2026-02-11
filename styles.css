@@ -2260,6 +2260,198 @@ select {
 }
 
 /* ======================================================================
+   SECTION INFO ICON (Tooltip on hover)
+   ====================================================================== */
+
+.section-info-icon {
+  display: inline-flex;
+  align-items: center;
+  vertical-align: middle;
+  position: relative;
+  cursor: help;
+  color: var(--text-muted);
+  margin-left: 4px;
+  transition: color var(--duration) var(--ease);
+}
+
+.section-info-icon:hover {
+  color: var(--accent);
+}
+
+.section-info-icon svg {
+  display: block;
+}
+
+.section-info-icon::after {
+  content: attr(title);
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--bg-sidebar);
+  color: #E5E7EB;
+  font-size: 0.72rem;
+  font-weight: 400;
+  line-height: 1.5;
+  letter-spacing: normal;
+  text-transform: none;
+  padding: 10px 14px;
+  border-radius: var(--radius-md);
+  width: 260px;
+  white-space: normal;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 200ms var(--ease);
+  z-index: 100;
+  box-shadow: var(--shadow-lg);
+}
+
+.section-info-icon:hover::after {
+  opacity: 1;
+}
+
+/* ======================================================================
+   PIE CHART (Department Health Map)
+   ====================================================================== */
+
+.pie-chart-wrap {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-6);
+}
+
+.pie-chart-svg {
+  width: 160px;
+  height: 160px;
+  flex-shrink: 0;
+}
+
+.pie-legend {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+}
+
+.pie-legend-item {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  font-size: 0.78rem;
+}
+
+.pie-legend-color {
+  width: 10px;
+  height: 10px;
+  border-radius: 3px;
+  flex-shrink: 0;
+}
+
+.pie-legend-name {
+  font-weight: 500;
+  color: var(--text-heading);
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.pie-legend-count {
+  font-weight: 600;
+  color: var(--text-secondary);
+  font-variant-numeric: tabular-nums;
+}
+
+.pie-legend-score {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ======================================================================
+   SIGNAL BOARD TABS (Green / Orange / Red)
+   ====================================================================== */
+
+.signal-board-tabs {
+  display: flex;
+  gap: var(--sp-1);
+  margin-bottom: var(--sp-4);
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: var(--sp-2);
+}
+
+.signal-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: var(--sp-2) var(--sp-3);
+  border: none;
+  background: none;
+  font-family: inherit;
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  cursor: pointer;
+  border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+  border-bottom: 2px solid transparent;
+  transition: all var(--duration) var(--ease);
+}
+
+.signal-tab:hover {
+  color: var(--text-heading);
+  background: var(--bg-subtle);
+}
+
+.signal-tab.active {
+  color: var(--text-heading);
+  font-weight: 600;
+}
+
+.signal-tab-green.active {
+  border-bottom-color: var(--zone-g);
+}
+
+.signal-tab-orange.active {
+  border-bottom-color: var(--zone-o);
+}
+
+.signal-tab-red.active {
+  border-bottom-color: var(--zone-r);
+}
+
+.signal-tab-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.signal-tab-dot.zone-green { background: var(--zone-g); }
+.signal-tab-dot.zone-orange { background: var(--zone-o); }
+.signal-tab-dot.zone-red { background: var(--zone-r); }
+
+.signal-tab-count {
+  font-size: 0.68rem;
+  font-weight: 600;
+  background: var(--bg-subtle);
+  padding: 1px 6px;
+  border-radius: 10px;
+  color: var(--text-muted);
+}
+
+.signal-tab.active .signal-tab-count {
+  background: var(--accent-light);
+  color: var(--accent);
+}
+
+.signal-board-list {
+  max-height: 360px;
+  overflow-y: auto;
+}
+
+/* ======================================================================
    RESPONSIVE
    ====================================================================== */
 
