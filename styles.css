@@ -1612,6 +1612,176 @@ body {
   color: var(--text-secondary);
 }
 
+/* ==================== Member Trend Badges ==================== */
+
+.trend-badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 0.65rem;
+  font-weight: 700;
+  vertical-align: middle;
+  margin-left: 4px;
+}
+
+.trend-badge-sm {
+  font-size: 0.7rem;
+  vertical-align: middle;
+  margin-left: 2px;
+}
+
+.trend-rising, .trend-badge-sm.trend-rising {
+  color: var(--accent-green);
+}
+
+.trend-falling, .trend-badge-sm.trend-falling {
+  color: var(--accent-red);
+}
+
+.trend-flat, .trend-badge-sm.trend-flat {
+  color: var(--text-secondary);
+}
+
+.trend-badge.trend-rising {
+  background: rgba(34, 197, 94, 0.12);
+}
+
+.trend-badge.trend-falling {
+  background: rgba(239, 68, 68, 0.12);
+}
+
+.trend-badge.trend-flat {
+  background: rgba(136, 136, 160, 0.1);
+}
+
+/* ==================== Monthly Warning Badge ==================== */
+
+.monthly-warning-badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 0.6rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  background: rgba(234, 179, 8, 0.2);
+  color: var(--accent-yellow);
+  vertical-align: middle;
+  margin-left: 4px;
+  animation: pulse-overdue 2s ease-in-out infinite;
+}
+
+.monthly-warning-badge-sm {
+  display: inline-block;
+  padding: 1px 5px;
+  border-radius: 3px;
+  font-size: 0.55rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  background: rgba(234, 179, 8, 0.2);
+  color: var(--accent-yellow);
+  vertical-align: middle;
+  margin-left: 3px;
+}
+
+.card-monthly-warning {
+  border-color: rgba(234, 179, 8, 0.35) !important;
+}
+
+.monthly-warn-item {
+  border-left: 3px solid var(--accent-yellow);
+  padding-left: 12px !important;
+}
+
+/* ==================== Red Flag Decay Badge ==================== */
+
+.decay-badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 0.6rem;
+  font-weight: 700;
+  background: rgba(74, 108, 247, 0.12);
+  color: var(--accent-blue);
+  vertical-align: middle;
+  margin-left: 4px;
+}
+
+.decay-badge-sm {
+  display: inline-block;
+  padding: 1px 5px;
+  border-radius: 3px;
+  font-size: 0.55rem;
+  font-weight: 800;
+  background: rgba(74, 108, 247, 0.12);
+  color: var(--accent-blue);
+  vertical-align: middle;
+  margin-left: 3px;
+}
+
+/* ==================== Flags Meta Row (in flag history modal) ==================== */
+
+.flags-meta-row {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 12px;
+  margin-bottom: 16px;
+}
+
+/* ==================== Leadership Button ==================== */
+
+.btn-icon-leadership {
+  color: var(--accent-purple) !important;
+  border-color: rgba(168, 85, 247, 0.3) !important;
+}
+
+.btn-icon-leadership:hover {
+  background: rgba(168, 85, 247, 0.15) !important;
+  border-color: var(--accent-purple) !important;
+}
+
+/* ==================== Leadership Modal Checkboxes ==================== */
+
+.leadership-checks {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.leadership-check-label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  background: var(--bg-dark);
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  font-size: 0.9rem;
+  color: var(--text-primary);
+}
+
+.leadership-check-label:hover {
+  border-color: var(--accent-purple);
+  background: rgba(168, 85, 247, 0.04);
+}
+
+.leadership-check-label input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--accent-purple);
+  cursor: pointer;
+}
+
+/* ==================== Rules Title Blue ==================== */
+
+.rules-title-blue {
+  color: var(--accent-blue);
+}
+
 /* ==================== Date Range Filter ==================== */
 
 .date-range-bar {

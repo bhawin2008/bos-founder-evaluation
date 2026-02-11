@@ -246,6 +246,42 @@
         </div>
 
         <div class="rules-section">
+          <h3 class="rules-section-title rules-title-blue">Special Rules</h3>
+          <div class="rules-grid">
+            <div class="rule-card rule-card-green">
+              <div class="rule-icon-wrap green">
+                <span class="rule-icon">&#9819;</span>
+                <span class="rule-count">+1ea</span>
+              </div>
+              <div class="rule-info">
+                <div class="rule-name">Leadership Multiplier</div>
+                <div class="rule-desc">If a person mentors 2+ teammates, helps in cross-team collaboration, or is referenced positively by others, they receive <strong>+1 green flag per qualifying criterion</strong> per month.</div>
+              </div>
+            </div>
+            <div class="rule-card rule-card-red">
+              <div class="rule-icon-wrap red">
+                <span class="rule-icon">&#9888;</span>
+                <span class="rule-count">warn</span>
+              </div>
+              <div class="rule-info">
+                <div class="rule-name">Monthly Red Warning</div>
+                <div class="rule-desc">If a member accumulates <strong>2+ red flags in a single month</strong> (even if net score is still positive), a warning badge is triggered for immediate attention.</div>
+              </div>
+            </div>
+            <div class="rule-card">
+              <div class="rule-icon-wrap" style="background:rgba(74,108,247,0.12);color:var(--accent-blue);">
+                <span class="rule-icon">&#8681;</span>
+                <span class="rule-count">-50%</span>
+              </div>
+              <div class="rule-info">
+                <div class="rule-name">Red Flag Decay</div>
+                <div class="rule-desc">If no red flags are received for <strong>2 consecutive months</strong>, all previous red flags lose <strong>50% weight</strong>. This rewards sustained improvement and gives members a path to recovery.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="rules-section">
           <h3 class="rules-section-title">How It Works</h3>
           <div class="rules-how-list">
             <div class="rules-how-item">
@@ -258,7 +294,7 @@
             </div>
             <div class="rules-how-item">
               <div class="rules-how-number">3</div>
-              <div class="rules-how-text"><strong>Report a blunder</strong> anytime using the flag button on active tasks. This assigns 3 red flags immediately.</div>
+              <div class="rules-how-text"><strong>Report a blunder</strong> anytime using the flag button on completed/cancelled tasks. This assigns 3 red flags immediately.</div>
             </div>
             <div class="rules-how-item">
               <div class="rules-how-number">4</div>
@@ -266,7 +302,15 @@
             </div>
             <div class="rules-how-item">
               <div class="rules-how-number">5</div>
-              <div class="rules-how-text"><strong>Track performance</strong> on the Dashboard and in each member's Flag History to see green flags, red flags, and net score.</div>
+              <div class="rules-how-text"><strong>Leadership Multiplier</strong> — use the crown button on member cards to award green flags for mentoring, collaboration, or positive references.</div>
+            </div>
+            <div class="rules-how-item">
+              <div class="rules-how-number">6</div>
+              <div class="rules-how-text"><strong>Red Flag Decay</strong> — 2 clean months (no reds) automatically halves old red flag weight. <strong>Monthly Warning</strong> triggers when 2+ reds land in one month.</div>
+            </div>
+            <div class="rules-how-item">
+              <div class="rules-how-number">7</div>
+              <div class="rules-how-text"><strong>Track performance</strong> on the Dashboard. Member trends show Rising/Flat/Falling. Red Alerts fire for 2+ consecutive red-zone months.</div>
             </div>
           </div>
         </div>
@@ -478,6 +522,40 @@
       <div class="form-actions">
         <button class="btn-secondary" onclick="closeModal('extraordinary-modal')">Cancel</button>
         <button class="btn-primary" onclick="submitExtraordinary()">Award 2 Green Flags</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Leadership Multiplier Modal -->
+  <div id="leadership-modal" class="modal-overlay">
+    <div class="modal modal-sm">
+      <div class="modal-header">
+        <h3>Leadership Multiplier</h3>
+        <button class="modal-close" onclick="closeModal('leadership-modal')">&times;</button>
+      </div>
+      <p class="review-task-name" id="leadership-member-name"></p>
+      <p class="confirm-text">Award green flag(s) for leadership contributions. Check all that apply:</p>
+      <div class="leadership-checks">
+        <label class="leadership-check-label">
+          <input type="checkbox" class="leadership-check" data-label="Mentored 2+ teammates">
+          <span>Mentored 2+ teammates</span>
+        </label>
+        <label class="leadership-check-label">
+          <input type="checkbox" class="leadership-check" data-label="Cross-team collaboration">
+          <span>Cross-team collaboration</span>
+        </label>
+        <label class="leadership-check-label">
+          <input type="checkbox" class="leadership-check" data-label="Positively referenced by others">
+          <span>Positively referenced by others</span>
+        </label>
+      </div>
+      <div class="form-group" style="margin-top: 16px;">
+        <label for="leadership-reason">Note (optional)</label>
+        <textarea id="leadership-reason" rows="2" placeholder="Additional details..."></textarea>
+      </div>
+      <div class="form-actions">
+        <button class="btn-secondary" onclick="closeModal('leadership-modal')">Cancel</button>
+        <button class="btn-primary" onclick="submitLeadership()">Award Leadership Flags</button>
       </div>
     </div>
   </div>

@@ -329,6 +329,142 @@ function isRedAlert(memberId) {
   });
 }
 
+// ==================== Member Trend (Rising / Flat / Falling) ====================
+
+function getMemberNetAtMonth(memberId, monthKey) {
+  var red = 0;
+  var green = 0;
+  data.flags.forEach(function(f) {
+    if (f.memberId === memberId && getMonthKey(f.createdAt) <= monthKey) {
+      if (f.color === "red") red += f.count;
+      else if (f.color === "green") green += f.count;
+    }
+  });
+  return green - red;
+}
+
+function getMemberTrend(memberId) {
+  var months = getActiveMonths();
+  if (months.length < 2) return "flat";
+  var prev = getMemberNetAtMonth(memberId, months[months.length - 2]);
+  var curr = getMemberNetAtMonth(memberId, months[months.length - 1]);
+  if (curr > prev) return "rising";
+  if (curr < prev) return "falling";
+  return "flat";
+}
+
+function renderTrendBadge(memberId) {
+  var trend = getMemberTrend(memberId);
+  if (trend === "rising") return '<span class="trend-badge trend-rising">&#9650; Rising</span>';
+  if (trend === "falling") return '<span class="trend-badge trend-falling">&#9660; Falling</span>';
+  return '<span class="trend-badge trend-flat">&#9644; Flat</span>';
+}
+
+// ==================== Red Flag Decay ====================
+// If no red flags for 2 consecutive months, older red flags lose 50% weight
+
+function getEffectiveFlags(memberId) {
+  var months = getActiveMonths();
+  var currentMonth = months.length > 0 ? months[months.length - 1] : getMonthKey(new Date().toISOString());
+
+  // Count red flags per month for this member
+  var redByMonth = {};
+  data.flags.forEach(function(f) {
+    if (f.memberId === memberId && f.color === "red") {
+      var mk = getMonthKey(f.createdAt);
+      redByMonth[mk] = (redByMonth[mk] || 0) + f.count;
+    }
+  });
+
+  // Find consecutive clean months (0 red flags) ending at the most recent months
+  var cleanStreak = 0;
+  for (var i = months.length - 1; i >= 0; i--) {
+    if (!redByMonth[months[i]] || redByMonth[months[i]] === 0) {
+      cleanStreak++;
+    } else {
+      break;
+    }
+  }
+
+  var decayActive = cleanStreak >= 2;
+
+  var effectiveRed = 0;
+  var effectiveGreen = 0;
+  data.flags.forEach(function(f) {
+    if (f.memberId !== memberId) return;
+    if (f.color === "green") {
+      effectiveGreen += f.count;
+    } else if (f.color === "red") {
+      if (decayActive) {
+        // Old red flags (before the clean streak) get 50% decay
+        var flagMonth = getMonthKey(f.createdAt);
+        var flagInCleanPeriod = false;
+        for (var j = months.length - cleanStreak; j < months.length; j++) {
+          if (j >= 0 && months[j] === flagMonth) { flagInCleanPeriod = true; break; }
+        }
+        if (!flagInCleanPeriod) {
+          effectiveRed += Math.ceil(f.count * 0.5); // 50% decay rounded up
+        } else {
+          effectiveRed += f.count;
+        }
+      } else {
+        effectiveRed += f.count;
+      }
+    }
+  });
+
+  return { red: effectiveRed, green: effectiveGreen, decayActive: decayActive, cleanStreak: cleanStreak };
+}
+
+// ==================== Monthly Warning (2+ red in a month) ====================
+
+function getMonthlyRedWarning(memberId) {
+  var currentMonth = getMonthKey(new Date().toISOString());
+  var redThisMonth = 0;
+  data.flags.forEach(function(f) {
+    if (f.memberId === memberId && f.color === "red" && getMonthKey(f.createdAt) === currentMonth) {
+      redThisMonth += f.count;
+    }
+  });
+  return redThisMonth >= 2;
+}
+
+// ==================== Leadership Multiplier ====================
+
+var pendingLeadershipMemberId = null;
+
+function openLeadership(memberId) {
+  var member = data.members.find(function(m) { return m.id === memberId; });
+  if (!member) return;
+  pendingLeadershipMemberId = memberId;
+  document.getElementById("leadership-member-name").textContent = member.name;
+  document.getElementById("leadership-reason").value = "";
+  // Reset checkboxes
+  document.querySelectorAll(".leadership-check").forEach(function(cb) { cb.checked = false; });
+  openModal("leadership-modal");
+}
+
+function submitLeadership() {
+  var memberId = pendingLeadershipMemberId;
+  if (!memberId) { closeModal("leadership-modal"); return; }
+
+  var checks = document.querySelectorAll(".leadership-check:checked");
+  if (checks.length === 0) { closeModal("leadership-modal"); return; }
+
+  var reasons = [];
+  checks.forEach(function(cb) { reasons.push(cb.getAttribute("data-label")); });
+  var note = document.getElementById("leadership-reason").value.trim();
+  var reason = "Leadership Multiplier: " + reasons.join(", ");
+  if (note) reason += " — " + note;
+
+  // +1 green flag per qualifying criterion
+  addFlag(memberId, null, "green", checks.length, reason);
+
+  closeModal("leadership-modal");
+  pendingLeadershipMemberId = null;
+  refreshAll();
+}
+
 // ==================== Task Completion Review ====================
 
 function toggleTaskStatus(id) {
@@ -441,6 +577,13 @@ function showMemberFlags(memberId) {
   document.getElementById("flags-modal-title").textContent = escapeHtml(member.name) + " — Flag History";
 
   var flags = getMemberFlags(memberId);
+  var eff = getEffectiveFlags(memberId);
+  var effNet = eff.green - eff.red;
+  var trend = getMemberTrend(memberId);
+  var trendLabel = trend === "rising" ? "&#9650; Rising" : (trend === "falling" ? "&#9660; Falling" : "&#9644; Flat");
+  var trendCls = trend === "rising" ? "trend-rising" : (trend === "falling" ? "trend-falling" : "trend-flat");
+  var monthlyWarn = getMonthlyRedWarning(memberId);
+
   var summaryEl = document.getElementById("flags-summary");
   summaryEl.innerHTML =
     '<div class="flags-summary-row">' +
@@ -449,13 +592,18 @@ function showMemberFlags(memberId) {
         '<span class="flags-summary-label">Green Flags</span>' +
       '</div>' +
       '<div class="flags-summary-item red">' +
-        '<span class="flags-summary-count">' + flags.red + '</span>' +
-        '<span class="flags-summary-label">Red Flags</span>' +
+        '<span class="flags-summary-count">' + flags.red + (eff.decayActive ? '<span style="font-size:0.5em;opacity:0.7"> → ' + eff.red + '</span>' : '') + '</span>' +
+        '<span class="flags-summary-label">Red Flags' + (eff.decayActive ? ' (decayed)' : '') + '</span>' +
       '</div>' +
-      '<div class="flags-summary-item net ' + (flags.green - flags.red >= 0 ? 'green' : 'red') + '">' +
-        '<span class="flags-summary-count">' + (flags.green - flags.red > 0 ? '+' : '') + (flags.green - flags.red) + '</span>' +
-        '<span class="flags-summary-label">Net Score</span>' +
+      '<div class="flags-summary-item net ' + (effNet >= 0 ? 'green' : 'red') + '">' +
+        '<span class="flags-summary-count">' + (effNet > 0 ? '+' : '') + effNet + '</span>' +
+        '<span class="flags-summary-label">Effective Net</span>' +
       '</div>' +
+    '</div>' +
+    '<div class="flags-meta-row">' +
+      '<span class="trend-badge ' + trendCls + '">' + trendLabel + '</span>' +
+      (eff.decayActive ? '<span class="decay-badge">Decay Active (' + eff.cleanStreak + ' clean months → -50% old reds)</span>' : '') +
+      (monthlyWarn ? '<span class="monthly-warning-badge">2+ Red Flags This Month</span>' : '') +
     '</div>';
 
   var historyList = document.getElementById("flags-history-list");
@@ -639,19 +787,24 @@ function renderMembers() {
     var roleColor = role ? role.color : "blue";
     var flagHtml = renderFlagBadge(member.id);
     var alertHtml = isRedAlert(member.id) ? '<span class="red-alert-badge">RED ALERT</span>' : '';
+    var trendHtml = renderTrendBadge(member.id);
+    var warningHtml = getMonthlyRedWarning(member.id) ? '<span class="monthly-warning-badge">2+ RED THIS MONTH</span>' : '';
+    var eff = getEffectiveFlags(member.id);
+    var decayHtml = eff.decayActive ? '<span class="decay-badge">Decay Active (-50%)</span>' : '';
 
     var card = document.createElement("div");
-    card.className = "card" + (isRedAlert(member.id) ? " card-red-alert" : "");
+    card.className = "card" + (isRedAlert(member.id) ? " card-red-alert" : "") + (getMonthlyRedWarning(member.id) ? " card-monthly-warning" : "");
     card.innerHTML =
       '<div class="card-top">' +
         '<div class="member-info">' +
           '<div class="avatar ' + roleColor + '">' + initials + '</div>' +
           '<div>' +
-            '<div class="member-name">' + escapeHtml(member.name) + ' ' + flagHtml + ' ' + alertHtml + '</div>' +
+            '<div class="member-name">' + escapeHtml(member.name) + ' ' + flagHtml + ' ' + trendHtml + ' ' + alertHtml + ' ' + warningHtml + '</div>' +
             '<div class="member-email">' + escapeHtml(member.email) + '</div>' +
           '</div>' +
         '</div>' +
         '<div class="card-actions">' +
+          '<button class="btn-icon btn-icon-leadership" onclick="openLeadership(\'' + member.id + '\')" title="Leadership Multiplier">&#9819;</button>' +
           '<button class="btn-icon" onclick="showMemberFlags(\'' + member.id + '\')" title="View Flags">&#9873;</button>' +
           '<button class="btn-icon" onclick="editMember(\'' + member.id + '\')" title="Edit">&#9998;</button>' +
           '<button class="btn-icon btn-icon-danger" onclick="deleteMember(\'' + member.id + '\')" title="Delete">&#10005;</button>' +
@@ -661,6 +814,7 @@ function renderMembers() {
         '<div class="role-badge ' + roleColor + '">' + (role ? escapeHtml(role.name) : "No Role") + '</div>' +
         '<span class="status-badge status-' + member.status + '">' + formatStatus(member.status) + '</span>' +
         '<span class="card-meta">' + taskCount + ' active task' + (taskCount !== 1 ? 's' : '') + '</span>' +
+        decayHtml +
       '</div>';
     container.appendChild(card);
   });
@@ -1150,32 +1304,41 @@ function renderDashboard() {
     } else {
       var memberFlagData = data.members.map(function(m) {
         var flags = getMemberFlagsFiltered(m.id);
-        return { member: m, green: flags.green, red: flags.red, net: flags.green - flags.red };
-      }).sort(function(a, b) { return b.net - a.net; });
+        var eff = getEffectiveFlags(m.id);
+        var effNet = eff.green - eff.red;
+        return { member: m, green: flags.green, red: flags.red, net: flags.green - flags.red, effNet: effNet, decayActive: eff.decayActive };
+      }).sort(function(a, b) { return b.effNet - a.effNet; });
 
       flagStatusEl.innerHTML = "";
       memberFlagData.forEach(function(mf) {
         var initials = mf.member.name.split(" ").map(function(n) { return n[0]; }).join("").toUpperCase().substring(0, 2);
         var role = data.roles.find(function(r) { return r.id === mf.member.roleId; });
         var roleColor = role ? role.color : "blue";
-        var netClass = mf.net > 0 ? "green" : (mf.net < 0 ? "red" : "neutral");
+        var netClass = mf.effNet > 0 ? "green" : (mf.effNet < 0 ? "red" : "neutral");
         var alertCls = isRedAlert(mf.member.id) ? " alert-item" : "";
+        var warnCls = getMonthlyRedWarning(mf.member.id) ? " monthly-warn-item" : "";
+        var trend = getMemberTrend(mf.member.id);
+        var trendIcon = trend === "rising" ? "&#9650;" : (trend === "falling" ? "&#9660;" : "&#9644;");
+        var trendCls = trend === "rising" ? "trend-rising" : (trend === "falling" ? "trend-falling" : "trend-flat");
 
         var item = document.createElement("div");
-        item.className = "dashboard-list-item clickable" + alertCls;
+        item.className = "dashboard-list-item clickable" + alertCls + warnCls;
         item.onclick = function() { showMemberFlags(mf.member.id); };
         item.innerHTML =
           '<div class="avatar avatar-sm ' + roleColor + '">' + initials + '</div>' +
           '<div class="dashboard-item-info">' +
             '<span class="dashboard-item-name">' + escapeHtml(mf.member.name) +
+              ' <span class="trend-badge-sm ' + trendCls + '">' + trendIcon + '</span>' +
               (isRedAlert(mf.member.id) ? ' <span class="red-alert-badge-sm">ALERT</span>' : '') +
+              (getMonthlyRedWarning(mf.member.id) ? ' <span class="monthly-warning-badge-sm">WARN</span>' : '') +
+              (mf.decayActive ? ' <span class="decay-badge-sm">-50%</span>' : '') +
             '</span>' +
             '<span class="dashboard-item-detail">' + (role ? escapeHtml(role.name) : "No Role") + '</span>' +
           '</div>' +
           '<div class="dashboard-flag-chips">' +
             '<span class="flag-chip flag-chip-green">&#9873; ' + mf.green + '</span>' +
             '<span class="flag-chip flag-chip-red">&#9873; ' + mf.red + '</span>' +
-            '<span class="flag-chip flag-chip-net ' + netClass + '">' + (mf.net > 0 ? '+' : '') + mf.net + '</span>' +
+            '<span class="flag-chip flag-chip-net ' + netClass + '">' + (mf.effNet > 0 ? '+' : '') + mf.effNet + '</span>' +
           '</div>';
         flagStatusEl.appendChild(item);
       });
