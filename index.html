@@ -54,16 +54,40 @@
             <div class="stat-label">Active Tasks</div>
           </div>
           <div class="stat-card">
-            <div class="stat-value stat-value-green" id="stat-green-flags">0</div>
-            <div class="stat-label">Green Flags</div>
+            <div class="stat-value stat-value-green" id="stat-green-flags">0%</div>
+            <div class="stat-label">% in Green</div>
+            <div class="stat-sub" id="stat-green-flags-sub">0 flags</div>
           </div>
           <div class="stat-card">
-            <div class="stat-value stat-value-red" id="stat-red-flags">0</div>
-            <div class="stat-label">Red Flags</div>
+            <div class="stat-value stat-value-red" id="stat-red-flags">0%</div>
+            <div class="stat-label">% in Red</div>
+            <div class="stat-sub" id="stat-red-flags-sub">0 flags</div>
           </div>
         </div>
 
         <div class="dashboard-sections">
+          <div class="dashboard-section">
+            <h3>Zone Distribution</h3>
+            <div id="dashboard-zone-dist"></div>
+          </div>
+          <div class="dashboard-section">
+            <h3>Zone Movement Trend</h3>
+            <div id="dashboard-trend"></div>
+          </div>
+        </div>
+
+        <div class="dashboard-sections" style="margin-top: 24px;">
+          <div class="dashboard-section">
+            <h3>Red Alerts</h3>
+            <div id="dashboard-alerts"></div>
+          </div>
+          <div class="dashboard-section">
+            <h3>Department Heatmap</h3>
+            <div id="dashboard-heatmap"></div>
+          </div>
+        </div>
+
+        <div class="dashboard-sections" style="margin-top: 24px;">
           <div class="dashboard-section">
             <h3>Member Flag Status</h3>
             <div id="dashboard-flag-status"></div>
@@ -71,17 +95,6 @@
           <div class="dashboard-section">
             <h3>Overdue Tasks</h3>
             <div id="dashboard-overdue"></div>
-          </div>
-        </div>
-
-        <div class="dashboard-sections" style="margin-top: 24px;">
-          <div class="dashboard-section">
-            <h3>Recent Members</h3>
-            <div id="recent-members"></div>
-          </div>
-          <div class="dashboard-section">
-            <h3>Recent Tasks</h3>
-            <div id="recent-tasks"></div>
           </div>
         </div>
       </div>
@@ -108,7 +121,9 @@
           <button class="filter-btn active" data-filter="all" onclick="filterTasks('all')">All</button>
           <button class="filter-btn" data-filter="pending" onclick="filterTasks('pending')">Pending</button>
           <button class="filter-btn" data-filter="in-progress" onclick="filterTasks('in-progress')">In Progress</button>
+          <button class="filter-btn" data-filter="hold" onclick="filterTasks('hold')">Hold</button>
           <button class="filter-btn" data-filter="completed" onclick="filterTasks('completed')">Completed</button>
+          <button class="filter-btn" data-filter="cancelled" onclick="filterTasks('cancelled')">Cancelled</button>
           <button class="filter-btn filter-btn-overdue" data-filter="overdue" onclick="filterTasks('overdue')">Overdue</button>
         </div>
         <div id="tasks-list" class="card-list"></div>
@@ -296,11 +311,17 @@
           <input type="date" id="task-due">
         </div>
         <div class="form-group">
+          <label for="task-notes">Notes</label>
+          <textarea id="task-notes" rows="2" placeholder="Additional notes or details..."></textarea>
+        </div>
+        <div class="form-group">
           <label for="task-status">Status</label>
           <select id="task-status">
             <option value="pending">Pending</option>
             <option value="in-progress">In Progress</option>
+            <option value="hold">Hold</option>
             <option value="completed">Completed</option>
+            <option value="cancelled">Cancelled</option>
           </select>
         </div>
         <div class="form-actions">

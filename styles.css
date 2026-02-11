@@ -1260,6 +1260,358 @@ body {
   color: var(--text-primary);
 }
 
+/* ==================== Stat Sub-text ==================== */
+
+.stat-sub {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  margin-top: 2px;
+}
+
+/* ==================== Cancelled & Hold Status ==================== */
+
+.status-hold {
+  background: rgba(234, 179, 8, 0.15);
+  color: var(--accent-yellow);
+}
+
+.status-cancelled {
+  background: rgba(136, 136, 160, 0.2);
+  color: var(--text-secondary);
+  text-decoration: line-through;
+}
+
+.task-cancelled .task-title {
+  text-decoration: line-through;
+  color: var(--text-secondary);
+}
+
+.task-cancelled .task-desc {
+  text-decoration: line-through;
+}
+
+.task-hold {
+  border-left: 3px solid var(--accent-yellow);
+}
+
+.task-checkbox.cancelled {
+  background: var(--text-secondary);
+  border-color: var(--text-secondary);
+  color: white;
+  cursor: default;
+}
+
+.task-checkbox.on-hold {
+  background: rgba(234, 179, 8, 0.2);
+  border-color: var(--accent-yellow);
+  color: var(--accent-yellow);
+  cursor: default;
+  font-size: 0.55rem;
+  letter-spacing: -1px;
+}
+
+.task-checkbox.disabled {
+  cursor: default;
+  opacity: 0.7;
+}
+
+.task-checkbox.disabled:hover {
+  border-color: var(--border-color);
+}
+
+/* ==================== Task Notes ==================== */
+
+.task-notes {
+  font-size: 0.8rem;
+  color: var(--accent-yellow);
+  margin-top: 4px;
+  padding: 4px 8px;
+  background: rgba(234, 179, 8, 0.06);
+  border-radius: 6px;
+  border-left: 2px solid var(--accent-yellow);
+}
+
+.task-notes-label {
+  font-weight: 700;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  color: var(--accent-yellow);
+}
+
+/* ==================== Zone Distribution Bar ==================== */
+
+.zone-bar {
+  display: flex;
+  height: 32px;
+  border-radius: 8px;
+  overflow: hidden;
+  margin-bottom: 12px;
+}
+
+.zone-bar-seg {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: white;
+  transition: width 0.3s ease;
+  min-width: 0;
+}
+
+.zone-bar-seg.green {
+  background: var(--accent-green);
+}
+
+.zone-bar-seg.yellow {
+  background: var(--accent-yellow);
+}
+
+.zone-bar-seg.red {
+  background: var(--accent-red);
+}
+
+.zone-legend {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.zone-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+.zone-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+
+.zone-dot.green {
+  background: var(--accent-green);
+}
+
+.zone-dot.yellow {
+  background: var(--accent-yellow);
+}
+
+.zone-dot.red {
+  background: var(--accent-red);
+}
+
+/* ==================== Movement Cards ==================== */
+
+.movement-cards {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.movement-card {
+  flex: 1;
+  text-align: center;
+  padding: 12px 8px;
+  border-radius: 10px;
+  border: 1px solid var(--border-color);
+}
+
+.movement-card.green {
+  background: rgba(34, 197, 94, 0.08);
+  border-color: rgba(34, 197, 94, 0.25);
+}
+
+.movement-card.yellow {
+  background: rgba(234, 179, 8, 0.08);
+  border-color: rgba(234, 179, 8, 0.25);
+}
+
+.movement-card.red {
+  background: rgba(239, 68, 68, 0.08);
+  border-color: rgba(239, 68, 68, 0.25);
+}
+
+.movement-val {
+  display: block;
+  font-size: 1.4rem;
+  font-weight: 800;
+  line-height: 1;
+  margin-bottom: 4px;
+}
+
+.movement-card.green .movement-val {
+  color: var(--accent-green);
+}
+
+.movement-card.yellow .movement-val {
+  color: var(--accent-yellow);
+}
+
+.movement-card.red .movement-val {
+  color: var(--accent-red);
+}
+
+.movement-lbl {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+/* ==================== Trend Chart ==================== */
+
+.trend-chart {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.trend-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.trend-label {
+  min-width: 70px;
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  text-align: right;
+}
+
+.trend-bar {
+  flex: 1;
+  display: flex;
+  height: 18px;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.trend-period {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  text-align: center;
+  margin-top: 10px;
+  font-style: italic;
+}
+
+/* ==================== Red Alert Badges ==================== */
+
+.red-alert-badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 0.65rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  background: rgba(239, 68, 68, 0.2);
+  color: var(--accent-red);
+  animation: pulse-overdue 2s ease-in-out infinite;
+  vertical-align: middle;
+  margin-left: 4px;
+}
+
+.red-alert-badge-sm {
+  display: inline-block;
+  padding: 1px 6px;
+  border-radius: 3px;
+  font-size: 0.6rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  background: rgba(239, 68, 68, 0.2);
+  color: var(--accent-red);
+  animation: pulse-overdue 2s ease-in-out infinite;
+  vertical-align: middle;
+  margin-left: 4px;
+}
+
+.card-red-alert {
+  border-color: rgba(239, 68, 68, 0.4) !important;
+  background: linear-gradient(135deg, var(--bg-card), rgba(239, 68, 68, 0.04));
+}
+
+.card-red-alert:hover {
+  border-color: rgba(239, 68, 68, 0.6) !important;
+}
+
+/* ==================== Alert Items ==================== */
+
+.alert-item {
+  border-left: 3px solid var(--accent-red);
+  padding-left: 12px !important;
+}
+
+/* ==================== Department Heatmap ==================== */
+
+.heatmap-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 10px;
+}
+
+.heatmap-cell {
+  padding: 14px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--border-color);
+  text-align: center;
+  transition: transform 0.2s ease;
+}
+
+.heatmap-cell:hover {
+  transform: translateY(-2px);
+}
+
+.heatmap-cell.green {
+  background: rgba(34, 197, 94, 0.08);
+  border-color: rgba(34, 197, 94, 0.25);
+}
+
+.heatmap-cell.red {
+  background: rgba(239, 68, 68, 0.08);
+  border-color: rgba(239, 68, 68, 0.25);
+}
+
+.heatmap-cell.neutral {
+  background: rgba(136, 136, 160, 0.06);
+}
+
+.heatmap-dept {
+  font-size: 0.82rem;
+  font-weight: 700;
+  margin-bottom: 4px;
+  color: var(--text-primary);
+}
+
+.heatmap-val {
+  font-size: 1.1rem;
+  font-weight: 800;
+  margin-bottom: 2px;
+}
+
+.heatmap-cell.green .heatmap-val {
+  color: var(--accent-green);
+}
+
+.heatmap-cell.red .heatmap-val {
+  color: var(--accent-red);
+}
+
+.heatmap-cell.neutral .heatmap-val {
+  color: var(--text-secondary);
+}
+
+.heatmap-detail {
+  font-size: 0.7rem;
+  color: var(--text-secondary);
+}
+
 /* ==================== Responsive ==================== */
 
 @media (max-width: 900px) {

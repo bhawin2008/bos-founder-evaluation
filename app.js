@@ -114,7 +114,7 @@ function renderFlagBadge(memberId) {
 }
 
 function isOverdue(task) {
-  if (!task.dueDate || task.status === "completed") return false;
+  if (!task.dueDate || task.status === "completed" || task.status === "cancelled") return false;
   var today = new Date();
   today.setHours(0, 0, 0, 0);
   var parts = task.dueDate.split("-");
@@ -132,6 +132,61 @@ function checkOverdueFlags() {
   saveData(data);
 }
 
+// ==================== Zone Analytics ====================
+
+function getMemberZone(memberId) {
+  var f = getMemberFlags(memberId);
+  var net = f.green - f.red;
+  if (net > 0) return "green";
+  if (net < 0) return "red";
+  return "yellow";
+}
+
+function getMonthKey(dateStr) {
+  var d = new Date(dateStr);
+  return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0");
+}
+
+function getMonthLabel(key) {
+  var parts = key.split("-");
+  var d = new Date(parts[0], parts[1] - 1, 1);
+  return d.toLocaleDateString("en-US", { month: "short", year: "numeric" });
+}
+
+function getMemberZoneAtMonth(memberId, monthKey) {
+  var red = 0;
+  var green = 0;
+  data.flags.forEach(function(f) {
+    if (f.memberId === memberId && getMonthKey(f.createdAt) <= monthKey) {
+      if (f.color === "red") red += f.count;
+      else if (f.color === "green") green += f.count;
+    }
+  });
+  var net = green - red;
+  if (net > 0) return "green";
+  if (net < 0) return "red";
+  return "yellow";
+}
+
+function getActiveMonths() {
+  var months = {};
+  data.flags.forEach(function(f) {
+    months[getMonthKey(f.createdAt)] = true;
+  });
+  // Always include current month
+  months[getMonthKey(new Date().toISOString())] = true;
+  return Object.keys(months).sort();
+}
+
+function isRedAlert(memberId) {
+  var months = getActiveMonths();
+  if (months.length < 2) return false;
+  var last2 = months.slice(-2);
+  return last2.every(function(m) {
+    return getMemberZoneAtMonth(memberId, m) === "red";
+  });
+}
+
 // ==================== Task Completion Review ====================
 
 function toggleTaskStatus(id) {
@@ -139,12 +194,10 @@ function toggleTaskStatus(id) {
   if (!task) return;
 
   if (task.status === "completed") {
-    // Un-completing — just revert
     task.status = "pending";
     saveData(data);
     refreshAll();
   } else {
-    // Completing — open review modal
     pendingReviewTaskId = id;
     document.getElementById("review-task-name").textContent = task.title;
     openModal("review-modal");
@@ -437,19 +490,22 @@ function renderMembers() {
 
   filtered.forEach(function(member) {
     var role = data.roles.find(function(r) { return r.id === member.roleId; });
-    var taskCount = data.tasks.filter(function(t) { return t.assigneeId === member.id && t.status !== "completed"; }).length;
+    var taskCount = data.tasks.filter(function(t) {
+      return t.assigneeId === member.id && t.status !== "completed" && t.status !== "cancelled";
+    }).length;
     var initials = member.name.split(" ").map(function(n) { return n[0]; }).join("").toUpperCase().substring(0, 2);
     var roleColor = role ? role.color : "blue";
     var flagHtml = renderFlagBadge(member.id);
+    var alertHtml = isRedAlert(member.id) ? '<span class="red-alert-badge">RED ALERT</span>' : '';
 
     var card = document.createElement("div");
-    card.className = "card";
+    card.className = "card" + (isRedAlert(member.id) ? " card-red-alert" : "");
     card.innerHTML =
       '<div class="card-top">' +
         '<div class="member-info">' +
           '<div class="avatar ' + roleColor + '">' + initials + '</div>' +
           '<div>' +
-            '<div class="member-name">' + escapeHtml(member.name) + ' ' + flagHtml + '</div>' +
+            '<div class="member-name">' + escapeHtml(member.name) + ' ' + flagHtml + ' ' + alertHtml + '</div>' +
             '<div class="member-email">' + escapeHtml(member.email) + '</div>' +
           '</div>' +
         '</div>' +
@@ -477,6 +533,7 @@ function saveTask(event) {
     id: editId || generateId(),
     title: document.getElementById("task-title").value.trim(),
     description: document.getElementById("task-description").value.trim(),
+    notes: document.getElementById("task-notes").value.trim(),
     assigneeId: document.getElementById("task-assignee").value,
     priority: document.getElementById("task-priority").value,
     dueDate: document.getElementById("task-due").value,
@@ -486,7 +543,6 @@ function saveTask(event) {
       : new Date().toISOString()
   };
 
-  // Preserve flag-related fields on edit
   if (editId) {
     var existing = data.tasks.find(function(t) { return t.id === editId; });
     if (existing) {
@@ -510,6 +566,7 @@ function editTask(id) {
   document.getElementById("task-edit-id").value = task.id;
   document.getElementById("task-title").value = task.title;
   document.getElementById("task-description").value = task.description;
+  document.getElementById("task-notes").value = task.notes || "";
   populateMemberDropdown("task-assignee");
   document.getElementById("task-assignee").value = task.assigneeId;
   document.getElementById("task-priority").value = task.priority;
@@ -536,7 +593,6 @@ function filterTasks(filter) {
 }
 
 function getTaskFlagIndicator(task) {
-  // Show flags awarded on this task
   var taskFlags = data.flags.filter(function(f) { return f.taskId === task.id; });
   if (taskFlags.length === 0) return '';
 
@@ -571,10 +627,10 @@ function renderTasks() {
 
   filtered.sort(function(a, b) {
     var priorityOrder = { high: 0, medium: 1, low: 2 };
-    var statusOrder = { "in-progress": 0, pending: 1, completed: 2 };
-    if (statusOrder[a.status] !== statusOrder[b.status]) {
-      return statusOrder[a.status] - statusOrder[b.status];
-    }
+    var statusOrder = { "in-progress": 0, pending: 1, hold: 2, completed: 3, cancelled: 4 };
+    var sa = statusOrder[a.status] !== undefined ? statusOrder[a.status] : 5;
+    var sb = statusOrder[b.status] !== undefined ? statusOrder[b.status] : 5;
+    if (sa !== sb) return sa - sb;
     return priorityOrder[a.priority] - priorityOrder[b.priority];
   });
 
@@ -582,24 +638,47 @@ function renderTasks() {
     var assignee = data.members.find(function(m) { return m.id === task.assigneeId; });
     var overdueClass = isOverdue(task) ? " task-overdue" : "";
     var flagIndicator = getTaskFlagIndicator(task);
+    var isDone = task.status === "completed";
+    var isCancelled = task.status === "cancelled";
+    var isHold = task.status === "hold";
+    var isFinished = isDone || isCancelled;
+    var checkboxDisabled = isCancelled || isHold;
+
+    var showExtraordinary = isDone && task.assigneeId;
+    var showBlunder = isFinished && task.assigneeId;
+
+    var cardClass = "card task-card";
+    if (isDone) cardClass += " task-completed";
+    if (isCancelled) cardClass += " task-cancelled";
+    if (isHold) cardClass += " task-hold";
+    cardClass += overdueClass;
+
+    var notesHtml = '';
+    if (task.notes) {
+      notesHtml = '<div class="task-notes"><span class="task-notes-label">Notes:</span> ' + escapeHtml(task.notes) + '</div>';
+    }
 
     var card = document.createElement("div");
-    card.className = "card task-card" + (task.status === "completed" ? " task-completed" : "") + overdueClass;
+    card.className = cardClass;
     card.innerHTML =
       '<div class="card-top">' +
         '<div class="task-info">' +
-          '<button class="task-checkbox ' + (task.status === "completed" ? "checked" : "") + '" onclick="toggleTaskStatus(\'' + task.id + '\')">' +
-            (task.status === "completed" ? "&#10003;" : "") +
+          '<button class="task-checkbox' + (isDone ? " checked" : "") + (isCancelled ? " cancelled" : "") + (isHold ? " on-hold" : "") + (checkboxDisabled ? " disabled" : "") + '"' +
+            (checkboxDisabled ? '' : ' onclick="toggleTaskStatus(\'' + task.id + '\')"') + '>' +
+            (isDone ? "&#10003;" : (isCancelled ? "&#10005;" : (isHold ? "&#9646;&#9646;" : ""))) +
           '</button>' +
           '<div>' +
             '<div class="task-title">' + escapeHtml(task.title) + ' ' + flagIndicator + '</div>' +
             (task.description ? '<div class="task-desc">' + escapeHtml(task.description) + '</div>' : '') +
+            notesHtml +
           '</div>' +
         '</div>' +
         '<div class="card-actions">' +
-          (task.status !== "completed" && task.assigneeId
-            ? '<button class="btn-icon btn-icon-extraordinary" onclick="openExtraordinary(\'' + task.id + '\')" title="Mark Extraordinary (+2 Green)">&#9733;</button>' +
-              '<button class="btn-icon btn-icon-blunder" onclick="openBlunder(\'' + task.id + '\')" title="Report Blunder (+3 Red)">&#9873;</button>'
+          (showExtraordinary
+            ? '<button class="btn-icon btn-icon-extraordinary" onclick="openExtraordinary(\'' + task.id + '\')" title="Mark Extraordinary (+2 Green)">&#9733;</button>'
+            : '') +
+          (showBlunder
+            ? '<button class="btn-icon btn-icon-blunder" onclick="openBlunder(\'' + task.id + '\')" title="Report Blunder (+3 Red)">&#9873;</button>'
             : '') +
           '<button class="btn-icon" onclick="editTask(\'' + task.id + '\')" title="Edit">&#9998;</button>' +
           '<button class="btn-icon btn-icon-danger" onclick="deleteTask(\'' + task.id + '\')" title="Delete">&#10005;</button>' +
@@ -619,9 +698,10 @@ function renderTasks() {
 // ==================== Dashboard ====================
 
 function renderDashboard() {
-  var activeTasks = data.tasks.filter(function(t) { return t.status !== "completed"; });
+  var activeTasks = data.tasks.filter(function(t) {
+    return t.status !== "completed" && t.status !== "cancelled";
+  });
 
-  // Count all flags
   var totalGreen = 0;
   var totalRed = 0;
   data.flags.forEach(function(f) {
@@ -629,12 +709,194 @@ function renderDashboard() {
     else if (f.color === "red") totalRed += f.count;
   });
 
+  var totalFlags = totalGreen + totalRed;
+  var greenPct = totalFlags > 0 ? Math.round((totalGreen / totalFlags) * 100) : 0;
+  var redPct = totalFlags > 0 ? Math.round((totalRed / totalFlags) * 100) : 0;
+
   document.getElementById("stat-members").textContent = data.members.length;
   document.getElementById("stat-tasks").textContent = activeTasks.length;
-  document.getElementById("stat-green-flags").textContent = totalGreen;
-  document.getElementById("stat-red-flags").textContent = totalRed;
+  document.getElementById("stat-green-flags").textContent = greenPct + "%";
+  document.getElementById("stat-green-flags-sub").textContent = totalGreen + " flags";
+  document.getElementById("stat-red-flags").textContent = redPct + "%";
+  document.getElementById("stat-red-flags-sub").textContent = totalRed + " flags";
 
-  // Member Flag Status (sorted by net score descending)
+  // === Zone Distribution ===
+  var zoneDistEl = document.getElementById("dashboard-zone-dist");
+  if (zoneDistEl) {
+    if (data.members.length === 0) {
+      zoneDistEl.innerHTML = '<div class="empty-state-sm">No members yet</div>';
+    } else {
+      var greenCount = 0, yellowCount = 0, redCount = 0;
+      data.members.forEach(function(m) {
+        var z = getMemberZone(m.id);
+        if (z === "green") greenCount++;
+        else if (z === "red") redCount++;
+        else yellowCount++;
+      });
+      var total = data.members.length;
+      var gPct = Math.round((greenCount / total) * 100);
+      var yPct = Math.round((yellowCount / total) * 100);
+      var rPct = Math.round((redCount / total) * 100);
+
+      zoneDistEl.innerHTML =
+        '<div class="zone-bar">' +
+          (gPct > 0 ? '<div class="zone-bar-seg green" style="width:' + gPct + '%">' + gPct + '%</div>' : '') +
+          (yPct > 0 ? '<div class="zone-bar-seg yellow" style="width:' + yPct + '%">' + yPct + '%</div>' : '') +
+          (rPct > 0 ? '<div class="zone-bar-seg red" style="width:' + rPct + '%">' + rPct + '%</div>' : '') +
+        '</div>' +
+        '<div class="zone-legend">' +
+          '<span class="zone-legend-item"><span class="zone-dot green"></span> Green ' + greenCount + ' (' + gPct + '%)</span>' +
+          '<span class="zone-legend-item"><span class="zone-dot yellow"></span> Neutral ' + yellowCount + ' (' + yPct + '%)</span>' +
+          '<span class="zone-legend-item"><span class="zone-dot red"></span> Red ' + redCount + ' (' + rPct + '%)</span>' +
+        '</div>';
+    }
+  }
+
+  // === Zone Movement Trend ===
+  var trendEl = document.getElementById("dashboard-trend");
+  if (trendEl) {
+    var months = getActiveMonths();
+    if (months.length < 2 || data.members.length === 0) {
+      trendEl.innerHTML = '<div class="empty-state-sm">Need at least 2 months of flag data for trends</div>';
+    } else {
+      // Calculate movement between last two months
+      var prevMonth = months[months.length - 2];
+      var currMonth = months[months.length - 1];
+      var improved = 0, declined = 0, stable = 0;
+      var zoneRank = { red: 0, yellow: 1, green: 2 };
+
+      data.members.forEach(function(m) {
+        var prev = getMemberZoneAtMonth(m.id, prevMonth);
+        var curr = getMemberZoneAtMonth(m.id, currMonth);
+        if (zoneRank[curr] > zoneRank[prev]) improved++;
+        else if (zoneRank[curr] < zoneRank[prev]) declined++;
+        else stable++;
+      });
+
+      var mTotal = data.members.length;
+      var iPct = Math.round((improved / mTotal) * 100);
+      var dPct = Math.round((declined / mTotal) * 100);
+      var sPct = Math.round((stable / mTotal) * 100);
+
+      // Build trend chart (last up to 6 months)
+      var chartMonths = months.slice(-6);
+      var chartRows = '';
+      chartMonths.forEach(function(mo) {
+        var g = 0, y = 0, r = 0;
+        data.members.forEach(function(m) {
+          var z = getMemberZoneAtMonth(m.id, mo);
+          if (z === "green") g++;
+          else if (z === "red") r++;
+          else y++;
+        });
+        var tot = data.members.length;
+        var gW = Math.round((g / tot) * 100);
+        var yW = Math.round((y / tot) * 100);
+        var rW = Math.round((r / tot) * 100);
+        chartRows +=
+          '<div class="trend-row">' +
+            '<span class="trend-label">' + getMonthLabel(mo) + '</span>' +
+            '<div class="trend-bar">' +
+              (gW > 0 ? '<div class="zone-bar-seg green" style="width:' + gW + '%"></div>' : '') +
+              (yW > 0 ? '<div class="zone-bar-seg yellow" style="width:' + yW + '%"></div>' : '') +
+              (rW > 0 ? '<div class="zone-bar-seg red" style="width:' + rW + '%"></div>' : '') +
+            '</div>' +
+          '</div>';
+      });
+
+      trendEl.innerHTML =
+        '<div class="movement-cards">' +
+          '<div class="movement-card green"><span class="movement-val">' + iPct + '%</span><span class="movement-lbl">Improved</span></div>' +
+          '<div class="movement-card yellow"><span class="movement-val">' + sPct + '%</span><span class="movement-lbl">Stable</span></div>' +
+          '<div class="movement-card red"><span class="movement-val">' + dPct + '%</span><span class="movement-lbl">Declined</span></div>' +
+        '</div>' +
+        '<div class="trend-chart">' + chartRows + '</div>' +
+        '<div class="trend-period">Comparing ' + getMonthLabel(prevMonth) + ' → ' + getMonthLabel(currMonth) + '</div>';
+    }
+  }
+
+  // === Red Alerts ===
+  var alertEl = document.getElementById("dashboard-alerts");
+  if (alertEl) {
+    var alertMembers = data.members.filter(function(m) { return isRedAlert(m.id); });
+    if (alertMembers.length === 0) {
+      alertEl.innerHTML = '<div class="empty-state-sm">No red alerts — all clear</div>';
+    } else {
+      alertEl.innerHTML = "";
+      alertMembers.forEach(function(member) {
+        var role = data.roles.find(function(r) { return r.id === member.roleId; });
+        var flags = getMemberFlags(member.id);
+        var initials = member.name.split(" ").map(function(n) { return n[0]; }).join("").toUpperCase().substring(0, 2);
+        var item = document.createElement("div");
+        item.className = "dashboard-list-item alert-item clickable";
+        item.onclick = function() { showMemberFlags(member.id); };
+        item.innerHTML =
+          '<div class="avatar avatar-sm red">' + initials + '</div>' +
+          '<div class="dashboard-item-info">' +
+            '<span class="dashboard-item-name overdue-text">' + escapeHtml(member.name) + '</span>' +
+            '<span class="dashboard-item-detail">Red zone for 2+ consecutive months</span>' +
+          '</div>' +
+          '<span class="flag-chip flag-chip-red">&#9873; ' + flags.red + '</span>';
+        alertEl.appendChild(item);
+      });
+    }
+  }
+
+  // === Department Heatmap ===
+  var heatmapEl = document.getElementById("dashboard-heatmap");
+  if (heatmapEl) {
+    if (data.roles.length === 0) {
+      heatmapEl.innerHTML = '<div class="empty-state-sm">No roles/departments defined</div>';
+    } else {
+      var html = '<div class="heatmap-grid">';
+      data.roles.forEach(function(role) {
+        var roleMembers = data.members.filter(function(m) { return m.roleId === role.id; });
+        if (roleMembers.length === 0) {
+          html += '<div class="heatmap-cell neutral"><div class="heatmap-dept">' + escapeHtml(role.name) + '</div><div class="heatmap-val">No members</div></div>';
+          return;
+        }
+        var totalNet = 0;
+        var gCount = 0, rCount = 0;
+        roleMembers.forEach(function(m) {
+          var f = getMemberFlags(m.id);
+          totalNet += (f.green - f.red);
+          gCount += f.green;
+          rCount += f.red;
+        });
+        var avgNet = totalNet / roleMembers.length;
+        var heatClass = avgNet > 0 ? "green" : (avgNet < 0 ? "red" : "neutral");
+        html += '<div class="heatmap-cell ' + heatClass + '">' +
+          '<div class="heatmap-dept">' + escapeHtml(role.name) + '</div>' +
+          '<div class="heatmap-val">' + (avgNet > 0 ? '+' : '') + avgNet.toFixed(1) + ' avg</div>' +
+          '<div class="heatmap-detail">' + roleMembers.length + ' members · ' + gCount + 'G / ' + rCount + 'R</div>' +
+        '</div>';
+      });
+
+      // Unassigned
+      var unassigned = data.members.filter(function(m) { return !m.roleId; });
+      if (unassigned.length > 0) {
+        var uNet = 0, uG = 0, uR = 0;
+        unassigned.forEach(function(m) {
+          var f = getMemberFlags(m.id);
+          uNet += (f.green - f.red);
+          uG += f.green;
+          uR += f.red;
+        });
+        var uAvg = uNet / unassigned.length;
+        var uClass = uAvg > 0 ? "green" : (uAvg < 0 ? "red" : "neutral");
+        html += '<div class="heatmap-cell ' + uClass + '">' +
+          '<div class="heatmap-dept">Unassigned</div>' +
+          '<div class="heatmap-val">' + (uAvg > 0 ? '+' : '') + uAvg.toFixed(1) + ' avg</div>' +
+          '<div class="heatmap-detail">' + unassigned.length + ' members · ' + uG + 'G / ' + uR + 'R</div>' +
+        '</div>';
+      }
+
+      html += '</div>';
+      heatmapEl.innerHTML = html;
+    }
+  }
+
+  // === Member Flag Status ===
   var flagStatusEl = document.getElementById("dashboard-flag-status");
   if (flagStatusEl) {
     if (data.members.length === 0) {
@@ -651,14 +913,17 @@ function renderDashboard() {
         var role = data.roles.find(function(r) { return r.id === mf.member.roleId; });
         var roleColor = role ? role.color : "blue";
         var netClass = mf.net > 0 ? "green" : (mf.net < 0 ? "red" : "neutral");
+        var alertCls = isRedAlert(mf.member.id) ? " alert-item" : "";
 
         var item = document.createElement("div");
-        item.className = "dashboard-list-item clickable";
+        item.className = "dashboard-list-item clickable" + alertCls;
         item.onclick = function() { showMemberFlags(mf.member.id); };
         item.innerHTML =
           '<div class="avatar avatar-sm ' + roleColor + '">' + initials + '</div>' +
           '<div class="dashboard-item-info">' +
-            '<span class="dashboard-item-name">' + escapeHtml(mf.member.name) + '</span>' +
+            '<span class="dashboard-item-name">' + escapeHtml(mf.member.name) +
+              (isRedAlert(mf.member.id) ? ' <span class="red-alert-badge-sm">ALERT</span>' : '') +
+            '</span>' +
             '<span class="dashboard-item-detail">' + (role ? escapeHtml(role.name) : "No Role") + '</span>' +
           '</div>' +
           '<div class="dashboard-flag-chips">' +
@@ -671,7 +936,7 @@ function renderDashboard() {
     }
   }
 
-  // Overdue Tasks
+  // === Overdue Tasks ===
   var overdueEl = document.getElementById("dashboard-overdue");
   if (overdueEl) {
     var overdueTasks = data.tasks.filter(function(t) { return isOverdue(t); });
@@ -693,58 +958,6 @@ function renderDashboard() {
       });
     }
   }
-
-  // Recent members (last 5)
-  var recentMembers = document.getElementById("recent-members");
-  if (recentMembers) {
-    var recent = data.members.slice(-5).reverse();
-    if (recent.length === 0) {
-      recentMembers.innerHTML = '<div class="empty-state-sm">No members yet</div>';
-    } else {
-      recentMembers.innerHTML = "";
-      recent.forEach(function(member) {
-        var role = data.roles.find(function(r) { return r.id === member.roleId; });
-        var initials = member.name.split(" ").map(function(n) { return n[0]; }).join("").toUpperCase().substring(0, 2);
-        var roleColor = role ? role.color : "blue";
-        var flagHtml = renderFlagBadge(member.id);
-        var item = document.createElement("div");
-        item.className = "dashboard-list-item";
-        item.innerHTML =
-          '<div class="avatar avatar-sm ' + roleColor + '">' + initials + '</div>' +
-          '<div class="dashboard-item-info">' +
-            '<span class="dashboard-item-name">' + escapeHtml(member.name) + ' ' + flagHtml + '</span>' +
-            '<span class="dashboard-item-detail">' + (role ? escapeHtml(role.name) : "No Role") + '</span>' +
-          '</div>' +
-          '<span class="status-badge status-' + member.status + '">' + formatStatus(member.status) + '</span>';
-        recentMembers.appendChild(item);
-      });
-    }
-  }
-
-  // Recent tasks (last 5)
-  var recentTasks = document.getElementById("recent-tasks");
-  if (recentTasks) {
-    var recentT = data.tasks.slice(-5).reverse();
-    if (recentT.length === 0) {
-      recentTasks.innerHTML = '<div class="empty-state-sm">No tasks yet</div>';
-    } else {
-      recentTasks.innerHTML = "";
-      recentT.forEach(function(task) {
-        var assignee = data.members.find(function(m) { return m.id === task.assigneeId; });
-        var flagIndicator = getTaskFlagIndicator(task);
-        var item = document.createElement("div");
-        item.className = "dashboard-list-item";
-        item.innerHTML =
-          '<div class="dashboard-item-info">' +
-            '<span class="dashboard-item-name">' + escapeHtml(task.title) + ' ' + flagIndicator + '</span>' +
-            '<span class="dashboard-item-detail">' + (assignee ? escapeHtml(assignee.name) : "Unassigned") + '</span>' +
-          '</div>' +
-          '<span class="priority-badge priority-' + task.priority + '">' + task.priority + '</span>' +
-          '<span class="status-badge status-' + task.status + '">' + formatStatus(task.status) + '</span>';
-        recentTasks.appendChild(item);
-      });
-    }
-  }
 }
 
 // ==================== Delete Confirmation ====================
@@ -755,11 +968,9 @@ function confirmDelete() {
     data.tasks.forEach(function(t) {
       if (t.assigneeId === pendingDeleteId) t.assigneeId = "";
     });
-    // Remove flags for deleted member
     data.flags = data.flags.filter(function(f) { return f.memberId !== pendingDeleteId; });
   } else if (pendingDeleteType === "task") {
     data.tasks = data.tasks.filter(function(t) { return t.id !== pendingDeleteId; });
-    // Remove flags tied to deleted task
     data.flags = data.flags.filter(function(f) { return f.taskId !== pendingDeleteId; });
   } else if (pendingDeleteType === "role") {
     data.roles = data.roles.filter(function(r) { return r.id !== pendingDeleteId; });
