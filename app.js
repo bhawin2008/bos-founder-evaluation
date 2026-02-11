@@ -20,18 +20,34 @@ function loadData() {
     members: JSON.parse(localStorage.getItem("boss_members") || "[]"),
     tasks: JSON.parse(localStorage.getItem("boss_tasks") || "[]"),
     roles: JSON.parse(localStorage.getItem("boss_roles") || "[]"),
-    flags: JSON.parse(localStorage.getItem("boss_flags") || "[]")
+    flags: JSON.parse(localStorage.getItem("boss_flags") || "[]"),
+    categories: JSON.parse(localStorage.getItem("boss_categories") || "null")
   };
 }
+
+var defaultCategories = [
+  { id: "cat_people", name: "People" },
+  { id: "cat_sop", name: "SOP" },
+  { id: "cat_emotion", name: "Emotion" },
+  { id: "cat_skill", name: "Skill" },
+  { id: "cat_domain", name: "Domain" },
+  { id: "cat_management", name: "Management" },
+  { id: "cat_other", name: "Other" }
+];
 
 function saveData(data) {
   localStorage.setItem("boss_members", JSON.stringify(data.members));
   localStorage.setItem("boss_tasks", JSON.stringify(data.tasks));
   localStorage.setItem("boss_roles", JSON.stringify(data.roles));
   localStorage.setItem("boss_flags", JSON.stringify(data.flags));
+  localStorage.setItem("boss_categories", JSON.stringify(data.categories));
 }
 
 var data = loadData();
+if (!data.categories) {
+  data.categories = defaultCategories.slice();
+  saveData(data);
+}
 var currentFilter = "all";
 var pendingDeleteType = null;
 var pendingDeleteId = null;
@@ -228,8 +244,15 @@ function openModal(modalId) {
   }
   if (modalId === "task-modal") {
     populateMemberDropdown("task-assignee");
+    populateCategoryDropdown("task-category");
     var alertEl = document.getElementById("task-assignee-alert");
     if (alertEl) { alertEl.style.display = "none"; alertEl.innerHTML = ""; }
+  }
+  if (modalId === "extraordinary-modal") {
+    populateCategoryDropdown("extraordinary-category");
+  }
+  if (modalId === "blunder-modal") {
+    populateCategoryDropdown("blunder-category");
   }
 }
 
@@ -724,7 +747,7 @@ function showMemberFlags(memberId) {
       item.className = "flag-history-item";
       var dateStr = new Date(f.createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
       var noteHtml = f.note ? '<span class="flag-history-note">' + escapeHtml(f.note) + '</span>' : '';
-      var catHtml = f.category ? '<span class="flag-category-badge">' + escapeHtml(categoryLabels[f.category] || f.category) + '</span>' : '';
+      var catHtml = f.category ? '<span class="flag-category-badge">' + escapeHtml(getCategoryLabel(f.category)) + '</span>' : '';
       item.innerHTML =
         '<div class="flag-history-icon ' + f.color + '">' +
           icons.dot + (f.count > 1 ? ' x' + f.count : '') +
@@ -1000,10 +1023,11 @@ function saveTask(event) {
 
 // ==================== Assignee Risk Alert ====================
 
-var categoryLabels = {
-  people: "People", system: "System", emotions: "Emotions",
-  skills: "Skills", domain: "Domain", management: "Management", other: "Other"
-};
+function getCategoryLabel(catId) {
+  if (!catId) return "";
+  var cat = data.categories.find(function(c) { return c.id === catId; });
+  return cat ? cat.name : catId;
+}
 
 function checkAssigneeRisk() {
   var alertEl = document.getElementById("task-assignee-alert");
@@ -1037,7 +1061,7 @@ function checkAssigneeRisk() {
     if (catCount >= 2) {
       warnings.push({
         type: "category",
-        text: "This member has <strong>" + catCount + " growth signals</strong> in <strong>" + (categoryLabels[category] || category) + "</strong> this month. Consider support or reassignment."
+        text: "This member has <strong>" + catCount + " growth signals</strong> in <strong>" + (getCategoryLabel(category)) + "</strong> this month. Consider support or reassignment."
       });
     }
   }
@@ -1315,7 +1339,7 @@ function renderTasks() {
 
     var taskMeta = '';
     if (task.category) {
-      taskMeta += '<span class="tt-category-badge">' + escapeHtml(categoryLabels[task.category] || task.category) + '</span>';
+      taskMeta += '<span class="tt-category-badge">' + escapeHtml(getCategoryLabel(task.category)) + '</span>';
     }
     if (task.keywords) {
       task.keywords.split(",").forEach(function(kw) {
@@ -1908,6 +1932,12 @@ function confirmDelete() {
     });
   }
 
+  // Category deletion (uses separate variable)
+  if (pendingDeleteCategoryId) {
+    data.categories = data.categories.filter(function(c) { return c.id !== pendingDeleteCategoryId; });
+    pendingDeleteCategoryId = null;
+  }
+
   saveData(data);
   closeModal("confirm-modal");
   pendingDeleteType = null;
@@ -1965,6 +1995,92 @@ function populateMemberDropdown(selectId) {
   if (currentValue) select.value = currentValue;
 }
 
+// ==================== Category Management ====================
+
+function populateCategoryDropdown(selectId, includeEmpty) {
+  var el = document.getElementById(selectId);
+  if (!el) return;
+  var currentVal = el.value;
+  var firstOptText = el.options[0] ? el.options[0].textContent : "Select category...";
+  el.innerHTML = '<option value="">' + firstOptText + '</option>';
+  data.categories.forEach(function(cat) {
+    el.innerHTML += '<option value="' + cat.id + '">' + escapeHtml(cat.name) + '</option>';
+  });
+  el.value = currentVal;
+}
+
+function openAddCategory() {
+  document.getElementById("category-edit-id").value = "";
+  document.getElementById("category-name").value = "";
+  document.getElementById("category-modal-title").textContent = "Add Category";
+  openModal("category-modal");
+}
+
+function editCategory(id) {
+  var cat = data.categories.find(function(c) { return c.id === id; });
+  if (!cat) return;
+  document.getElementById("category-edit-id").value = cat.id;
+  document.getElementById("category-name").value = cat.name;
+  document.getElementById("category-modal-title").textContent = "Edit Category";
+  openModal("category-modal");
+}
+
+function saveCategory(event) {
+  event.preventDefault();
+  var editId = document.getElementById("category-edit-id").value;
+  var name = document.getElementById("category-name").value.trim();
+  if (!name) return;
+
+  if (editId) {
+    var idx = data.categories.findIndex(function(c) { return c.id === editId; });
+    if (idx !== -1) data.categories[idx].name = name;
+  } else {
+    data.categories.push({
+      id: "cat_" + generateId(),
+      name: name
+    });
+  }
+
+  saveData(data);
+  closeModal("category-modal");
+  refreshAll();
+}
+
+var pendingDeleteCategoryId = null;
+
+function deleteCategoryConfirm(id) {
+  var cat = data.categories.find(function(c) { return c.id === id; });
+  if (!cat) return;
+  pendingDeleteCategoryId = id;
+  document.getElementById("confirm-text").textContent =
+    'Delete category "' + cat.name + '"? Existing flags and tasks with this category will keep their data.';
+  openModal("confirm-modal");
+}
+
+function renderCategories() {
+  var container = document.getElementById("config-categories-list");
+  if (!container) return;
+
+  if (data.categories.length === 0) {
+    container.innerHTML = '<div class="empty-state">No categories defined. Add your first category.</div>';
+    return;
+  }
+
+  var html = '<div class="config-table">';
+  data.categories.forEach(function(cat, index) {
+    html += '<div class="config-row">' +
+      '<span class="config-row-name">' + escapeHtml(cat.name) + '</span>' +
+      '<span class="config-row-id">' + escapeHtml(cat.id) + '</span>' +
+      '<div class="config-row-actions">' +
+        '<button class="btn-icon" onclick="editCategory(\'' + cat.id + '\')" title="Edit"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>' +
+        '<button class="btn-icon btn-icon-danger" onclick="deleteCategoryConfirm(\'' + cat.id + '\')" title="Delete"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></button>' +
+      '</div>' +
+    '</div>';
+  });
+  html += '</div>';
+  container.innerHTML = html;
+}
+
 function refreshAll() {
   checkOverdueFlags();
   renderDashboard();
@@ -1972,6 +2088,7 @@ function refreshAll() {
   renderMembers();
   renderTasks();
   renderRoles();
+  renderCategories();
 }
 
 // ==================== Demo Data Seeding ====================
