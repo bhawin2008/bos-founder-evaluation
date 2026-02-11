@@ -4,7 +4,8 @@ function loadData() {
   return {
     members: JSON.parse(localStorage.getItem("boss_members") || "[]"),
     tasks: JSON.parse(localStorage.getItem("boss_tasks") || "[]"),
-    roles: JSON.parse(localStorage.getItem("boss_roles") || "[]")
+    roles: JSON.parse(localStorage.getItem("boss_roles") || "[]"),
+    flags: JSON.parse(localStorage.getItem("boss_flags") || "[]")
   };
 }
 
@@ -12,12 +13,15 @@ function saveData(data) {
   localStorage.setItem("boss_members", JSON.stringify(data.members));
   localStorage.setItem("boss_tasks", JSON.stringify(data.tasks));
   localStorage.setItem("boss_roles", JSON.stringify(data.roles));
+  localStorage.setItem("boss_flags", JSON.stringify(data.flags));
 }
 
-let data = loadData();
-let currentFilter = "all";
-let pendingDeleteType = null;
-let pendingDeleteId = null;
+var data = loadData();
+var currentFilter = "all";
+var pendingDeleteType = null;
+var pendingDeleteId = null;
+var pendingReviewTaskId = null;
+var pendingBlunderTaskId = null;
 
 // ==================== Navigation ====================
 
@@ -58,6 +62,201 @@ function closeModal(modalId) {
     var type = modalId.replace("-modal", "");
     titleEl.textContent = "Add " + type.charAt(0).toUpperCase() + type.slice(1);
   }
+}
+
+// ==================== Flag Helpers ====================
+
+function getMemberFlags(memberId) {
+  var red = 0;
+  var green = 0;
+  data.flags.forEach(function(f) {
+    if (f.memberId === memberId) {
+      if (f.color === "red") red += f.count;
+      else if (f.color === "green") green += f.count;
+    }
+  });
+  return { red: red, green: green };
+}
+
+function getMemberFlagList(memberId) {
+  return data.flags.filter(function(f) {
+    return f.memberId === memberId;
+  }).sort(function(a, b) {
+    return new Date(b.createdAt) - new Date(a.createdAt);
+  });
+}
+
+function addFlag(memberId, taskId, color, count, reason) {
+  data.flags.push({
+    id: generateId(),
+    memberId: memberId,
+    taskId: taskId,
+    color: color,
+    count: count,
+    reason: reason,
+    createdAt: new Date().toISOString()
+  });
+  saveData(data);
+}
+
+function renderFlagBadge(memberId) {
+  var flags = getMemberFlags(memberId);
+  var parts = [];
+  if (flags.green > 0) {
+    parts.push('<span class="flag-count flag-green-count">&#9873; ' + flags.green + '</span>');
+  }
+  if (flags.red > 0) {
+    parts.push('<span class="flag-count flag-red-count">&#9873; ' + flags.red + '</span>');
+  }
+  if (parts.length === 0) return '';
+  return '<span class="flag-badges">' + parts.join('') + '</span>';
+}
+
+function isOverdue(task) {
+  if (!task.dueDate || task.status === "completed") return false;
+  var today = new Date();
+  today.setHours(0, 0, 0, 0);
+  var parts = task.dueDate.split("-");
+  var due = new Date(parts[0], parts[1] - 1, parts[2]);
+  return due < today;
+}
+
+function checkOverdueFlags() {
+  data.tasks.forEach(function(task) {
+    if (isOverdue(task) && task.assigneeId && !task.overdueFlagged) {
+      addFlag(task.assigneeId, task.id, "red", 1, "Missed deadline: " + task.title);
+      task.overdueFlagged = true;
+    }
+  });
+  saveData(data);
+}
+
+// ==================== Task Completion Review ====================
+
+function toggleTaskStatus(id) {
+  var task = data.tasks.find(function(t) { return t.id === id; });
+  if (!task) return;
+
+  if (task.status === "completed") {
+    // Un-completing — just revert
+    task.status = "pending";
+    saveData(data);
+    refreshAll();
+  } else {
+    // Completing — open review modal
+    pendingReviewTaskId = id;
+    document.getElementById("review-task-name").textContent = task.title;
+    openModal("review-modal");
+  }
+}
+
+function submitReview(quality) {
+  var task = data.tasks.find(function(t) { return t.id === pendingReviewTaskId; });
+  if (!task) return;
+
+  task.status = "completed";
+  task.reviewResult = quality;
+
+  if (task.assigneeId) {
+    if (quality === "extraordinary") {
+      addFlag(task.assigneeId, task.id, "green", 2, "Extraordinary result: " + task.title);
+    } else if (quality === "perfect") {
+      addFlag(task.assigneeId, task.id, "green", 1, "Completed perfectly: " + task.title);
+    } else if (quality === "below") {
+      addFlag(task.assigneeId, task.id, "red", 1, "Below expectation: " + task.title);
+    }
+  }
+
+  saveData(data);
+  closeModal("review-modal");
+  pendingReviewTaskId = null;
+  refreshAll();
+}
+
+function cancelReview() {
+  pendingReviewTaskId = null;
+  closeModal("review-modal");
+}
+
+// ==================== Blunder ====================
+
+function openBlunder(taskId) {
+  var task = data.tasks.find(function(t) { return t.id === taskId; });
+  if (!task) return;
+  pendingBlunderTaskId = taskId;
+  document.getElementById("blunder-task-name").textContent = task.title;
+  document.getElementById("blunder-note").value = "";
+  openModal("blunder-modal");
+}
+
+function submitBlunder() {
+  var task = data.tasks.find(function(t) { return t.id === pendingBlunderTaskId; });
+  if (!task || !task.assigneeId) {
+    closeModal("blunder-modal");
+    return;
+  }
+
+  var note = document.getElementById("blunder-note").value.trim();
+  var reason = "Blunder in task: " + task.title;
+  if (note) reason += " — " + note;
+
+  addFlag(task.assigneeId, task.id, "red", 3, reason);
+
+  closeModal("blunder-modal");
+  pendingBlunderTaskId = null;
+  refreshAll();
+}
+
+// ==================== Member Flag History ====================
+
+function showMemberFlags(memberId) {
+  var member = data.members.find(function(m) { return m.id === memberId; });
+  if (!member) return;
+
+  document.getElementById("flags-modal-title").textContent = escapeHtml(member.name) + " — Flag History";
+
+  var flags = getMemberFlags(memberId);
+  var summaryEl = document.getElementById("flags-summary");
+  summaryEl.innerHTML =
+    '<div class="flags-summary-row">' +
+      '<div class="flags-summary-item green">' +
+        '<span class="flags-summary-count">' + flags.green + '</span>' +
+        '<span class="flags-summary-label">Green Flags</span>' +
+      '</div>' +
+      '<div class="flags-summary-item red">' +
+        '<span class="flags-summary-count">' + flags.red + '</span>' +
+        '<span class="flags-summary-label">Red Flags</span>' +
+      '</div>' +
+      '<div class="flags-summary-item net ' + (flags.green - flags.red >= 0 ? 'green' : 'red') + '">' +
+        '<span class="flags-summary-count">' + (flags.green - flags.red > 0 ? '+' : '') + (flags.green - flags.red) + '</span>' +
+        '<span class="flags-summary-label">Net Score</span>' +
+      '</div>' +
+    '</div>';
+
+  var historyList = document.getElementById("flags-history-list");
+  var flagEntries = getMemberFlagList(memberId);
+
+  if (flagEntries.length === 0) {
+    historyList.innerHTML = '<div class="empty-state-sm">No flags recorded yet</div>';
+  } else {
+    historyList.innerHTML = "";
+    flagEntries.forEach(function(f) {
+      var item = document.createElement("div");
+      item.className = "flag-history-item";
+      var dateStr = new Date(f.createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+      item.innerHTML =
+        '<div class="flag-history-icon ' + f.color + '">' +
+          '&#9873;' + (f.count > 1 ? ' x' + f.count : '') +
+        '</div>' +
+        '<div class="flag-history-info">' +
+          '<span class="flag-history-reason">' + escapeHtml(f.reason) + '</span>' +
+          '<span class="flag-history-date">' + dateStr + '</span>' +
+        '</div>';
+      historyList.appendChild(item);
+    });
+  }
+
+  openModal("flags-modal");
 }
 
 // ==================== Roles ====================
@@ -122,13 +321,13 @@ function renderRoles() {
     card.className = "card";
     card.innerHTML =
       '<div class="card-top">' +
-        '<div class="role-badge ' + role.color + '">' + role.name + '</div>' +
+        '<div class="role-badge ' + role.color + '">' + escapeHtml(role.name) + '</div>' +
         '<div class="card-actions">' +
           '<button class="btn-icon" onclick="editRole(\'' + role.id + '\')" title="Edit">&#9998;</button>' +
           '<button class="btn-icon btn-icon-danger" onclick="deleteRole(\'' + role.id + '\')" title="Delete">&#10005;</button>' +
         '</div>' +
       '</div>' +
-      '<p class="card-desc">' + (role.description || "No description") + '</p>' +
+      '<p class="card-desc">' + (role.description ? escapeHtml(role.description) : "No description") + '</p>' +
       '<div class="card-meta">' + memberCount + ' member' + (memberCount !== 1 ? 's' : '') + '</div>';
     container.appendChild(card);
   });
@@ -211,6 +410,7 @@ function renderMembers() {
     var taskCount = data.tasks.filter(function(t) { return t.assigneeId === member.id && t.status !== "completed"; }).length;
     var initials = member.name.split(" ").map(function(n) { return n[0]; }).join("").toUpperCase().substring(0, 2);
     var roleColor = role ? role.color : "blue";
+    var flagHtml = renderFlagBadge(member.id);
 
     var card = document.createElement("div");
     card.className = "card";
@@ -219,11 +419,12 @@ function renderMembers() {
         '<div class="member-info">' +
           '<div class="avatar ' + roleColor + '">' + initials + '</div>' +
           '<div>' +
-            '<div class="member-name">' + escapeHtml(member.name) + '</div>' +
+            '<div class="member-name">' + escapeHtml(member.name) + ' ' + flagHtml + '</div>' +
             '<div class="member-email">' + escapeHtml(member.email) + '</div>' +
           '</div>' +
         '</div>' +
         '<div class="card-actions">' +
+          '<button class="btn-icon" onclick="showMemberFlags(\'' + member.id + '\')" title="View Flags">&#9873;</button>' +
           '<button class="btn-icon" onclick="editMember(\'' + member.id + '\')" title="Edit">&#9998;</button>' +
           '<button class="btn-icon btn-icon-danger" onclick="deleteMember(\'' + member.id + '\')" title="Delete">&#10005;</button>' +
         '</div>' +
@@ -255,7 +456,13 @@ function saveTask(event) {
       : new Date().toISOString()
   };
 
+  // Preserve flag-related fields on edit
   if (editId) {
+    var existing = data.tasks.find(function(t) { return t.id === editId; });
+    if (existing) {
+      task.overdueFlagged = existing.overdueFlagged;
+      task.reviewResult = existing.reviewResult;
+    }
     var idx = data.tasks.findIndex(function(t) { return t.id === editId; });
     if (idx !== -1) data.tasks[idx] = task;
   } else {
@@ -290,24 +497,26 @@ function deleteTask(id) {
   openModal("confirm-modal");
 }
 
-function toggleTaskStatus(id) {
-  var task = data.tasks.find(function(t) { return t.id === id; });
-  if (!task) return;
-  if (task.status === "completed") {
-    task.status = "pending";
-  } else {
-    task.status = "completed";
-  }
-  saveData(data);
-  refreshAll();
-}
-
 function filterTasks(filter) {
   currentFilter = filter;
   document.querySelectorAll(".filter-btn").forEach(function(btn) {
     btn.classList.toggle("active", btn.getAttribute("data-filter") === filter);
   });
   renderTasks();
+}
+
+function getTaskFlagIndicator(task) {
+  // Show flags awarded on this task
+  var taskFlags = data.flags.filter(function(f) { return f.taskId === task.id; });
+  if (taskFlags.length === 0) return '';
+
+  var parts = [];
+  taskFlags.forEach(function(f) {
+    for (var i = 0; i < f.count; i++) {
+      parts.push('<span class="task-flag-pip ' + f.color + '">&#9873;</span>');
+    }
+  });
+  return '<span class="task-flag-indicator">' + parts.join('') + '</span>';
 }
 
 function renderTasks() {
@@ -317,6 +526,7 @@ function renderTasks() {
 
   var filtered = data.tasks.filter(function(t) {
     if (currentFilter === "all") return true;
+    if (currentFilter === "overdue") return isOverdue(t);
     return t.status === currentFilter;
   });
 
@@ -340,8 +550,11 @@ function renderTasks() {
 
   filtered.forEach(function(task) {
     var assignee = data.members.find(function(m) { return m.id === task.assigneeId; });
+    var overdueClass = isOverdue(task) ? " task-overdue" : "";
+    var flagIndicator = getTaskFlagIndicator(task);
+
     var card = document.createElement("div");
-    card.className = "card task-card" + (task.status === "completed" ? " task-completed" : "");
+    card.className = "card task-card" + (task.status === "completed" ? " task-completed" : "") + overdueClass;
     card.innerHTML =
       '<div class="card-top">' +
         '<div class="task-info">' +
@@ -349,11 +562,14 @@ function renderTasks() {
             (task.status === "completed" ? "&#10003;" : "") +
           '</button>' +
           '<div>' +
-            '<div class="task-title">' + escapeHtml(task.title) + '</div>' +
+            '<div class="task-title">' + escapeHtml(task.title) + ' ' + flagIndicator + '</div>' +
             (task.description ? '<div class="task-desc">' + escapeHtml(task.description) + '</div>' : '') +
           '</div>' +
         '</div>' +
         '<div class="card-actions">' +
+          (task.status !== "completed" && task.assigneeId
+            ? '<button class="btn-icon btn-icon-blunder" onclick="openBlunder(\'' + task.id + '\')" title="Report Blunder">&#9873;</button>'
+            : '') +
           '<button class="btn-icon" onclick="editTask(\'' + task.id + '\')" title="Edit">&#9998;</button>' +
           '<button class="btn-icon btn-icon-danger" onclick="deleteTask(\'' + task.id + '\')" title="Delete">&#10005;</button>' +
         '</div>' +
@@ -361,6 +577,7 @@ function renderTasks() {
       '<div class="card-bottom">' +
         '<span class="priority-badge priority-' + task.priority + '">' + task.priority + '</span>' +
         '<span class="status-badge status-' + task.status + '">' + formatStatus(task.status) + '</span>' +
+        (isOverdue(task) ? '<span class="status-badge status-overdue">Overdue</span>' : '') +
         (assignee ? '<span class="card-meta">Assigned to ' + escapeHtml(assignee.name) + '</span>' : '<span class="card-meta">Unassigned</span>') +
         (task.dueDate ? '<span class="card-meta">Due ' + formatDate(task.dueDate) + '</span>' : '') +
       '</div>';
@@ -372,12 +589,79 @@ function renderTasks() {
 
 function renderDashboard() {
   var activeTasks = data.tasks.filter(function(t) { return t.status !== "completed"; });
-  var completedTasks = data.tasks.filter(function(t) { return t.status === "completed"; });
+
+  // Count all flags
+  var totalGreen = 0;
+  var totalRed = 0;
+  data.flags.forEach(function(f) {
+    if (f.color === "green") totalGreen += f.count;
+    else if (f.color === "red") totalRed += f.count;
+  });
 
   document.getElementById("stat-members").textContent = data.members.length;
   document.getElementById("stat-tasks").textContent = activeTasks.length;
-  document.getElementById("stat-completed").textContent = completedTasks.length;
-  document.getElementById("stat-roles").textContent = data.roles.length;
+  document.getElementById("stat-green-flags").textContent = totalGreen;
+  document.getElementById("stat-red-flags").textContent = totalRed;
+
+  // Member Flag Status (sorted by net score descending)
+  var flagStatusEl = document.getElementById("dashboard-flag-status");
+  if (flagStatusEl) {
+    if (data.members.length === 0) {
+      flagStatusEl.innerHTML = '<div class="empty-state-sm">No members yet</div>';
+    } else {
+      var memberFlagData = data.members.map(function(m) {
+        var flags = getMemberFlags(m.id);
+        return { member: m, green: flags.green, red: flags.red, net: flags.green - flags.red };
+      }).sort(function(a, b) { return b.net - a.net; });
+
+      flagStatusEl.innerHTML = "";
+      memberFlagData.forEach(function(mf) {
+        var initials = mf.member.name.split(" ").map(function(n) { return n[0]; }).join("").toUpperCase().substring(0, 2);
+        var role = data.roles.find(function(r) { return r.id === mf.member.roleId; });
+        var roleColor = role ? role.color : "blue";
+        var netClass = mf.net > 0 ? "green" : (mf.net < 0 ? "red" : "neutral");
+
+        var item = document.createElement("div");
+        item.className = "dashboard-list-item clickable";
+        item.onclick = function() { showMemberFlags(mf.member.id); };
+        item.innerHTML =
+          '<div class="avatar avatar-sm ' + roleColor + '">' + initials + '</div>' +
+          '<div class="dashboard-item-info">' +
+            '<span class="dashboard-item-name">' + escapeHtml(mf.member.name) + '</span>' +
+            '<span class="dashboard-item-detail">' + (role ? escapeHtml(role.name) : "No Role") + '</span>' +
+          '</div>' +
+          '<div class="dashboard-flag-chips">' +
+            '<span class="flag-chip flag-chip-green">&#9873; ' + mf.green + '</span>' +
+            '<span class="flag-chip flag-chip-red">&#9873; ' + mf.red + '</span>' +
+            '<span class="flag-chip flag-chip-net ' + netClass + '">' + (mf.net > 0 ? '+' : '') + mf.net + '</span>' +
+          '</div>';
+        flagStatusEl.appendChild(item);
+      });
+    }
+  }
+
+  // Overdue Tasks
+  var overdueEl = document.getElementById("dashboard-overdue");
+  if (overdueEl) {
+    var overdueTasks = data.tasks.filter(function(t) { return isOverdue(t); });
+    if (overdueTasks.length === 0) {
+      overdueEl.innerHTML = '<div class="empty-state-sm">No overdue tasks</div>';
+    } else {
+      overdueEl.innerHTML = "";
+      overdueTasks.forEach(function(task) {
+        var assignee = data.members.find(function(m) { return m.id === task.assigneeId; });
+        var item = document.createElement("div");
+        item.className = "dashboard-list-item";
+        item.innerHTML =
+          '<div class="dashboard-item-info">' +
+            '<span class="dashboard-item-name overdue-text">' + escapeHtml(task.title) + '</span>' +
+            '<span class="dashboard-item-detail">' + (assignee ? escapeHtml(assignee.name) : "Unassigned") + ' — Due ' + formatDate(task.dueDate) + '</span>' +
+          '</div>' +
+          '<span class="status-badge status-overdue">Overdue</span>';
+        overdueEl.appendChild(item);
+      });
+    }
+  }
 
   // Recent members (last 5)
   var recentMembers = document.getElementById("recent-members");
@@ -391,12 +675,13 @@ function renderDashboard() {
         var role = data.roles.find(function(r) { return r.id === member.roleId; });
         var initials = member.name.split(" ").map(function(n) { return n[0]; }).join("").toUpperCase().substring(0, 2);
         var roleColor = role ? role.color : "blue";
+        var flagHtml = renderFlagBadge(member.id);
         var item = document.createElement("div");
         item.className = "dashboard-list-item";
         item.innerHTML =
           '<div class="avatar avatar-sm ' + roleColor + '">' + initials + '</div>' +
           '<div class="dashboard-item-info">' +
-            '<span class="dashboard-item-name">' + escapeHtml(member.name) + '</span>' +
+            '<span class="dashboard-item-name">' + escapeHtml(member.name) + ' ' + flagHtml + '</span>' +
             '<span class="dashboard-item-detail">' + (role ? escapeHtml(role.name) : "No Role") + '</span>' +
           '</div>' +
           '<span class="status-badge status-' + member.status + '">' + formatStatus(member.status) + '</span>';
@@ -415,11 +700,12 @@ function renderDashboard() {
       recentTasks.innerHTML = "";
       recentT.forEach(function(task) {
         var assignee = data.members.find(function(m) { return m.id === task.assigneeId; });
+        var flagIndicator = getTaskFlagIndicator(task);
         var item = document.createElement("div");
         item.className = "dashboard-list-item";
         item.innerHTML =
           '<div class="dashboard-item-info">' +
-            '<span class="dashboard-item-name">' + escapeHtml(task.title) + '</span>' +
+            '<span class="dashboard-item-name">' + escapeHtml(task.title) + ' ' + flagIndicator + '</span>' +
             '<span class="dashboard-item-detail">' + (assignee ? escapeHtml(assignee.name) : "Unassigned") + '</span>' +
           '</div>' +
           '<span class="priority-badge priority-' + task.priority + '">' + task.priority + '</span>' +
@@ -438,8 +724,12 @@ function confirmDelete() {
     data.tasks.forEach(function(t) {
       if (t.assigneeId === pendingDeleteId) t.assigneeId = "";
     });
+    // Remove flags for deleted member
+    data.flags = data.flags.filter(function(f) { return f.memberId !== pendingDeleteId; });
   } else if (pendingDeleteType === "task") {
     data.tasks = data.tasks.filter(function(t) { return t.id !== pendingDeleteId; });
+    // Remove flags tied to deleted task
+    data.flags = data.flags.filter(function(f) { return f.taskId !== pendingDeleteId; });
   } else if (pendingDeleteType === "role") {
     data.roles = data.roles.filter(function(r) { return r.id !== pendingDeleteId; });
     data.members.forEach(function(m) {
@@ -505,6 +795,7 @@ function populateMemberDropdown(selectId) {
 }
 
 function refreshAll() {
+  checkOverdueFlags();
   renderDashboard();
   renderMembers();
   renderTasks();

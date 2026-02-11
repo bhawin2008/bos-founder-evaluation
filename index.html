@@ -48,16 +48,27 @@
             <div class="stat-label">Active Tasks</div>
           </div>
           <div class="stat-card">
-            <div class="stat-value" id="stat-completed">0</div>
-            <div class="stat-label">Completed Tasks</div>
+            <div class="stat-value stat-value-green" id="stat-green-flags">0</div>
+            <div class="stat-label">Green Flags</div>
           </div>
           <div class="stat-card">
-            <div class="stat-value" id="stat-roles">0</div>
-            <div class="stat-label">Roles Defined</div>
+            <div class="stat-value stat-value-red" id="stat-red-flags">0</div>
+            <div class="stat-label">Red Flags</div>
           </div>
         </div>
 
         <div class="dashboard-sections">
+          <div class="dashboard-section">
+            <h3>Member Flag Status</h3>
+            <div id="dashboard-flag-status"></div>
+          </div>
+          <div class="dashboard-section">
+            <h3>Overdue Tasks</h3>
+            <div id="dashboard-overdue"></div>
+          </div>
+        </div>
+
+        <div class="dashboard-sections" style="margin-top: 24px;">
           <div class="dashboard-section">
             <h3>Recent Members</h3>
             <div id="recent-members"></div>
@@ -92,6 +103,7 @@
           <button class="filter-btn" data-filter="pending" onclick="filterTasks('pending')">Pending</button>
           <button class="filter-btn" data-filter="in-progress" onclick="filterTasks('in-progress')">In Progress</button>
           <button class="filter-btn" data-filter="completed" onclick="filterTasks('completed')">Completed</button>
+          <button class="filter-btn filter-btn-overdue" data-filter="overdue" onclick="filterTasks('overdue')">Overdue</button>
         </div>
         <div id="tasks-list" class="card-list"></div>
       </div>
@@ -229,6 +241,78 @@
           <button type="submit" class="btn-primary">Save Role</button>
         </div>
       </form>
+    </div>
+  </div>
+
+  <!-- Task Completion Review Modal -->
+  <div id="review-modal" class="modal-overlay">
+    <div class="modal">
+      <div class="modal-header">
+        <h3>Review Task Completion</h3>
+        <button class="modal-close" onclick="closeModal('review-modal')">&times;</button>
+      </div>
+      <p class="review-task-name" id="review-task-name"></p>
+      <p class="review-prompt">How was this task completed?</p>
+      <div class="flag-options">
+        <button class="flag-option-btn green-flag" onclick="submitReview('extraordinary')">
+          <span class="flag-icon green">&#9873;&#9873;</span>
+          <span class="flag-option-label">Extraordinary Result</span>
+          <span class="flag-option-desc">+2 Green Flags</span>
+        </button>
+        <button class="flag-option-btn green-flag" onclick="submitReview('perfect')">
+          <span class="flag-icon green">&#9873;</span>
+          <span class="flag-option-label">Completed Perfectly</span>
+          <span class="flag-option-desc">+1 Green Flag</span>
+        </button>
+        <button class="flag-option-btn neutral-flag" onclick="submitReview('none')">
+          <span class="flag-icon neutral">&#10003;</span>
+          <span class="flag-option-label">Completed (No Flag)</span>
+          <span class="flag-option-desc">Just mark done</span>
+        </button>
+        <button class="flag-option-btn red-flag" onclick="submitReview('below')">
+          <span class="flag-icon red">&#9873;</span>
+          <span class="flag-option-label">Below Expectation</span>
+          <span class="flag-option-desc">+1 Red Flag</span>
+        </button>
+      </div>
+      <div class="form-actions">
+        <button class="btn-secondary" onclick="cancelReview()">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Blunder Flag Modal -->
+  <div id="blunder-modal" class="modal-overlay">
+    <div class="modal modal-sm">
+      <div class="modal-header">
+        <h3>Report Blunder</h3>
+        <button class="modal-close" onclick="closeModal('blunder-modal')">&times;</button>
+      </div>
+      <p class="review-task-name" id="blunder-task-name"></p>
+      <p class="confirm-text">This will assign <strong style="color: var(--accent-red);">3 red flags</strong> to the assignee for a blunder in task progress.</p>
+      <div class="form-group" style="margin-top: 16px;">
+        <label for="blunder-note">Note (optional)</label>
+        <textarea id="blunder-note" rows="2" placeholder="Describe the blunder..."></textarea>
+      </div>
+      <div class="form-actions">
+        <button class="btn-secondary" onclick="closeModal('blunder-modal')">Cancel</button>
+        <button class="btn-danger" onclick="submitBlunder()">Confirm Blunder (3 Red Flags)</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Member Flags Modal -->
+  <div id="flags-modal" class="modal-overlay">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 id="flags-modal-title">Flag History</h3>
+        <button class="modal-close" onclick="closeModal('flags-modal')">&times;</button>
+      </div>
+      <div id="flags-summary" class="flags-summary"></div>
+      <div id="flags-history-list" class="flags-history-list"></div>
+      <div class="form-actions">
+        <button class="btn-secondary" onclick="closeModal('flags-modal')">Close</button>
+      </div>
     </div>
   </div>
 

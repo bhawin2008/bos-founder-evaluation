@@ -723,6 +723,374 @@ body {
   line-height: 1.5;
 }
 
+/* ==================== Flag Badges (inline on member names) ==================== */
+
+.flag-badges {
+  display: inline-flex;
+  gap: 6px;
+  margin-left: 6px;
+  vertical-align: middle;
+}
+
+.flag-count {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  padding: 2px 8px;
+  border-radius: 6px;
+  font-size: 0.7rem;
+  font-weight: 700;
+}
+
+.flag-green-count {
+  background: rgba(34, 197, 94, 0.15);
+  color: var(--accent-green);
+}
+
+.flag-red-count {
+  background: rgba(239, 68, 68, 0.15);
+  color: var(--accent-red);
+}
+
+/* ==================== Stat Value Colors ==================== */
+
+.stat-value-green {
+  background: linear-gradient(135deg, #16a34a, #22c55e) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  background-clip: text !important;
+}
+
+.stat-value-red {
+  background: linear-gradient(135deg, #dc2626, #ef4444) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  background-clip: text !important;
+}
+
+/* ==================== Dashboard Flag Chips ==================== */
+
+.dashboard-flag-chips {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.flag-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  padding: 3px 8px;
+  border-radius: 6px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.flag-chip-green {
+  background: rgba(34, 197, 94, 0.12);
+  color: var(--accent-green);
+}
+
+.flag-chip-red {
+  background: rgba(239, 68, 68, 0.12);
+  color: var(--accent-red);
+}
+
+.flag-chip-net {
+  padding: 3px 10px;
+  border-radius: 6px;
+  font-weight: 800;
+}
+
+.flag-chip-net.green {
+  background: rgba(34, 197, 94, 0.18);
+  color: var(--accent-green);
+}
+
+.flag-chip-net.red {
+  background: rgba(239, 68, 68, 0.18);
+  color: var(--accent-red);
+}
+
+.flag-chip-net.neutral {
+  background: rgba(136, 136, 160, 0.15);
+  color: var(--text-secondary);
+}
+
+.dashboard-list-item.clickable {
+  cursor: pointer;
+  border-radius: 8px;
+  padding: 10px 8px;
+  margin: 0 -8px;
+  transition: background 0.15s ease;
+}
+
+.dashboard-list-item.clickable:hover {
+  background: var(--bg-card-hover);
+}
+
+/* ==================== Overdue Styles ==================== */
+
+.status-overdue {
+  background: rgba(239, 68, 68, 0.2);
+  color: var(--accent-red);
+  animation: pulse-overdue 2s ease-in-out infinite;
+}
+
+@keyframes pulse-overdue {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
+
+.task-overdue {
+  border-color: rgba(239, 68, 68, 0.3);
+}
+
+.task-overdue:hover {
+  border-color: rgba(239, 68, 68, 0.5);
+}
+
+.overdue-text {
+  color: var(--accent-red);
+}
+
+.filter-btn-overdue {
+  color: var(--accent-red);
+  border-color: rgba(239, 68, 68, 0.3);
+}
+
+.filter-btn-overdue:hover {
+  border-color: var(--accent-red);
+  color: var(--accent-red);
+}
+
+.filter-btn-overdue.active {
+  background: rgba(239, 68, 68, 0.12);
+  border-color: var(--accent-red);
+  color: var(--accent-red);
+}
+
+/* ==================== Task Flag Indicators ==================== */
+
+.task-flag-indicator {
+  display: inline-flex;
+  gap: 2px;
+  margin-left: 6px;
+  vertical-align: middle;
+}
+
+.task-flag-pip {
+  font-size: 0.7rem;
+}
+
+.task-flag-pip.green {
+  color: var(--accent-green);
+}
+
+.task-flag-pip.red {
+  color: var(--accent-red);
+}
+
+/* ==================== Blunder Button ==================== */
+
+.btn-icon-blunder {
+  color: var(--accent-red) !important;
+  border-color: rgba(239, 68, 68, 0.3) !important;
+}
+
+.btn-icon-blunder:hover {
+  background: rgba(239, 68, 68, 0.15) !important;
+  border-color: var(--accent-red) !important;
+}
+
+/* ==================== Review Modal ==================== */
+
+.review-task-name {
+  font-weight: 600;
+  font-size: 1rem;
+  margin-bottom: 8px;
+  color: var(--text-primary);
+}
+
+.review-prompt {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  margin-bottom: 20px;
+}
+
+.flag-options {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.flag-option-btn {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 18px;
+  background: var(--bg-dark);
+  border: 1.5px solid var(--border-color);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: left;
+  color: var(--text-primary);
+  font-family: inherit;
+}
+
+.flag-option-btn:hover {
+  background: var(--bg-card-hover);
+}
+
+.flag-option-btn.green-flag:hover {
+  border-color: var(--accent-green);
+  background: rgba(34, 197, 94, 0.06);
+}
+
+.flag-option-btn.red-flag:hover {
+  border-color: var(--accent-red);
+  background: rgba(239, 68, 68, 0.06);
+}
+
+.flag-option-btn.neutral-flag:hover {
+  border-color: var(--text-secondary);
+}
+
+.flag-icon {
+  font-size: 1.1rem;
+  min-width: 28px;
+  text-align: center;
+}
+
+.flag-icon.green { color: var(--accent-green); }
+.flag-icon.red { color: var(--accent-red); }
+.flag-icon.neutral { color: var(--text-secondary); }
+
+.flag-option-label {
+  font-weight: 600;
+  font-size: 0.9rem;
+  flex: 1;
+}
+
+.flag-option-desc {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+/* ==================== Flags Summary (in modal) ==================== */
+
+.flags-summary {
+  margin-bottom: 20px;
+}
+
+.flags-summary-row {
+  display: flex;
+  gap: 12px;
+}
+
+.flags-summary-item {
+  flex: 1;
+  text-align: center;
+  padding: 16px 12px;
+  border-radius: 12px;
+  border: 1px solid var(--border-color);
+  background: var(--bg-dark);
+}
+
+.flags-summary-item.green {
+  border-color: rgba(34, 197, 94, 0.25);
+}
+
+.flags-summary-item.red {
+  border-color: rgba(239, 68, 68, 0.25);
+}
+
+.flags-summary-count {
+  display: block;
+  font-size: 1.8rem;
+  font-weight: 800;
+  line-height: 1;
+  margin-bottom: 4px;
+}
+
+.flags-summary-item.green .flags-summary-count {
+  color: var(--accent-green);
+}
+
+.flags-summary-item.red .flags-summary-count {
+  color: var(--accent-red);
+}
+
+.flags-summary-label {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+/* ==================== Flag History List ==================== */
+
+.flags-history-list {
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.flag-history-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.flag-history-item:last-child {
+  border-bottom: none;
+}
+
+.flag-history-icon {
+  min-width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.flag-history-icon.green {
+  background: rgba(34, 197, 94, 0.15);
+  color: var(--accent-green);
+}
+
+.flag-history-icon.red {
+  background: rgba(239, 68, 68, 0.15);
+  color: var(--accent-red);
+}
+
+.flag-history-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.flag-history-reason {
+  display: block;
+  font-size: 0.88rem;
+  font-weight: 500;
+  color: var(--text-primary);
+  margin-bottom: 2px;
+}
+
+.flag-history-date {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+}
+
 /* ==================== Responsive ==================== */
 
 @media (max-width: 900px) {
