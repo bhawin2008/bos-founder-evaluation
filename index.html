@@ -28,6 +28,12 @@
           <span class="nav-icon">&#9733;</span> Roles
         </button>
       </nav>
+      <div class="sidebar-spacer"></div>
+      <nav class="sidebar-nav sidebar-nav-bottom">
+        <button class="nav-item" data-view="flagrules" onclick="switchView('flagrules')">
+          <span class="nav-icon">&#9873;</span> Flag Rules
+        </button>
+      </nav>
     </aside>
 
     <!-- Main Content -->
@@ -115,6 +121,102 @@
           <button class="btn-primary" onclick="openModal('role-modal')">+ Add Role</button>
         </div>
         <div id="roles-list" class="card-list"></div>
+      </div>
+
+      <!-- Flag Rules View -->
+      <div id="flagrules-view" class="view">
+        <div class="view-header">
+          <h2>Flag Rules</h2>
+          <p class="view-subtitle">Performance tracking guidelines</p>
+        </div>
+
+        <div class="rules-section">
+          <h3 class="rules-section-title rules-title-red">Red Flags</h3>
+          <div class="rules-grid">
+            <div class="rule-card rule-card-red">
+              <div class="rule-icon-wrap red">
+                <span class="rule-icon">&#9873;</span>
+                <span class="rule-count">x1</span>
+              </div>
+              <div class="rule-info">
+                <div class="rule-name">Missed Deadline</div>
+                <div class="rule-desc">If a task is not completed by its due date, the assignee automatically receives <strong>1 red flag</strong>. This is detected automatically by the system.</div>
+              </div>
+            </div>
+            <div class="rule-card rule-card-red">
+              <div class="rule-icon-wrap red">
+                <span class="rule-icon">&#9873;</span>
+                <span class="rule-count">x1</span>
+              </div>
+              <div class="rule-info">
+                <div class="rule-name">Below Expectation</div>
+                <div class="rule-desc">If a task is completed but the result does not meet the expected standard, the assignee receives <strong>1 red flag</strong>. Assigned during task completion review.</div>
+              </div>
+            </div>
+            <div class="rule-card rule-card-red">
+              <div class="rule-icon-wrap red">
+                <span class="rule-icon">&#9873;</span>
+                <span class="rule-count">x3</span>
+              </div>
+              <div class="rule-info">
+                <div class="rule-name">Blunder</div>
+                <div class="rule-desc">If a person makes a serious mistake or blunder during task progress, they receive <strong>3 red flags</strong>. Can be reported at any time via the flag button on active tasks.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="rules-section">
+          <h3 class="rules-section-title rules-title-green">Green Flags</h3>
+          <div class="rules-grid">
+            <div class="rule-card rule-card-green">
+              <div class="rule-icon-wrap green">
+                <span class="rule-icon">&#9873;</span>
+                <span class="rule-count">x1</span>
+              </div>
+              <div class="rule-info">
+                <div class="rule-name">Completed Perfectly</div>
+                <div class="rule-desc">If a task is completed perfectly and meets all expectations, the assignee receives <strong>1 green flag</strong>. Assigned during task completion review.</div>
+              </div>
+            </div>
+            <div class="rule-card rule-card-green">
+              <div class="rule-icon-wrap green">
+                <span class="rule-icon">&#9873;</span>
+                <span class="rule-count">x2</span>
+              </div>
+              <div class="rule-info">
+                <div class="rule-name">Extraordinary Result</div>
+                <div class="rule-desc">If a task is completed with an extraordinary result that exceeds expectations, the assignee receives <strong>2 green flags</strong>. Assigned during task completion review.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="rules-section">
+          <h3 class="rules-section-title">How It Works</h3>
+          <div class="rules-how-list">
+            <div class="rules-how-item">
+              <div class="rules-how-number">1</div>
+              <div class="rules-how-text"><strong>Assign tasks</strong> to team members with a due date.</div>
+            </div>
+            <div class="rules-how-item">
+              <div class="rules-how-number">2</div>
+              <div class="rules-how-text"><strong>Overdue detection</strong> runs automatically. If a task passes its due date, 1 red flag is assigned to the member.</div>
+            </div>
+            <div class="rules-how-item">
+              <div class="rules-how-number">3</div>
+              <div class="rules-how-text"><strong>Report a blunder</strong> anytime using the flag button on active tasks. This assigns 3 red flags immediately.</div>
+            </div>
+            <div class="rules-how-item">
+              <div class="rules-how-number">4</div>
+              <div class="rules-how-text"><strong>Complete a task</strong> by clicking the checkbox. A review modal lets you rate the quality and assign green or red flags.</div>
+            </div>
+            <div class="rules-how-item">
+              <div class="rules-how-number">5</div>
+              <div class="rules-how-text"><strong>Track performance</strong> on the Dashboard and in each member's Flag History to see green flags, red flags, and net score.</div>
+            </div>
+          </div>
+        </div>
       </div>
     </main>
   </div>

@@ -69,10 +69,19 @@ body {
   margin-top: 2px;
 }
 
+.sidebar-spacer {
+  flex: 1;
+}
+
 .sidebar-nav {
   display: flex;
   flex-direction: column;
   gap: 4px;
+}
+
+.sidebar-nav-bottom {
+  border-top: 1px solid var(--border-color);
+  padding-top: 12px;
 }
 
 .nav-item {
@@ -1089,6 +1098,154 @@ body {
 .flag-history-date {
   font-size: 0.75rem;
   color: var(--text-secondary);
+}
+
+/* ==================== Flag Rules Page ==================== */
+
+.rules-section {
+  margin-bottom: 32px;
+}
+
+.rules-section-title {
+  font-size: 1.15rem;
+  font-weight: 700;
+  margin-bottom: 16px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.rules-title-red {
+  color: var(--accent-red);
+}
+
+.rules-title-green {
+  color: var(--accent-green);
+}
+
+.rules-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.rule-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 18px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 14px;
+  padding: 20px;
+  transition: border-color 0.2s ease;
+}
+
+.rule-card:hover {
+  border-color: #3a3a4a;
+}
+
+.rule-card-red {
+  border-left: 3px solid var(--accent-red);
+}
+
+.rule-card-green {
+  border-left: 3px solid var(--accent-green);
+}
+
+.rule-icon-wrap {
+  min-width: 52px;
+  height: 52px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  gap: 0;
+}
+
+.rule-icon-wrap.red {
+  background: rgba(239, 68, 68, 0.12);
+  color: var(--accent-red);
+}
+
+.rule-icon-wrap.green {
+  background: rgba(34, 197, 94, 0.12);
+  color: var(--accent-green);
+}
+
+.rule-icon {
+  font-size: 1.2rem;
+  line-height: 1;
+}
+
+.rule-count {
+  font-size: 0.65rem;
+  font-weight: 800;
+  letter-spacing: 0.3px;
+  margin-top: 2px;
+}
+
+.rule-info {
+  flex: 1;
+}
+
+.rule-name {
+  font-size: 1rem;
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+
+.rule-desc {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  line-height: 1.55;
+}
+
+.rule-desc strong {
+  color: var(--text-primary);
+}
+
+/* How It Works Steps */
+
+.rules-how-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.rules-how-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  padding: 16px 0;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.rules-how-item:last-child {
+  border-bottom: none;
+}
+
+.rules-how-number {
+  min-width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  background: rgba(74, 108, 247, 0.12);
+  color: var(--accent-blue);
+  font-weight: 800;
+  font-size: 0.85rem;
+}
+
+.rules-how-text {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  padding-top: 4px;
+}
+
+.rules-how-text strong {
+  color: var(--text-primary);
 }
 
 /* ==================== Responsive ==================== */
