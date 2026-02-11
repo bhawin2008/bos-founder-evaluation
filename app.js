@@ -1453,8 +1453,130 @@ function refreshAll() {
   renderRoles();
 }
 
+// ==================== Demo Data Seeding ====================
+
+function seedDemoData() {
+  // Only seed if no data exists
+  if (data.members.length > 0 || data.roles.length > 0) return;
+
+  // --- Roles ---
+  var roles = [
+    { id: "role_dev", name: "Developer", description: "Software development and engineering", color: "blue", createdAt: "2024-11-15T10:00:00.000Z" },
+    { id: "role_design", name: "Designer", description: "UI/UX design and visual assets", color: "purple", createdAt: "2024-11-15T10:00:00.000Z" },
+    { id: "role_mgr", name: "Manager", description: "Project management and team coordination", color: "green", createdAt: "2024-11-15T10:00:00.000Z" },
+    { id: "role_qa", name: "QA Engineer", description: "Quality assurance and testing", color: "orange", createdAt: "2024-11-15T10:00:00.000Z" }
+  ];
+
+  // --- Members ---
+  // Patterns planned:
+  //   Arjun  (Dev)     → Rising (more green in Jan than Dec)
+  //   Priya  (Designer)→ Falling (gets red flags in Jan)
+  //   Rahul  (Manager) → Flat (balanced both months)
+  //   Sneha  (QA)      → Red Alert (red zone both Dec & Jan)
+  //   Vikram (Dev)     → Decay Active (clean Dec & Jan, old reds from Nov context)
+  //   Meera  (Designer)→ Monthly Warning (2+ red in current month)
+  //   Karan  (QA)      → Rising (big improvement in Jan)
+  //   Deepa  (Manager) → Falling (decline in Jan)
+  var members = [
+    { id: "mem_arjun",  name: "Arjun Patel",    email: "arjun@team.com",  roleId: "role_dev",    status: "active", createdAt: "2024-11-20T09:00:00.000Z" },
+    { id: "mem_priya",  name: "Priya Sharma",   email: "priya@team.com",  roleId: "role_design", status: "active", createdAt: "2024-11-20T09:00:00.000Z" },
+    { id: "mem_rahul",  name: "Rahul Gupta",    email: "rahul@team.com",  roleId: "role_mgr",    status: "active", createdAt: "2024-11-20T09:00:00.000Z" },
+    { id: "mem_sneha",  name: "Sneha Reddy",    email: "sneha@team.com",  roleId: "role_qa",     status: "active", createdAt: "2024-11-20T09:00:00.000Z" },
+    { id: "mem_vikram", name: "Vikram Singh",   email: "vikram@team.com", roleId: "role_dev",    status: "active", createdAt: "2024-11-20T09:00:00.000Z" },
+    { id: "mem_meera",  name: "Meera Iyer",     email: "meera@team.com",  roleId: "role_design", status: "active", createdAt: "2024-11-20T09:00:00.000Z" },
+    { id: "mem_karan",  name: "Karan Malhotra", email: "karan@team.com",  roleId: "role_qa",     status: "active", createdAt: "2024-11-20T09:00:00.000Z" },
+    { id: "mem_deepa",  name: "Deepa Nair",     email: "deepa@team.com",  roleId: "role_mgr",    status: "active", createdAt: "2024-11-20T09:00:00.000Z" }
+  ];
+
+  // --- Tasks (spread across Dec 2024 & Jan 2025) ---
+  var tasks = [
+    // December 2024 tasks
+    { id: "task_01", title: "Build login module",          description: "Implement user authentication", notes: "Using JWT tokens",       assigneeId: "mem_arjun",  priority: "high",   dueDate: "2024-12-10", status: "completed", reviewResult: "perfect",       createdAt: "2024-12-01T09:00:00.000Z" },
+    { id: "task_02", title: "Design dashboard mockups",    description: "Create wireframes for new dashboard", notes: "",                  assigneeId: "mem_priya",  priority: "high",   dueDate: "2024-12-12", status: "completed", reviewResult: "perfect",       createdAt: "2024-12-01T09:00:00.000Z" },
+    { id: "task_03", title: "Sprint planning Q1",          description: "Plan Q1 sprint milestones",    notes: "Include team feedback",   assigneeId: "mem_rahul",  priority: "medium", dueDate: "2024-12-15", status: "completed", reviewResult: "acceptable",    createdAt: "2024-12-02T10:00:00.000Z" },
+    { id: "task_04", title: "Regression test suite",       description: "Run full regression tests",    notes: "Found 3 critical bugs",   assigneeId: "mem_sneha",  priority: "high",   dueDate: "2024-12-08", status: "completed", reviewResult: "below",         createdAt: "2024-12-01T09:00:00.000Z" },
+    { id: "task_05", title: "API optimization",            description: "Optimize slow endpoints",      notes: "Reduced latency by 40%",  assigneeId: "mem_vikram", priority: "medium", dueDate: "2024-12-18", status: "completed", reviewResult: "perfect",       createdAt: "2024-12-05T10:00:00.000Z" },
+    { id: "task_06", title: "Brand style guide update",    description: "Update brand colors and fonts", notes: "",                        assigneeId: "mem_meera",  priority: "low",    dueDate: "2024-12-20", status: "completed", reviewResult: "acceptable",    createdAt: "2024-12-03T09:00:00.000Z" },
+    { id: "task_07", title: "E2E test automation",         description: "Set up automated E2E tests",   notes: "Using Cypress",           assigneeId: "mem_karan",  priority: "high",   dueDate: "2024-12-22", status: "completed", reviewResult: "below",         createdAt: "2024-12-05T09:00:00.000Z" },
+    { id: "task_08", title: "Budget review meeting",       description: "Review Q4 budget allocation",  notes: "",                        assigneeId: "mem_deepa",  priority: "medium", dueDate: "2024-12-19", status: "completed", reviewResult: "perfect",       createdAt: "2024-12-04T09:00:00.000Z" },
+    // January 2025 tasks
+    { id: "task_09", title: "Payment gateway integration", description: "Integrate Stripe payments",    notes: "Sandbox testing done",    assigneeId: "mem_arjun",  priority: "high",   dueDate: "2025-01-10", status: "completed", reviewResult: "extraordinary", createdAt: "2025-01-02T09:00:00.000Z" },
+    { id: "task_10", title: "Mobile responsive redesign",  description: "Make all pages responsive",    notes: "Missed 3 breakpoints",    assigneeId: "mem_priya",  priority: "high",   dueDate: "2025-01-08", status: "completed", reviewResult: "below",         createdAt: "2025-01-02T09:00:00.000Z" },
+    { id: "task_11", title: "Onboarding flow",             description: "Design new user onboarding",   notes: "",                        assigneeId: "mem_rahul",  priority: "medium", dueDate: "2025-01-15", status: "completed", reviewResult: "acceptable",    createdAt: "2025-01-03T10:00:00.000Z" },
+    { id: "task_12", title: "Load testing",                description: "Test system under peak load",  notes: "Server crashed at 500 concurrent", assigneeId: "mem_sneha", priority: "high", dueDate: "2025-01-12", status: "completed", reviewResult: "below", createdAt: "2025-01-03T09:00:00.000Z" },
+    { id: "task_13", title: "Database migration",          description: "Migrate to PostgreSQL 16",     notes: "Smooth migration",        assigneeId: "mem_vikram", priority: "high",   dueDate: "2025-01-18", status: "completed", reviewResult: "perfect",       createdAt: "2025-01-05T09:00:00.000Z" },
+    { id: "task_14", title: "Icon library creation",       description: "Create custom SVG icon set",   notes: "",                        assigneeId: "mem_meera",  priority: "medium", dueDate: "2025-01-20", status: "in-progress",                              createdAt: "2025-01-06T09:00:00.000Z" },
+    { id: "task_15", title: "Performance benchmarks",      description: "Run and document benchmarks",  notes: "Great improvement shown",  assigneeId: "mem_karan", priority: "medium", dueDate: "2025-01-22", status: "completed", reviewResult: "extraordinary", createdAt: "2025-01-06T09:00:00.000Z" },
+    { id: "task_16", title: "Stakeholder presentation",    description: "Prepare Q1 kickoff slides",    notes: "Feedback was lukewarm",   assigneeId: "mem_deepa",  priority: "high",   dueDate: "2025-01-14", status: "completed", reviewResult: "below",         createdAt: "2025-01-04T09:00:00.000Z" },
+    { id: "task_17", title: "Security audit",              description: "Conduct security review",      notes: "",                        assigneeId: "mem_arjun",  priority: "high",   dueDate: "2025-01-25", status: "in-progress",                              createdAt: "2025-01-10T09:00:00.000Z" },
+    { id: "task_18", title: "User feedback analysis",      description: "Analyze Q4 user survey data",  notes: "Key insights documented", assigneeId: "mem_priya",  priority: "low",    dueDate: "2025-01-28", status: "hold",                                     createdAt: "2025-01-08T09:00:00.000Z" }
+  ];
+
+  // --- Flags ---
+  // Arjun: Dec → 1 green; Jan → 3 green (rising, net +4)
+  // Priya: Dec → 1 green; Jan → 2 red (falling, net -1)
+  // Rahul: Dec → 1 green, 1 red; Jan → 1 green, 1 red (flat, net 0)
+  // Sneha: Dec → 2 red; Jan → 2 red (red alert, red zone both months, also monthly warning)
+  // Vikram: Nov → 2 red (old); Dec → 0 red; Jan → 0 red (decay active, 2 clean months) + 1 green each
+  // Meera: Dec → 1 green; Jan → 2 red (monthly warning, falling)
+  // Karan: Dec → 1 red; Jan → 3 green (rising, net +2)
+  // Deepa: Dec → 2 green; Jan → 2 red (falling, net 0 but declining)
+  var flags = [
+    // === Arjun (Rising) ===
+    { id: "flag_01", memberId: "mem_arjun", taskId: "task_01", color: "green", count: 1, reason: "Completed perfectly: Build login module",         createdAt: "2024-12-10T15:00:00.000Z" },
+    { id: "flag_02", memberId: "mem_arjun", taskId: "task_09", color: "green", count: 2, reason: "Extraordinary result: Payment gateway integration", createdAt: "2025-01-10T15:00:00.000Z" },
+    { id: "flag_03", memberId: "mem_arjun", taskId: null,      color: "green", count: 1, reason: "Leadership Multiplier: Mentoring, Cross-team collaboration", createdAt: "2025-01-15T10:00:00.000Z" },
+
+    // === Priya (Falling) ===
+    { id: "flag_04", memberId: "mem_priya", taskId: "task_02", color: "green", count: 1, reason: "Completed perfectly: Design dashboard mockups",    createdAt: "2024-12-12T15:00:00.000Z" },
+    { id: "flag_05", memberId: "mem_priya", taskId: "task_10", color: "red",   count: 1, reason: "Below expectation: Mobile responsive redesign",    createdAt: "2025-01-08T15:00:00.000Z" },
+    { id: "flag_06", memberId: "mem_priya", taskId: null,      color: "red",   count: 1, reason: "Missed code review deadlines twice",               createdAt: "2025-01-20T10:00:00.000Z" },
+
+    // === Rahul (Flat) ===
+    { id: "flag_07", memberId: "mem_rahul", taskId: "task_03", color: "green", count: 1, reason: "Completed: Sprint planning Q1",                    createdAt: "2024-12-15T15:00:00.000Z" },
+    { id: "flag_08", memberId: "mem_rahul", taskId: null,      color: "red",   count: 1, reason: "Late status report submission",                    createdAt: "2024-12-22T10:00:00.000Z" },
+    { id: "flag_09", memberId: "mem_rahul", taskId: "task_11", color: "green", count: 1, reason: "Completed: Onboarding flow",                      createdAt: "2025-01-15T15:00:00.000Z" },
+    { id: "flag_10", memberId: "mem_rahul", taskId: null,      color: "red",   count: 1, reason: "Unresponsive during critical issue escalation",    createdAt: "2025-01-22T10:00:00.000Z" },
+
+    // === Sneha (Red Alert + Monthly Warning) ===
+    { id: "flag_11", memberId: "mem_sneha", taskId: "task_04", color: "red",   count: 1, reason: "Below expectation: Regression test suite",         createdAt: "2024-12-08T15:00:00.000Z" },
+    { id: "flag_12", memberId: "mem_sneha", taskId: null,      color: "red",   count: 1, reason: "Missed critical bug in production release",        createdAt: "2024-12-18T10:00:00.000Z" },
+    { id: "flag_13", memberId: "mem_sneha", taskId: "task_12", color: "red",   count: 1, reason: "Below expectation: Load testing",                  createdAt: "2025-01-12T15:00:00.000Z" },
+    { id: "flag_14", memberId: "mem_sneha", taskId: null,      color: "red",   count: 1, reason: "Inadequate test coverage on new module",           createdAt: "2025-01-25T10:00:00.000Z" },
+
+    // === Vikram (Decay Active - old reds from Nov, clean Dec & Jan) ===
+    { id: "flag_15", memberId: "mem_vikram", taskId: null,      color: "red",   count: 1, reason: "Deployed without peer review",                   createdAt: "2024-11-10T10:00:00.000Z" },
+    { id: "flag_16", memberId: "mem_vikram", taskId: null,      color: "red",   count: 1, reason: "Production outage from untested change",          createdAt: "2024-11-18T10:00:00.000Z" },
+    { id: "flag_17", memberId: "mem_vikram", taskId: "task_05", color: "green", count: 1, reason: "Completed perfectly: API optimization",           createdAt: "2024-12-18T15:00:00.000Z" },
+    { id: "flag_18", memberId: "mem_vikram", taskId: "task_13", color: "green", count: 1, reason: "Completed perfectly: Database migration",         createdAt: "2025-01-18T15:00:00.000Z" },
+
+    // === Meera (Monthly Warning in Jan - 2 red flags in Jan) ===
+    { id: "flag_19", memberId: "mem_meera", taskId: "task_06", color: "green", count: 1, reason: "Completed: Brand style guide update",              createdAt: "2024-12-20T15:00:00.000Z" },
+    { id: "flag_20", memberId: "mem_meera", taskId: null,      color: "red",   count: 1, reason: "Delivered assets with wrong brand colors",         createdAt: "2025-01-12T10:00:00.000Z" },
+    { id: "flag_21", memberId: "mem_meera", taskId: null,      color: "red",   count: 1, reason: "Repeated accessibility violations in designs",     createdAt: "2025-01-22T10:00:00.000Z" },
+
+    // === Karan (Rising - improved significantly in Jan) ===
+    { id: "flag_22", memberId: "mem_karan", taskId: "task_07", color: "red",   count: 1, reason: "Below expectation: E2E test automation",           createdAt: "2024-12-22T15:00:00.000Z" },
+    { id: "flag_23", memberId: "mem_karan", taskId: "task_15", color: "green", count: 2, reason: "Extraordinary result: Performance benchmarks",     createdAt: "2025-01-22T15:00:00.000Z" },
+    { id: "flag_24", memberId: "mem_karan", taskId: null,      color: "green", count: 1, reason: "Leadership Multiplier: Mentoring junior QA team",  createdAt: "2025-01-25T10:00:00.000Z" },
+
+    // === Deepa (Falling - good Dec, bad Jan) ===
+    { id: "flag_25", memberId: "mem_deepa", taskId: "task_08", color: "green", count: 1, reason: "Completed perfectly: Budget review meeting",       createdAt: "2024-12-19T15:00:00.000Z" },
+    { id: "flag_26", memberId: "mem_deepa", taskId: null,      color: "green", count: 1, reason: "Leadership Multiplier: Cross-team collaboration",  createdAt: "2024-12-28T10:00:00.000Z" },
+    { id: "flag_27", memberId: "mem_deepa", taskId: "task_16", color: "red",   count: 1, reason: "Below expectation: Stakeholder presentation",     createdAt: "2025-01-14T15:00:00.000Z" },
+    { id: "flag_28", memberId: "mem_deepa", taskId: null,      color: "red",   count: 1, reason: "Failed to communicate project delays to stakeholders", createdAt: "2025-01-26T10:00:00.000Z" }
+  ];
+
+  data.roles = roles;
+  data.members = members;
+  data.tasks = tasks;
+  data.flags = flags;
+  saveData(data);
+}
+
 // ==================== Initialize ====================
 
 document.addEventListener("DOMContentLoaded", function() {
+  seedDemoData();
   refreshAll();
 });
