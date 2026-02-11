@@ -337,8 +337,15 @@ function getActiveMonths() {
   data.flags.forEach(function(f) {
     months[getMonthKey(f.createdAt)] = true;
   });
-  // Always include current month
-  months[getMonthKey(new Date().toISOString())] = true;
+  // Only include current month if it has flag activity
+  var currentMonth = getMonthKey(new Date().toISOString());
+  if (!months[currentMonth]) {
+    // If no flags this month, still include it only if there are fewer than 2 months
+    // (so trends can still be calculated from earlier data)
+    if (Object.keys(months).length < 2) {
+      months[currentMonth] = true;
+    }
+  }
   return Object.keys(months).sort();
 }
 
@@ -1438,25 +1445,40 @@ function renderPredictiveInsights() {
   });
 
   // === 1. Leadership Training Candidates ===
-  // Accelerating members in thriving zone who haven't received leadership signals
-  var leadershipCandidates = memberAnalytics.filter(function(ma) {
-    return ma.trend === "rising" && ma.effNet > 0 && !ma.hasLeadershipFlag;
-  }).sort(function(a, b) { return b.effNet - a.effNet; });
+  // Strong performers in thriving zone — prioritize those without leadership recognition
+  var leadershipPool = memberAnalytics.filter(function(ma) {
+    return ma.effNet >= 2 && ma.zone === "green";
+  }).sort(function(a, b) {
+    // Prioritize: no leadership flag first, then by net score
+    if (a.hasLeadershipFlag !== b.hasLeadershipFlag) return a.hasLeadershipFlag ? 1 : -1;
+    return b.effNet - a.effNet;
+  });
 
-  leadershipCandidates.forEach(function(ma) {
-    insights.push({
-      type: "leadership",
-      icon: "&#9819;",
-      tag: "Leadership Training",
-      text: "Consider <strong>" + escapeHtml(ma.member.name) + "</strong> for leadership development",
-      reason: "Accelerating trend with +" + ma.effNet + " net signal. Strong performer without formal leadership recognition yet. Investing here amplifies culture."
-    });
+  leadershipPool.slice(0, 3).forEach(function(ma) {
+    var trendLabel = ma.trend === "rising" ? "accelerating" : (ma.trend === "falling" ? "needs attention" : "steady");
+    if (!ma.hasLeadershipFlag) {
+      insights.push({
+        type: "leadership",
+        icon: "&#9819;",
+        tag: "Leadership Training",
+        text: "Consider <strong>" + escapeHtml(ma.member.name) + "</strong> for leadership development",
+        reason: "Net +" + ma.effNet + " (" + trendLabel + "). Strong performer without formal leadership recognition yet. Investing here amplifies culture."
+      });
+    } else {
+      insights.push({
+        type: "leadership",
+        icon: "&#9819;",
+        tag: "Deepen Leadership",
+        text: "Continue investing in <strong>" + escapeHtml(ma.member.name) + "</strong>'s leadership growth",
+        reason: "Net +" + ma.effNet + " (" + trendLabel + "). Already shows leadership qualities — consider expanded mentorship scope or cross-team ownership."
+      });
+    }
   });
 
   // === 2. Structured Support Plan ===
-  // Members with red alerts or sustained negative trends
+  // Members in growth zone, red alerts, or declining trends
   var supportNeeded = memberAnalytics.filter(function(ma) {
-    return ma.redAlert || (ma.trend === "falling" && ma.zone === "red");
+    return ma.redAlert || ma.zone === "red" || (ma.trend === "falling" && ma.effNet < 0);
   }).sort(function(a, b) { return a.effNet - b.effNet; });
 
   supportNeeded.forEach(function(ma) {
@@ -1464,6 +1486,7 @@ function renderPredictiveInsights() {
     if (ma.redAlert) reasonParts.push("growth zone for 2+ consecutive months");
     if (ma.trend === "falling") reasonParts.push("declining trajectory");
     if (ma.monthlyWarn) reasonParts.push("multiple growth signals this month");
+    if (reasonParts.length === 0 && ma.zone === "red") reasonParts.push("currently in growth zone");
     insights.push({
       type: "support",
       icon: "&#9829;",
@@ -1474,40 +1497,41 @@ function renderPredictiveInsights() {
   });
 
   // === 3. Role Realignment Consideration ===
-  // Members with deep negative scores and falling trends - may need role change
+  // Members with deep negative scores — may need role change
   var realignCandidates = memberAnalytics.filter(function(ma) {
-    return ma.effNet <= -3 && ma.trend === "falling" && !ma.decayActive;
+    return ma.effNet <= -3 && !ma.decayActive;
   }).sort(function(a, b) { return a.effNet - b.effNet; });
 
   realignCandidates.forEach(function(ma) {
+    var trendLabel = ma.trend === "falling" ? "declining" : (ma.trend === "rising" ? "improving" : "persistent");
     insights.push({
       type: "realign",
       icon: "&#8634;",
       tag: "Consider Role Realignment",
       text: "Evaluate whether <strong>" + escapeHtml(ma.member.name) + "</strong>'s current role is the right fit",
-      reason: "Persistent decline (net " + ma.effNet + ", falling) in " + escapeHtml(ma.roleName) + " role. This may indicate a skills-to-role mismatch rather than a performance issue."
+      reason: trendLabel.charAt(0).toUpperCase() + trendLabel.slice(1) + " pattern (net " + ma.effNet + ") in " + escapeHtml(ma.roleName) + " role. This may indicate a skills-to-role mismatch rather than a performance issue."
     });
   });
 
   // === 4. Department Attention ===
-  // Roles with negative average net scores
+  // Roles with negative average net scores or many members in growth zone
   data.roles.forEach(function(role) {
     var roleMembers = memberAnalytics.filter(function(ma) { return ma.member.roleId === role.id; });
     if (roleMembers.length < 2) return;
 
     var totalNet = 0;
-    var fallingCount = 0;
+    var redCount = 0;
     roleMembers.forEach(function(ma) {
       totalNet += ma.effNet;
-      if (ma.trend === "falling") fallingCount++;
+      if (ma.zone === "red") redCount++;
     });
     var avgNet = totalNet / roleMembers.length;
-    var fallingPct = Math.round((fallingCount / roleMembers.length) * 100);
+    var redPct = Math.round((redCount / roleMembers.length) * 100);
 
-    if (avgNet < 0 || fallingPct >= 50) {
+    if (avgNet < 0 || redPct >= 50) {
       var reasons = [];
       if (avgNet < 0) reasons.push("avg net signal " + avgNet.toFixed(1));
-      if (fallingPct >= 50) reasons.push(fallingPct + "% of team has declining trajectory");
+      if (redPct >= 50) reasons.push(redPct + "% of team in growth zone");
       insights.push({
         type: "department",
         icon: "&#9888;",
@@ -1519,19 +1543,20 @@ function renderPredictiveInsights() {
   });
 
   // === 5. High Performers to Retain ===
-  // Top performers with heavy workload - burnout risk
+  // Top performers (high net score) — regardless of trend
   var topPerformers = memberAnalytics.filter(function(ma) {
-    return ma.effNet >= 3 && ma.trend === "rising";
+    return ma.effNet >= 3;
   }).sort(function(a, b) { return b.effNet - a.effNet; });
 
   topPerformers.forEach(function(ma) {
     var burnoutRisk = ma.activeTasks >= 3;
+    var trendLabel = ma.trend === "rising" ? "accelerating" : (ma.trend === "falling" ? "watch closely" : "steady");
     insights.push({
       type: "retain",
       icon: "&#9733;",
       tag: burnoutRisk ? "Retention + Burnout Risk" : "Key Contributor",
       text: "<strong>" + escapeHtml(ma.member.name) + "</strong> is a culture anchor — " + (burnoutRisk ? "watch for overload" : "invest in their growth"),
-      reason: "Net +" + ma.effNet + ", accelerating, " + ma.activeTasks + " active tasks. " +
+      reason: "Net +" + ma.effNet + ", " + trendLabel + ", " + ma.activeTasks + " active task" + (ma.activeTasks !== 1 ? "s" : "") + ". " +
         (burnoutRisk ? "High performers leave when overloaded and under-recognized. Rebalance workload." : "Consider expanded responsibilities or mentorship roles.")
     });
   });
