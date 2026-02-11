@@ -1393,6 +1393,191 @@ function renderDashboard() {
   }
 }
 
+// ==================== Predictive Insights ====================
+
+function renderPredictiveInsights() {
+  var el = document.getElementById("dashboard-insights");
+  if (!el) return;
+  if (data.members.length === 0) {
+    el.innerHTML = '<div class="insights-empty">Add team members and signals to generate insights</div>';
+    return;
+  }
+
+  var insights = [];
+
+  // Precompute member analytics
+  var memberAnalytics = data.members.map(function(m) {
+    var flags = getMemberFlags(m.id);
+    var eff = getEffectiveFlags(m.id);
+    var trend = getMemberTrend(m.id);
+    var zone = getMemberZone(m.id);
+    var redAlert = isRedAlert(m.id);
+    var monthlyWarn = getMonthlyRedWarning(m.id);
+    var role = data.roles.find(function(r) { return r.id === m.roleId; });
+    var activeTasks = data.tasks.filter(function(t) {
+      return t.assigneeId === m.id && t.status !== "completed" && t.status !== "cancelled";
+    }).length;
+    var hasLeadershipFlag = data.flags.some(function(f) {
+      return f.memberId === m.id && f.reason && f.reason.indexOf("Leadership") !== -1;
+    });
+    return {
+      member: m,
+      green: flags.green,
+      red: flags.red,
+      effNet: eff.green - eff.red,
+      trend: trend,
+      zone: zone,
+      redAlert: redAlert,
+      monthlyWarn: monthlyWarn,
+      role: role,
+      roleName: role ? role.name : "Unassigned",
+      activeTasks: activeTasks,
+      hasLeadershipFlag: hasLeadershipFlag,
+      decayActive: eff.decayActive
+    };
+  });
+
+  // === 1. Leadership Training Candidates ===
+  // Accelerating members in thriving zone who haven't received leadership signals
+  var leadershipCandidates = memberAnalytics.filter(function(ma) {
+    return ma.trend === "rising" && ma.effNet > 0 && !ma.hasLeadershipFlag;
+  }).sort(function(a, b) { return b.effNet - a.effNet; });
+
+  leadershipCandidates.forEach(function(ma) {
+    insights.push({
+      type: "leadership",
+      icon: "&#9819;",
+      tag: "Leadership Training",
+      text: "Consider <strong>" + escapeHtml(ma.member.name) + "</strong> for leadership development",
+      reason: "Accelerating trend with +" + ma.effNet + " net signal. Strong performer without formal leadership recognition yet. Investing here amplifies culture."
+    });
+  });
+
+  // === 2. Structured Support Plan ===
+  // Members with red alerts or sustained negative trends
+  var supportNeeded = memberAnalytics.filter(function(ma) {
+    return ma.redAlert || (ma.trend === "falling" && ma.zone === "red");
+  }).sort(function(a, b) { return a.effNet - b.effNet; });
+
+  supportNeeded.forEach(function(ma) {
+    var reasonParts = [];
+    if (ma.redAlert) reasonParts.push("growth zone for 2+ consecutive months");
+    if (ma.trend === "falling") reasonParts.push("declining trajectory");
+    if (ma.monthlyWarn) reasonParts.push("multiple growth signals this month");
+    insights.push({
+      type: "support",
+      icon: "&#9829;",
+      tag: "Needs Support Plan",
+      text: "<strong>" + escapeHtml(ma.member.name) + "</strong> would benefit from a structured support conversation",
+      reason: capitalizeFirst(reasonParts.join(", ")) + ". Net signal: " + ma.effNet + ". A 1:1 to understand blockers could shift this trajectory."
+    });
+  });
+
+  // === 3. Role Realignment Consideration ===
+  // Members with deep negative scores and falling trends - may need role change
+  var realignCandidates = memberAnalytics.filter(function(ma) {
+    return ma.effNet <= -3 && ma.trend === "falling" && !ma.decayActive;
+  }).sort(function(a, b) { return a.effNet - b.effNet; });
+
+  realignCandidates.forEach(function(ma) {
+    insights.push({
+      type: "realign",
+      icon: "&#8634;",
+      tag: "Consider Role Realignment",
+      text: "Evaluate whether <strong>" + escapeHtml(ma.member.name) + "</strong>'s current role is the right fit",
+      reason: "Persistent decline (net " + ma.effNet + ", falling) in " + escapeHtml(ma.roleName) + " role. This may indicate a skills-to-role mismatch rather than a performance issue."
+    });
+  });
+
+  // === 4. Department Attention ===
+  // Roles with negative average net scores
+  data.roles.forEach(function(role) {
+    var roleMembers = memberAnalytics.filter(function(ma) { return ma.member.roleId === role.id; });
+    if (roleMembers.length < 2) return;
+
+    var totalNet = 0;
+    var fallingCount = 0;
+    roleMembers.forEach(function(ma) {
+      totalNet += ma.effNet;
+      if (ma.trend === "falling") fallingCount++;
+    });
+    var avgNet = totalNet / roleMembers.length;
+    var fallingPct = Math.round((fallingCount / roleMembers.length) * 100);
+
+    if (avgNet < 0 || fallingPct >= 50) {
+      var reasons = [];
+      if (avgNet < 0) reasons.push("avg net signal " + avgNet.toFixed(1));
+      if (fallingPct >= 50) reasons.push(fallingPct + "% of team has declining trajectory");
+      insights.push({
+        type: "department",
+        icon: "&#9888;",
+        tag: "Team Attention",
+        text: "The <strong>" + escapeHtml(role.name) + "</strong> team needs focused attention",
+        reason: capitalizeFirst(reasons.join(". ")) + ". Review workload distribution, tooling, or process clarity within this group."
+      });
+    }
+  });
+
+  // === 5. High Performers to Retain ===
+  // Top performers with heavy workload - burnout risk
+  var topPerformers = memberAnalytics.filter(function(ma) {
+    return ma.effNet >= 3 && ma.trend === "rising";
+  }).sort(function(a, b) { return b.effNet - a.effNet; });
+
+  topPerformers.forEach(function(ma) {
+    var burnoutRisk = ma.activeTasks >= 3;
+    insights.push({
+      type: "retain",
+      icon: "&#9733;",
+      tag: burnoutRisk ? "Retention + Burnout Risk" : "Key Contributor",
+      text: "<strong>" + escapeHtml(ma.member.name) + "</strong> is a culture anchor — " + (burnoutRisk ? "watch for overload" : "invest in their growth"),
+      reason: "Net +" + ma.effNet + ", accelerating, " + ma.activeTasks + " active tasks. " +
+        (burnoutRisk ? "High performers leave when overloaded and under-recognized. Rebalance workload." : "Consider expanded responsibilities or mentorship roles.")
+    });
+  });
+
+  // === 6. Recovery Spotlight ===
+  // Members with decay active who are improving
+  var recoveryCandidates = memberAnalytics.filter(function(ma) {
+    return ma.decayActive && ma.effNet >= 0;
+  });
+
+  recoveryCandidates.forEach(function(ma) {
+    insights.push({
+      type: "leadership",
+      icon: "&#8635;",
+      tag: "Recovery Success",
+      text: "<strong>" + escapeHtml(ma.member.name) + "</strong> has recovered — acknowledge the turnaround",
+      reason: "Signal recovery active after 2+ clean months. Net signal now +" + ma.effNet + ". Public acknowledgment reinforces the behavior you want to see repeated."
+    });
+  });
+
+  // Render insights
+  if (insights.length === 0) {
+    el.innerHTML = '<div class="insights-empty">Not enough signal data to generate predictions yet. Insights appear as patterns emerge.</div>';
+    return;
+  }
+
+  el.innerHTML = "";
+  insights.forEach(function(ins) {
+    var card = document.createElement("div");
+    card.className = "insight-card";
+    card.innerHTML =
+      '<div class="insight-icon ' + ins.type + '">' + ins.icon + '</div>' +
+      '<div class="insight-body">' +
+        '<div class="insight-tag ' + ins.type + '">' + ins.tag + '</div>' +
+        '<div class="insight-text">' + ins.text + '</div>' +
+        '<div class="insight-reason">' + ins.reason + '</div>' +
+      '</div>';
+    el.appendChild(card);
+  });
+}
+
+function capitalizeFirst(str) {
+  if (!str) return str;
+  return str.charAt(0).toUpperCase() + str.slice(1);
+}
+
 // ==================== Delete Confirmation ====================
 
 function confirmDelete() {
@@ -1472,6 +1657,7 @@ function populateMemberDropdown(selectId) {
 function refreshAll() {
   checkOverdueFlags();
   renderDashboard();
+  renderPredictiveInsights();
   renderMembers();
   renderTasks();
   renderRoles();

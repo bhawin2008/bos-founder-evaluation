@@ -2215,6 +2215,113 @@ body {
   border-color: var(--accent-red);
 }
 
+/* ==================== Predictive Insights ==================== */
+
+.insights-panel {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 14px;
+  padding: 24px;
+}
+
+.insights-title {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 4px;
+}
+
+.insights-subtitle {
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+  margin-bottom: 20px;
+}
+
+.insights-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+.insight-card {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+  padding: 16px;
+  border-radius: 12px;
+  border: 1px solid var(--border-color);
+  background: var(--bg-dark);
+  transition: border-color 0.15s ease;
+}
+
+.insight-card:hover {
+  border-color: rgba(91, 124, 247, 0.25);
+}
+
+.insight-icon {
+  min-width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  font-size: 1.1rem;
+  flex-shrink: 0;
+}
+
+.insight-icon.leadership { background: rgba(54, 181, 160, 0.1); color: var(--accent-green); }
+.insight-icon.support { background: rgba(212, 133, 106, 0.1); color: var(--accent-red); }
+.insight-icon.department { background: rgba(201, 168, 76, 0.1); color: var(--accent-yellow); }
+.insight-icon.retain { background: rgba(91, 124, 247, 0.1); color: var(--accent-blue); }
+.insight-icon.realign { background: rgba(155, 123, 247, 0.1); color: var(--accent-purple); }
+
+.insight-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.insight-tag {
+  display: inline-block;
+  font-size: 0.6rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 2px 8px;
+  border-radius: 4px;
+  margin-bottom: 6px;
+}
+
+.insight-tag.leadership { background: rgba(54, 181, 160, 0.12); color: var(--accent-green); }
+.insight-tag.support { background: rgba(212, 133, 106, 0.12); color: var(--accent-red); }
+.insight-tag.department { background: rgba(201, 168, 76, 0.12); color: var(--accent-yellow); }
+.insight-tag.retain { background: rgba(91, 124, 247, 0.12); color: var(--accent-blue); }
+.insight-tag.realign { background: rgba(155, 123, 247, 0.12); color: var(--accent-purple); }
+
+.insight-text {
+  font-size: 0.84rem;
+  color: var(--text-primary);
+  line-height: 1.45;
+  margin-bottom: 4px;
+}
+
+.insight-text strong {
+  font-weight: 700;
+}
+
+.insight-reason {
+  font-size: 0.74rem;
+  color: var(--text-secondary);
+  line-height: 1.4;
+}
+
+.insights-empty {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 24px;
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+}
+
 /* ==================== Psychology Panel ==================== */
 
 .psychology-panel {
