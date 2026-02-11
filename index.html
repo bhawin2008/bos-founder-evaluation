@@ -33,6 +33,9 @@
         <button class="nav-item" data-view="reports" onclick="switchView('reports')">
           <span class="nav-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg></span> Reports
         </button>
+        <button class="nav-item" data-view="manual" onclick="switchView('manual')">
+          <span class="nav-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg></span> Manual
+        </button>
       </nav>
       <div class="sidebar-spacer"></div>
       <nav class="sidebar-nav sidebar-nav-bottom">
@@ -583,6 +586,740 @@
 
         <!-- Report Content Area -->
         <div id="rpt-content" class="rpt-content"></div>
+      </div>
+
+      <!-- Manual View -->
+      <div id="manual-view" class="view">
+        <div class="view-header">
+          <div>
+            <h2>System Manual</h2>
+            <p class="view-subtitle">Complete guide to using the GOR Framework</p>
+          </div>
+        </div>
+
+        <!-- Table of Contents -->
+        <div class="mnl-toc">
+          <h3 class="mnl-toc-title">Contents</h3>
+          <div class="mnl-toc-grid">
+            <a class="mnl-toc-item" onclick="scrollToManualSection('mnl-overview')">
+              <span class="mnl-toc-num">01</span>
+              <span class="mnl-toc-label">Overview</span>
+            </a>
+            <a class="mnl-toc-item" onclick="scrollToManualSection('mnl-navigation')">
+              <span class="mnl-toc-num">02</span>
+              <span class="mnl-toc-label">Navigation</span>
+            </a>
+            <a class="mnl-toc-item" onclick="scrollToManualSection('mnl-members')">
+              <span class="mnl-toc-num">03</span>
+              <span class="mnl-toc-label">Team Members</span>
+            </a>
+            <a class="mnl-toc-item" onclick="scrollToManualSection('mnl-tasks')">
+              <span class="mnl-toc-num">04</span>
+              <span class="mnl-toc-label">Tasks</span>
+            </a>
+            <a class="mnl-toc-item" onclick="scrollToManualSection('mnl-signals')">
+              <span class="mnl-toc-num">05</span>
+              <span class="mnl-toc-label">Signal System</span>
+            </a>
+            <a class="mnl-toc-item" onclick="scrollToManualSection('mnl-zones')">
+              <span class="mnl-toc-num">06</span>
+              <span class="mnl-toc-label">Zone Classification</span>
+            </a>
+            <a class="mnl-toc-item" onclick="scrollToManualSection('mnl-review')">
+              <span class="mnl-toc-num">07</span>
+              <span class="mnl-toc-label">Task Review</span>
+            </a>
+            <a class="mnl-toc-item" onclick="scrollToManualSection('mnl-mechanics')">
+              <span class="mnl-toc-num">08</span>
+              <span class="mnl-toc-label">System Mechanics</span>
+            </a>
+            <a class="mnl-toc-item" onclick="scrollToManualSection('mnl-dashboard')">
+              <span class="mnl-toc-num">09</span>
+              <span class="mnl-toc-label">Dashboard</span>
+            </a>
+            <a class="mnl-toc-item" onclick="scrollToManualSection('mnl-reports')">
+              <span class="mnl-toc-num">10</span>
+              <span class="mnl-toc-label">Reports</span>
+            </a>
+            <a class="mnl-toc-item" onclick="scrollToManualSection('mnl-config')">
+              <span class="mnl-toc-num">11</span>
+              <span class="mnl-toc-label">Configuration</span>
+            </a>
+            <a class="mnl-toc-item" onclick="scrollToManualSection('mnl-scoring')">
+              <span class="mnl-toc-num">12</span>
+              <span class="mnl-toc-label">Scoring Reference</span>
+            </a>
+          </div>
+        </div>
+
+        <!-- Section 1: Overview -->
+        <div class="mnl-section" id="mnl-overview">
+          <div class="mnl-section-header" onclick="toggleManualSection(this)">
+            <div class="mnl-section-num">01</div>
+            <div class="mnl-section-title-wrap">
+              <h3 class="mnl-section-title">Overview — What is GOR Framework?</h3>
+              <p class="mnl-section-subtitle">Understanding the Culture Intelligence Console</p>
+            </div>
+            <div class="mnl-section-chevron"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></div>
+          </div>
+          <div class="mnl-section-body">
+            <div class="mnl-content-block">
+              <p>The <strong>GOR Framework</strong> (Green-Orange-Red) is a Culture Intelligence Console designed for leadership teams. It replaces traditional performance management with a <strong>signal-based culture health tracking system</strong>.</p>
+              <div class="mnl-highlight-box mnl-highlight-accent">
+                <strong>Core Philosophy:</strong> This system measures <em>culture health direction</em>, not individual performance scores. Signals are coaching cues, not judgments. The goal is to create psychological safety while maintaining accountability.
+              </div>
+              <h4>Key Principles</h4>
+              <ul>
+                <li><strong>Signals, Not Judgments</strong> — "Growth signal" instead of "red flag." Language shapes perception.</li>
+                <li><strong>Culture Momentum</strong> — We measure direction (trends), not just position (snapshots).</li>
+                <li><strong>Psychological Safety</strong> — Calm dashboards produce better leadership decisions.</li>
+                <li><strong>Leadership Maturity</strong> — Clean signals for deliberate, accountable decisions.</li>
+              </ul>
+              <h4>What The System Tracks</h4>
+              <ul>
+                <li><strong>Team Members</strong> — Your team roster with roles and status</li>
+                <li><strong>Tasks</strong> — Work assignments with deadlines and quality review</li>
+                <li><strong>Signals</strong> — Strength (green) and Growth (red) culture indicators</li>
+                <li><strong>Zones</strong> — Green / Orange / Red health classification per member</li>
+                <li><strong>Reports</strong> — Executive-level analytics and culture intelligence</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <!-- Section 2: Navigation -->
+        <div class="mnl-section" id="mnl-navigation">
+          <div class="mnl-section-header" onclick="toggleManualSection(this)">
+            <div class="mnl-section-num">02</div>
+            <div class="mnl-section-title-wrap">
+              <h3 class="mnl-section-title">Navigation Guide</h3>
+              <p class="mnl-section-subtitle">Understanding each section of the application</p>
+            </div>
+            <div class="mnl-section-chevron"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></div>
+          </div>
+          <div class="mnl-section-body">
+            <div class="mnl-content-block">
+              <p>The sidebar provides access to all areas of the system. Here's what each section does:</p>
+              <div class="mnl-nav-grid">
+                <div class="mnl-nav-card">
+                  <div class="mnl-nav-card-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg></div>
+                  <div class="mnl-nav-card-info">
+                    <strong>Dashboard</strong>
+                    <span>Culture health overview — zone distribution, trends, support signals, overdue tasks, department health map, predictive insights.</span>
+                  </div>
+                </div>
+                <div class="mnl-nav-card">
+                  <div class="mnl-nav-card-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
+                  <div class="mnl-nav-card-info">
+                    <strong>Members</strong>
+                    <span>Manage team members — add, edit, view signal history, log extraordinary contributions, leadership signals, and critical incidents.</span>
+                  </div>
+                </div>
+                <div class="mnl-nav-card">
+                  <div class="mnl-nav-card-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></div>
+                  <div class="mnl-nav-card-info">
+                    <strong>Tasks</strong>
+                    <span>Create and track work assignments — set deadlines, assign members, filter by status, and review task quality on completion.</span>
+                  </div>
+                </div>
+                <div class="mnl-nav-card">
+                  <div class="mnl-nav-card-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+                  <div class="mnl-nav-card-info">
+                    <strong>Roles</strong>
+                    <span>Define team roles (departments) — used for grouping members in analytics and department health reports.</span>
+                  </div>
+                </div>
+                <div class="mnl-nav-card">
+                  <div class="mnl-nav-card-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>
+                  <div class="mnl-nav-card-info">
+                    <strong>Reports</strong>
+                    <span>Executive-level culture intelligence — 6 report types with KPIs, charts, tables, and CSV/PDF export.</span>
+                  </div>
+                </div>
+                <div class="mnl-nav-card">
+                  <div class="mnl-nav-card-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg></div>
+                  <div class="mnl-nav-card-info">
+                    <strong>Manual</strong>
+                    <span>This page — comprehensive guide to using the system with rules, scoring, and decision guides.</span>
+                  </div>
+                </div>
+                <div class="mnl-nav-card">
+                  <div class="mnl-nav-card-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg></div>
+                  <div class="mnl-nav-card-info">
+                    <strong>Signal Framework</strong>
+                    <span>Visual reference of all signal rules — growth signals, strength signals, culture mechanics, and how the system works.</span>
+                  </div>
+                </div>
+                <div class="mnl-nav-card">
+                  <div class="mnl-nav-card-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></div>
+                  <div class="mnl-nav-card-info">
+                    <strong>Configuration</strong>
+                    <span>Manage reason categories — add, edit, or remove categories used for classifying signals (People, SOP, Emotion, etc.).</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Section 3: Team Members -->
+        <div class="mnl-section" id="mnl-members">
+          <div class="mnl-section-header" onclick="toggleManualSection(this)">
+            <div class="mnl-section-num">03</div>
+            <div class="mnl-section-title-wrap">
+              <h3 class="mnl-section-title">Team Members</h3>
+              <p class="mnl-section-subtitle">Adding, managing, and tracking team members</p>
+            </div>
+            <div class="mnl-section-chevron"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></div>
+          </div>
+          <div class="mnl-section-body">
+            <div class="mnl-content-block">
+              <h4>Adding a Member</h4>
+              <ol>
+                <li>Go to <strong>Members</strong> from the sidebar</li>
+                <li>Click <strong>+ Add Member</strong></li>
+                <li>Fill in: Full Name, Email, Role (select from defined roles), and Status</li>
+                <li>Click <strong>Save Member</strong></li>
+              </ol>
+
+              <h4>Member Card</h4>
+              <p>Each member card displays:</p>
+              <ul>
+                <li><strong>Zone Badge</strong> — Green, Orange, or Red based on net score</li>
+                <li><strong>Net Score</strong> — Effective strength signals minus effective growth signals</li>
+                <li><strong>Role</strong> — The assigned department/role</li>
+                <li><strong>Trend Indicator</strong> — Accelerating, Steady, or Needs Attention</li>
+              </ul>
+
+              <h4>Member Actions</h4>
+              <div class="mnl-action-list">
+                <div class="mnl-action-item">
+                  <span class="mnl-action-icon mnl-action-green">Star</span>
+                  <span><strong>Exceptional Contribution</strong> — Record +2 strength signals for outstanding work</span>
+                </div>
+                <div class="mnl-action-item">
+                  <span class="mnl-action-icon mnl-action-amber">Crown</span>
+                  <span><strong>Leadership Signal</strong> — Recognize mentoring, collaboration, or peer references (+1 each)</span>
+                </div>
+                <div class="mnl-action-item">
+                  <span class="mnl-action-icon mnl-action-red">Alert</span>
+                  <span><strong>Critical Incident</strong> — Log a serious process failure (+3 growth signals)</span>
+                </div>
+                <div class="mnl-action-item">
+                  <span class="mnl-action-icon mnl-action-blue">History</span>
+                  <span><strong>Signal History</strong> — View all signals with dates, reasons, categories, and notes</span>
+                </div>
+              </div>
+
+              <h4>Editing &amp; Deleting</h4>
+              <p>Click the <strong>pencil icon</strong> to edit a member's details, or the <strong>trash icon</strong> to delete (with confirmation).</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Section 4: Tasks -->
+        <div class="mnl-section" id="mnl-tasks">
+          <div class="mnl-section-header" onclick="toggleManualSection(this)">
+            <div class="mnl-section-num">04</div>
+            <div class="mnl-section-title-wrap">
+              <h3 class="mnl-section-title">Tasks</h3>
+              <p class="mnl-section-subtitle">Creating, assigning, and managing work</p>
+            </div>
+            <div class="mnl-section-chevron"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></div>
+          </div>
+          <div class="mnl-section-body">
+            <div class="mnl-content-block">
+              <h4>Creating a Task</h4>
+              <ol>
+                <li>Go to <strong>Tasks</strong> from the sidebar</li>
+                <li>Click <strong>+ Add Task</strong></li>
+                <li>Fill in: Title, Description (optional), Assignee, Priority, Due Date, Notes</li>
+                <li>Click <strong>Save Task</strong></li>
+              </ol>
+              <div class="mnl-highlight-box mnl-highlight-amber">
+                <strong>Risk Alert:</strong> When assigning a task, the system checks if the member has 2+ growth signals in the same category or with matching keywords this month. A warning will appear but you can still assign the task.
+              </div>
+
+              <h4>Task Statuses</h4>
+              <div class="mnl-status-grid">
+                <div class="mnl-status-item"><span class="mnl-status-dot mnl-dot-pending"></span> <strong>Pending</strong> — Not yet started</div>
+                <div class="mnl-status-item"><span class="mnl-status-dot mnl-dot-progress"></span> <strong>In Progress</strong> — Currently being worked on</div>
+                <div class="mnl-status-item"><span class="mnl-status-dot mnl-dot-hold"></span> <strong>Hold</strong> — Paused or blocked</div>
+                <div class="mnl-status-item"><span class="mnl-status-dot mnl-dot-completed"></span> <strong>Completed</strong> — Done (triggers review)</div>
+                <div class="mnl-status-item"><span class="mnl-status-dot mnl-dot-cancelled"></span> <strong>Cancelled</strong> — No longer needed</div>
+                <div class="mnl-status-item"><span class="mnl-status-dot mnl-dot-overdue"></span> <strong>Overdue</strong> — Past due date (auto-detected)</div>
+              </div>
+
+              <h4>Filtering Tasks</h4>
+              <p>Use the filter bar at the top to show tasks by status: All, Pending, In Progress, Hold, Completed, Cancelled, or Overdue. You can also filter by time period using the calendar icon.</p>
+
+              <h4>Task Table Columns</h4>
+              <p>The task table shows: Task Title, Assignee, Priority, Due Date, Status, Category Badge (if signals were recorded), and Action buttons (edit, review, delete).</p>
+
+              <h4>Automatic Keywords</h4>
+              <p>Keywords are automatically extracted from the task title and description. These are used by the Risk Alert system to warn about repeated patterns when assigning tasks.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Section 5: Signal System -->
+        <div class="mnl-section" id="mnl-signals">
+          <div class="mnl-section-header" onclick="toggleManualSection(this)">
+            <div class="mnl-section-num">05</div>
+            <div class="mnl-section-title-wrap">
+              <h3 class="mnl-section-title">Signal System</h3>
+              <p class="mnl-section-subtitle">Understanding strength and growth signals</p>
+            </div>
+            <div class="mnl-section-chevron"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></div>
+          </div>
+          <div class="mnl-section-body">
+            <div class="mnl-content-block">
+              <p>Signals are the core unit of measurement in the GOR Framework. They come in two types:</p>
+
+              <div class="mnl-two-col">
+                <div class="mnl-col-card mnl-col-green">
+                  <h4>Strength Signals (Green)</h4>
+                  <p>Positive indicators of culture contribution and quality work.</p>
+                  <ul>
+                    <li><strong>Exceptional Contribution</strong> — +2 signals (exceeds expectations)</li>
+                    <li><strong>Completed with Excellence</strong> — +1 signal (meets all requirements)</li>
+                    <li><strong>Leadership Signal</strong> — +1 per criterion (mentoring, collaboration, peer reference)</li>
+                  </ul>
+                </div>
+                <div class="mnl-col-card mnl-col-red">
+                  <h4>Growth Signals (Red)</h4>
+                  <p>Coaching cues indicating areas for support and development.</p>
+                  <ul>
+                    <li><strong>Missed Deadline</strong> — +1 signal (automatic)</li>
+                    <li><strong>Needs Support</strong> — +1 signal (work needs improvement)</li>
+                    <li><strong>Blunder</strong> — +2 signals (notable mistakes)</li>
+                    <li><strong>Critical Incident</strong> — +3 signals (serious process failure)</li>
+                  </ul>
+                </div>
+              </div>
+
+              <h4>How Signals Are Created</h4>
+              <ul>
+                <li><strong>Automatically</strong> — Missed deadlines generate growth signals when a task passes its due date</li>
+                <li><strong>Via Task Review</strong> — When marking a task as completed, the reviewer selects a quality assessment</li>
+                <li><strong>Manually</strong> — Extraordinary contributions, leadership signals, and critical incidents can be logged from member cards</li>
+              </ul>
+
+              <h4>Signal Properties</h4>
+              <p>Each signal records: Member ID, Task ID (if applicable), Signal Color (green/red), Count (1-3), Reason, Note (optional), Category, and Creation Date.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Section 6: Zone Classification -->
+        <div class="mnl-section" id="mnl-zones">
+          <div class="mnl-section-header" onclick="toggleManualSection(this)">
+            <div class="mnl-section-num">06</div>
+            <div class="mnl-section-title-wrap">
+              <h3 class="mnl-section-title">Zone Classification</h3>
+              <p class="mnl-section-subtitle">Green, Orange, and Red zone thresholds</p>
+            </div>
+            <div class="mnl-section-chevron"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></div>
+          </div>
+          <div class="mnl-section-body">
+            <div class="mnl-content-block">
+              <p>Every team member is classified into a zone based on their <strong>Net Score</strong>:</p>
+              <div class="mnl-formula-box">
+                <strong>Net Score</strong> = Effective Strength Signals &minus; Effective Growth Signals
+              </div>
+
+              <div class="mnl-zone-cards">
+                <div class="mnl-zone-card mnl-zone-card-green">
+                  <div class="mnl-zone-badge-lg mnl-zbg-green">GREEN</div>
+                  <div class="mnl-zone-info">
+                    <div class="mnl-zone-condition">Net Score &ge; 3</div>
+                    <p>Strong culture contributor. Consistent delivery and positive signals. This member is thriving and may be a candidate for leadership recognition.</p>
+                  </div>
+                </div>
+                <div class="mnl-zone-card mnl-zone-card-orange">
+                  <div class="mnl-zone-badge-lg mnl-zbg-orange">ORANGE</div>
+                  <div class="mnl-zone-info">
+                    <div class="mnl-zone-condition">Net Score 0 to 2</div>
+                    <p>Neutral or developing. May need coaching or clearer expectations. Not a problem — just an area to watch and support proactively.</p>
+                  </div>
+                </div>
+                <div class="mnl-zone-card mnl-zone-card-red">
+                  <div class="mnl-zone-badge-lg mnl-zbg-red">RED</div>
+                  <div class="mnl-zone-info">
+                    <div class="mnl-zone-condition">Net Score &lt; 0</div>
+                    <p>Growth area. This is a coaching cue, not a punishment. Requires a 1-on-1 conversation to understand blockers and provide support.</p>
+                  </div>
+                </div>
+              </div>
+
+              <div class="mnl-highlight-box mnl-highlight-accent">
+                <strong>Important:</strong> Zones are about <em>culture health direction</em>, not individual value. A Red zone means the system has detected patterns that need attention — it's an invitation to help, not to judge.
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Section 7: Task Review -->
+        <div class="mnl-section" id="mnl-review">
+          <div class="mnl-section-header" onclick="toggleManualSection(this)">
+            <div class="mnl-section-num">07</div>
+            <div class="mnl-section-title-wrap">
+              <h3 class="mnl-section-title">Task Review Process</h3>
+              <p class="mnl-section-subtitle">Step-by-step guide to reviewing completed tasks</p>
+            </div>
+            <div class="mnl-section-chevron"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></div>
+          </div>
+          <div class="mnl-section-body">
+            <div class="mnl-content-block">
+              <p>When a task is ready for review, you can assess the quality of the completed work. The review process follows a two-step flow:</p>
+
+              <h4>Step 1: Select Quality Assessment</h4>
+              <p>Click the review button on a task to open the Review Modal. Choose one option:</p>
+              <div class="mnl-review-options">
+                <div class="mnl-review-opt mnl-review-green">
+                  <span class="mnl-review-opt-label">Exceptional Contribution</span>
+                  <span class="mnl-review-opt-result">+2 Strength Signals</span>
+                  <p>Work exceeded expectations and created outsized impact.</p>
+                </div>
+                <div class="mnl-review-opt mnl-review-green">
+                  <span class="mnl-review-opt-label">Completed with Excellence</span>
+                  <span class="mnl-review-opt-result">+1 Strength Signal</span>
+                  <p>Work met all requirements with solid delivery.</p>
+                </div>
+                <div class="mnl-review-opt mnl-review-neutral">
+                  <span class="mnl-review-opt-label">Completed (No Signal)</span>
+                  <span class="mnl-review-opt-result">No signals recorded</span>
+                  <p>Just mark as done — no quality assessment needed.</p>
+                </div>
+                <div class="mnl-review-opt mnl-review-red">
+                  <span class="mnl-review-opt-label">Needs Support</span>
+                  <span class="mnl-review-opt-result">+1 Growth Signal</span>
+                  <p>Work needs improvement — a coaching cue.</p>
+                </div>
+                <div class="mnl-review-opt mnl-review-red-severe">
+                  <span class="mnl-review-opt-label">Blunder</span>
+                  <span class="mnl-review-opt-result">+2 Growth Signals</span>
+                  <p>Notable mistakes or poor quality — a stronger coaching cue.</p>
+                </div>
+              </div>
+
+              <h4>Step 2: Add Category &amp; Note</h4>
+              <p>After selecting the assessment (except "No Signal"), a category dropdown and note field appear:</p>
+              <ul>
+                <li><strong>Category</strong> — Select a reason category (People, SOP, Emotion, Skill, Domain, Management, Other)</li>
+                <li><strong>Note</strong> — Optional context about the assessment</li>
+              </ul>
+              <p>Click <strong>Submit Review</strong> to record the signal and mark the task as completed.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Section 8: System Mechanics -->
+        <div class="mnl-section" id="mnl-mechanics">
+          <div class="mnl-section-header" onclick="toggleManualSection(this)">
+            <div class="mnl-section-num">08</div>
+            <div class="mnl-section-title-wrap">
+              <h3 class="mnl-section-title">System Mechanics</h3>
+              <p class="mnl-section-subtitle">Signal Recovery, Monthly Attention, and Risk Alerts</p>
+            </div>
+            <div class="mnl-section-chevron"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></div>
+          </div>
+          <div class="mnl-section-body">
+            <div class="mnl-content-block">
+              <div class="mnl-mechanic-cards">
+                <div class="mnl-mechanic-card">
+                  <div class="mnl-mechanic-icon mnl-mechanic-accent"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg></div>
+                  <h4>Signal Recovery</h4>
+                  <div class="mnl-mechanic-rule">Rule: 2 consecutive clean months (no growth signals)</div>
+                  <div class="mnl-mechanic-effect">Effect: All older growth signals reduced to <strong>50% weight</strong></div>
+                  <p>This rewards sustained improvement and provides a path to a clean slate. Members who demonstrate consistent positive behavior are not permanently penalized by older signals.</p>
+                </div>
+
+                <div class="mnl-mechanic-card">
+                  <div class="mnl-mechanic-icon mnl-mechanic-amber"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div>
+                  <h4>Monthly Attention Signal</h4>
+                  <div class="mnl-mechanic-rule">Rule: 2+ growth signals in a single calendar month</div>
+                  <div class="mnl-mechanic-effect">Effect: Attention badge appears on the member's card</div>
+                  <p>This is a pattern indicator, not a punishment. When a member accumulates multiple growth signals in one month, it invites a 1-on-1 coaching conversation to understand what's happening.</p>
+                </div>
+
+                <div class="mnl-mechanic-card">
+                  <div class="mnl-mechanic-icon mnl-mechanic-red"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div>
+                  <h4>Smart Risk Alert</h4>
+                  <div class="mnl-mechanic-rule">Rule: Assigning a task to a member with 2+ same-category or keyword-matching growth signals this month</div>
+                  <div class="mnl-mechanic-effect">Effect: Warning shown on the task form (assignment still allowed)</div>
+                  <p>The system proactively warns you when assigning work to someone who may be struggling in a related area. This helps leaders make informed decisions about workload distribution.</p>
+                </div>
+
+                <div class="mnl-mechanic-card">
+                  <div class="mnl-mechanic-icon mnl-mechanic-green"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></div>
+                  <h4>Overdue Auto-Detection</h4>
+                  <div class="mnl-mechanic-rule">Rule: Task passes its due date without completion</div>
+                  <div class="mnl-mechanic-effect">Effect: +1 growth signal automatically recorded</div>
+                  <p>The system checks for overdue tasks and automatically records a growth signal. This ensures accountability without manual intervention. Overdue tasks also appear in the Dashboard's Attention Queue.</p>
+                </div>
+              </div>
+
+              <h4>Reason Categories</h4>
+              <p>Every signal can be tagged with a reason category for pattern analysis. Default categories:</p>
+              <div class="mnl-cat-chips">
+                <span class="mnl-cat-chip">People</span>
+                <span class="mnl-cat-chip">SOP</span>
+                <span class="mnl-cat-chip">Emotion</span>
+                <span class="mnl-cat-chip">Skill</span>
+                <span class="mnl-cat-chip">Domain</span>
+                <span class="mnl-cat-chip">Management</span>
+                <span class="mnl-cat-chip">Other</span>
+              </div>
+              <p>Categories can be customized in <strong>Configuration</strong>. They help identify whether issues are systemic (SOP, Management) or individual (Skill, Emotion).</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Section 9: Dashboard -->
+        <div class="mnl-section" id="mnl-dashboard">
+          <div class="mnl-section-header" onclick="toggleManualSection(this)">
+            <div class="mnl-section-num">09</div>
+            <div class="mnl-section-title-wrap">
+              <h3 class="mnl-section-title">Dashboard Guide</h3>
+              <p class="mnl-section-subtitle">Understanding the culture health overview</p>
+            </div>
+            <div class="mnl-section-chevron"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></div>
+          </div>
+          <div class="mnl-section-body">
+            <div class="mnl-content-block">
+              <h4>Top Metrics</h4>
+              <div class="mnl-dash-metrics">
+                <div class="mnl-dash-metric">
+                  <strong>Team Members</strong>
+                  <span>Total active members in the system</span>
+                </div>
+                <div class="mnl-dash-metric">
+                  <strong>Active Tasks</strong>
+                  <span>Tasks currently assigned (not completed/cancelled)</span>
+                </div>
+                <div class="mnl-dash-metric">
+                  <strong>Culture Momentum</strong>
+                  <span>Net score across all members. Positive = healthy direction.</span>
+                </div>
+                <div class="mnl-dash-metric">
+                  <strong>Stability Index</strong>
+                  <span>Percentage of strength signals relative to total. Higher = more stable.</span>
+                </div>
+              </div>
+
+              <h4>Dashboard Sections</h4>
+              <ul>
+                <li><strong>Culture Health Distribution</strong> — Pie chart showing Green / Orange / Red zone split</li>
+                <li><strong>Culture Momentum Trend</strong> — 6-month trend showing zone movement over time</li>
+                <li><strong>Support Signals</strong> — Members in Red Zone for 2+ consecutive months</li>
+                <li><strong>Attention Queue</strong> — Tasks that have passed their due date</li>
+                <li><strong>Department Health Map</strong> — Pie chart of culture health by department/role</li>
+                <li><strong>Team Signal Board</strong> — Individual member zone status with tabs (All, Green, Orange, Red)</li>
+                <li><strong>Predictive Insights</strong> — Data-driven suggestions based on signal patterns</li>
+              </ul>
+
+              <h4>Date Filter</h4>
+              <p>Click the <strong>calendar icon</strong> in the header to filter by period: Today, Last Week, Last Month, Last Year, All Time, or a Custom date range.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Section 10: Reports -->
+        <div class="mnl-section" id="mnl-reports">
+          <div class="mnl-section-header" onclick="toggleManualSection(this)">
+            <div class="mnl-section-num">10</div>
+            <div class="mnl-section-title-wrap">
+              <h3 class="mnl-section-title">Reports</h3>
+              <p class="mnl-section-subtitle">Executive-level culture intelligence reports</p>
+            </div>
+            <div class="mnl-section-chevron"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></div>
+          </div>
+          <div class="mnl-section-body">
+            <div class="mnl-content-block">
+              <p>The Reports module provides 6 executive-level analytics views. Use the <strong>Period</strong> and <strong>Department</strong> dropdowns to filter data.</p>
+
+              <div class="mnl-report-cards">
+                <div class="mnl-report-card">
+                  <h4>1. Monthly Culture Health</h4>
+                  <p>Zone distribution, Culture Momentum Index, Risk Index, Stability Score, Net Improvement %, and a list of top/bottom contributors. Shows a sparkline trend of momentum over time.</p>
+                </div>
+                <div class="mnl-report-card">
+                  <h4>2. Zone Movement</h4>
+                  <p>Transition matrix showing how members moved between zones (Green→Orange, Red→Green, etc.). Includes movement trend bars and notable individual movements.</p>
+                </div>
+                <div class="mnl-report-card">
+                  <h4>3. Risk Radar</h4>
+                  <p>Members currently at risk (red zone this month), consecutive red zone tracking, department risk density, and category breakdown of growth signals.</p>
+                </div>
+                <div class="mnl-report-card">
+                  <h4>4. Leadership Pipeline</h4>
+                  <p>Identifies leadership candidates (sustained green zone), high-potential members, and tracks green momentum. Helps with succession planning.</p>
+                </div>
+                <div class="mnl-report-card">
+                  <h4>5. Department Culture</h4>
+                  <p>Department health cards with zone counts, health matrix heatmap across months, and department momentum sparklines. Identifies which departments need attention.</p>
+                </div>
+                <div class="mnl-report-card">
+                  <h4>6. Quarterly Intelligence</h4>
+                  <p>Executive summary narrative, zone distribution timeline over last 6 months, and quarter-over-quarter comparison table with all key metrics.</p>
+                </div>
+              </div>
+
+              <h4>Export Options</h4>
+              <ul>
+                <li><strong>CSV</strong> — Downloads a spreadsheet with member data and scores for the selected period</li>
+                <li><strong>PDF</strong> — Opens the print dialog for the current report (optimized print layout)</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <!-- Section 11: Configuration -->
+        <div class="mnl-section" id="mnl-config">
+          <div class="mnl-section-header" onclick="toggleManualSection(this)">
+            <div class="mnl-section-num">11</div>
+            <div class="mnl-section-title-wrap">
+              <h3 class="mnl-section-title">Configuration</h3>
+              <p class="mnl-section-subtitle">Managing system settings and categories</p>
+            </div>
+            <div class="mnl-section-chevron"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></div>
+          </div>
+          <div class="mnl-section-body">
+            <div class="mnl-content-block">
+              <h4>Reason Categories</h4>
+              <p>Categories are used to classify signals when logging extraordinary contributions, blunders, and critical incidents. They appear in signal dropdowns throughout the system.</p>
+
+              <h4>Managing Categories</h4>
+              <ol>
+                <li>Go to <strong>Configuration</strong> from the sidebar</li>
+                <li>Click <strong>+ Add Category</strong> to create a new one</li>
+                <li>Click the <strong>pencil icon</strong> to edit an existing category</li>
+                <li>Click the <strong>trash icon</strong> to delete a category</li>
+              </ol>
+
+              <h4>Default Categories</h4>
+              <table class="mnl-ref-table">
+                <thead>
+                  <tr><th>Category</th><th>When to Use</th></tr>
+                </thead>
+                <tbody>
+                  <tr><td><strong>People</strong></td><td>Issues related to team dynamics, communication, or interpersonal conflict</td></tr>
+                  <tr><td><strong>SOP</strong></td><td>Process failures, missing procedures, or workflow breakdowns</td></tr>
+                  <tr><td><strong>Emotion</strong></td><td>Decisions driven by stress, burnout, or emotional reactions</td></tr>
+                  <tr><td><strong>Skill</strong></td><td>Capability gaps or training needs in specific areas</td></tr>
+                  <tr><td><strong>Domain</strong></td><td>Lack of domain expertise or industry knowledge</td></tr>
+                  <tr><td><strong>Management</strong></td><td>Issues stemming from unclear direction, poor delegation, or leadership gaps</td></tr>
+                  <tr><td><strong>Other</strong></td><td>Situations that don't fit neatly into other categories</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Section 12: Scoring Reference -->
+        <div class="mnl-section" id="mnl-scoring">
+          <div class="mnl-section-header" onclick="toggleManualSection(this)">
+            <div class="mnl-section-num">12</div>
+            <div class="mnl-section-title-wrap">
+              <h3 class="mnl-section-title">Complete Scoring Reference</h3>
+              <p class="mnl-section-subtitle">All rules, scoring, and decision guide in one place</p>
+            </div>
+            <div class="mnl-section-chevron"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></div>
+          </div>
+          <div class="mnl-section-body">
+            <div class="mnl-content-block">
+              <h4>Signal Scoring Table</h4>
+              <table class="mnl-ref-table">
+                <thead>
+                  <tr><th>Action</th><th>Type</th><th>Signals</th><th>Trigger</th></tr>
+                </thead>
+                <tbody>
+                  <tr class="mnl-ref-row-green"><td>Exceptional Contribution</td><td>Strength</td><td>+2</td><td>Task review or manual recognition</td></tr>
+                  <tr class="mnl-ref-row-green"><td>Completed with Excellence</td><td>Strength</td><td>+1</td><td>Task review</td></tr>
+                  <tr class="mnl-ref-row-green"><td>Leadership Signal</td><td>Strength</td><td>+1 each</td><td>Mentoring, collaboration, peer reference</td></tr>
+                  <tr><td>Completed (No Signal)</td><td>None</td><td>0</td><td>Task marked complete, no quality assessment</td></tr>
+                  <tr class="mnl-ref-row-red"><td>Needs Support</td><td>Growth</td><td>+1</td><td>Task review — work needs improvement</td></tr>
+                  <tr class="mnl-ref-row-red"><td>Blunder</td><td>Growth</td><td>+2</td><td>Task review — notable mistakes or poor quality</td></tr>
+                  <tr class="mnl-ref-row-red"><td>Missed Deadline</td><td>Growth</td><td>+1</td><td>Automatic — task passes due date</td></tr>
+                  <tr class="mnl-ref-row-red"><td>Critical Incident</td><td>Growth</td><td>+3</td><td>Manual — serious process failure</td></tr>
+                </tbody>
+              </table>
+
+              <h4>Zone Thresholds</h4>
+              <table class="mnl-ref-table">
+                <thead>
+                  <tr><th>Zone</th><th>Net Score</th><th>Meaning</th></tr>
+                </thead>
+                <tbody>
+                  <tr class="mnl-ref-row-green"><td><span class="mnl-zone-pill mnl-pill-green">Green</span></td><td>&ge; 3</td><td>Strong culture contributor — thriving</td></tr>
+                  <tr class="mnl-ref-row-amber"><td><span class="mnl-zone-pill mnl-pill-orange">Orange</span></td><td>0 to 2</td><td>Developing — watch and support</td></tr>
+                  <tr class="mnl-ref-row-red"><td><span class="mnl-zone-pill mnl-pill-red">Red</span></td><td>&lt; 0</td><td>Growth area — coaching conversation needed</td></tr>
+                </tbody>
+              </table>
+
+              <h4>Decision Flowchart</h4>
+              <div class="mnl-decision-flow">
+                <div class="mnl-decision-row">
+                  <div class="mnl-decision-q">Task completed, work exceeded expectations?</div>
+                  <div class="mnl-decision-arrow">&rarr;</div>
+                  <div class="mnl-decision-a mnl-da-green">Exceptional Contribution (+2 Strength)</div>
+                </div>
+                <div class="mnl-decision-row">
+                  <div class="mnl-decision-q">Task completed, met all requirements?</div>
+                  <div class="mnl-decision-arrow">&rarr;</div>
+                  <div class="mnl-decision-a mnl-da-green">Completed with Excellence (+1 Strength)</div>
+                </div>
+                <div class="mnl-decision-row">
+                  <div class="mnl-decision-q">Task completed, no quality assessment needed?</div>
+                  <div class="mnl-decision-arrow">&rarr;</div>
+                  <div class="mnl-decision-a mnl-da-neutral">No Signal — just mark done</div>
+                </div>
+                <div class="mnl-decision-row">
+                  <div class="mnl-decision-q">Task completed, but work needs improvement?</div>
+                  <div class="mnl-decision-arrow">&rarr;</div>
+                  <div class="mnl-decision-a mnl-da-red">Needs Support (+1 Growth)</div>
+                </div>
+                <div class="mnl-decision-row">
+                  <div class="mnl-decision-q">Task completed, with notable mistakes?</div>
+                  <div class="mnl-decision-arrow">&rarr;</div>
+                  <div class="mnl-decision-a mnl-da-red">Blunder (+2 Growth)</div>
+                </div>
+                <div class="mnl-decision-row">
+                  <div class="mnl-decision-q">Serious process failure or systemic breakdown?</div>
+                  <div class="mnl-decision-arrow">&rarr;</div>
+                  <div class="mnl-decision-a mnl-da-red-severe">Critical Incident (+3 Growth)</div>
+                </div>
+                <div class="mnl-decision-row">
+                  <div class="mnl-decision-q">Member mentored, collaborated, or got peer recognition?</div>
+                  <div class="mnl-decision-arrow">&rarr;</div>
+                  <div class="mnl-decision-a mnl-da-green">Leadership Signal (+1 per criterion)</div>
+                </div>
+              </div>
+
+              <h4>Key Formulas</h4>
+              <table class="mnl-ref-table">
+                <thead>
+                  <tr><th>Metric</th><th>Formula</th><th>Used In</th></tr>
+                </thead>
+                <tbody>
+                  <tr><td><strong>Net Score</strong></td><td>Effective green signals &minus; Effective red signals</td><td>Zone classification, member cards</td></tr>
+                  <tr><td><strong>Culture Momentum Index</strong></td><td>Average net score across filtered members</td><td>Reports: Health, Quarterly</td></tr>
+                  <tr><td><strong>Risk Index</strong></td><td>% of members in Red zone</td><td>Reports: Health, Risk Radar</td></tr>
+                  <tr><td><strong>Stability Score</strong></td><td>% of members in Green zone</td><td>Reports: Health, Quarterly</td></tr>
+                  <tr><td><strong>Net Improvement</strong></td><td>% of members who improved zone month-over-month</td><td>Reports: Health, Quarterly</td></tr>
+                  <tr><td><strong>Signal Recovery</strong></td><td>2 clean months &rarr; 50% weight on old red signals</td><td>Net Score calculation</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Bottom attribution -->
+        <div class="mnl-footer">
+          <p>GOR Framework — Culture Intelligence Console</p>
+          <p class="mnl-footer-sub">Designed for leadership teams who believe culture is a system, not a slogan.</p>
+        </div>
       </div>
 
       <!-- Configuration View -->

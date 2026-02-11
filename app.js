@@ -235,6 +235,24 @@ function switchView(viewName) {
   refreshAll();
 }
 
+// ==================== Manual Section Toggle ====================
+
+function toggleManualSection(headerEl) {
+  var section = headerEl.parentElement;
+  section.classList.toggle("mnl-open");
+}
+
+function scrollToManualSection(sectionId) {
+  var el = document.getElementById(sectionId);
+  if (!el) return;
+  // Open the section
+  el.classList.add("mnl-open");
+  // Scroll into view
+  setTimeout(function() {
+    el.scrollIntoView({ behavior: "smooth", block: "start" });
+  }, 100);
+}
+
 // ==================== Modals ====================
 
 function openModal(modalId) {
