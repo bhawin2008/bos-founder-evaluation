@@ -1330,12 +1330,26 @@ function renderTasks() {
   if (!container) return;
   container.innerHTML = "";
 
+  // Text search filter
+  var taskSearchInput = document.getElementById("task-search");
+  var taskSearch = taskSearchInput ? taskSearchInput.value.toLowerCase() : "";
+
   var filtered = data.tasks.filter(function(t) {
     // Date range filter first
     if (!isTaskInDateRange(t)) return false;
-    if (currentFilter === "all") return true;
-    if (currentFilter === "overdue") return isOverdue(t);
-    return t.status === currentFilter;
+    if (currentFilter !== "all") {
+      if (currentFilter === "overdue") { if (!isOverdue(t)) return false; }
+      else { if (t.status !== currentFilter) return false; }
+    }
+    // Text search by task title or assignee name
+    if (taskSearch) {
+      var assignee = data.members.find(function(m) { return m.id === t.assigneeId; });
+      var assigneeName = assignee ? assignee.name.toLowerCase() : "";
+      if (t.title.toLowerCase().indexOf(taskSearch) === -1 && assigneeName.indexOf(taskSearch) === -1) {
+        return false;
+      }
+    }
+    return true;
   });
 
   if (filtered.length === 0) {
@@ -1446,12 +1460,6 @@ function renderTasks() {
     actions += '<button class="tt-action-btn tt-action-edit" onclick="editTask(\'' + task.id + '\')" title="Edit"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>';
     actions += '<button class="tt-action-btn tt-action-delete" onclick="deleteTask(\'' + task.id + '\')" title="Delete"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></button>';
 
-    var taskMeta = '';
-    var autoKeywords = extractKeywords((task.title || "") + " " + (task.description || ""));
-    autoKeywords.forEach(function(kw) {
-      if (kw) taskMeta += '<span class="tt-keyword-badge">' + escapeHtml(kw) + '</span>';
-    });
-
     var weightageVal = task.weightage || "not-important";
     var weightageLabel = weightageVal === "important" ? "Important" : "Not Important";
     var weightageBadge = weightageVal === "important"
@@ -1461,7 +1469,6 @@ function renderTasks() {
     html += '<tr class="' + rowClass + '">' +
       '<td class="tt-col-title">' +
         '<div class="tt-task-name">' + escapeHtml(task.title) + ' ' + flagIndicator + '</div>' +
-        (taskMeta ? '<div class="tt-task-tags">' + taskMeta + '</div>' : '') +
         (task.description ? '<div class="tt-task-desc">' + escapeHtml(task.description) + '</div>' : '') +
       '</td>' +
       '<td class="tt-col-assignee">' + assigneeSelect + '</td>' +

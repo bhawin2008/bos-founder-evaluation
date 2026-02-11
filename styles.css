@@ -1786,11 +1786,32 @@ h1, h2, h3, h4 { color: var(--text-heading); font-weight: 600; }
    TASK TABLE
    ====================================================================== */
 
+.task-filter-row {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+  margin-bottom: var(--sp-4);
+}
+.task-search-input {
+  padding: var(--sp-3) var(--sp-4);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  background: var(--bg-card);
+  color: var(--text-primary);
+  font-size: 0.85rem;
+  transition: border-color var(--duration) var(--ease);
+}
+.task-search-input:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-light);
+}
+.task-search-input::placeholder { color: var(--text-muted); }
+
 .filter-bar,
 .task-filters {
   display: flex;
   gap: var(--sp-2);
-  margin-bottom: var(--sp-4);
   flex-wrap: wrap;
 }
 

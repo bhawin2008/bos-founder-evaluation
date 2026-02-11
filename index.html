@@ -218,14 +218,17 @@
           </div>
         </div>
 
-        <div class="filter-bar">
-          <button class="filter-btn active" data-filter="all" onclick="filterTasks('all')">All</button>
-          <button class="filter-btn" data-filter="pending" onclick="filterTasks('pending')">Pending</button>
-          <button class="filter-btn" data-filter="in-progress" onclick="filterTasks('in-progress')">In Progress</button>
-          <button class="filter-btn" data-filter="hold" onclick="filterTasks('hold')">Hold</button>
-          <button class="filter-btn" data-filter="completed" onclick="filterTasks('completed')">Completed</button>
-          <button class="filter-btn" data-filter="cancelled" onclick="filterTasks('cancelled')">Cancelled</button>
-          <button class="filter-btn filter-btn-overdue" data-filter="overdue" onclick="filterTasks('overdue')">Overdue</button>
+        <div class="task-filter-row">
+          <input type="text" id="task-search" class="task-search-input" placeholder="Search by task or assignee name..." oninput="renderTasks()">
+          <div class="filter-bar">
+            <button class="filter-btn active" data-filter="all" onclick="filterTasks('all')">All</button>
+            <button class="filter-btn" data-filter="pending" onclick="filterTasks('pending')">Pending</button>
+            <button class="filter-btn" data-filter="in-progress" onclick="filterTasks('in-progress')">In Progress</button>
+            <button class="filter-btn" data-filter="hold" onclick="filterTasks('hold')">Hold</button>
+            <button class="filter-btn" data-filter="completed" onclick="filterTasks('completed')">Completed</button>
+            <button class="filter-btn" data-filter="cancelled" onclick="filterTasks('cancelled')">Cancelled</button>
+            <button class="filter-btn filter-btn-overdue" data-filter="overdue" onclick="filterTasks('overdue')">Overdue</button>
+          </div>
         </div>
         <div id="tasks-list"></div>
       </div>
