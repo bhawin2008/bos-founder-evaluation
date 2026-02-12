@@ -1879,193 +1879,473 @@ function renderPredictiveInsights() {
   }
 
   var insights = [];
+  var now = new Date();
 
-  // Precompute member analytics
-  var memberAnalytics = data.members.map(function(m) {
+  // =============================================
+  // TIER 1: Task Performance Analytics per member
+  // =============================================
+  var memberProfiles = data.members.map(function(m) {
+    var memberTasks = data.tasks.filter(function(t) { return t.assigneeId === m.id; });
+    var completedTasks = memberTasks.filter(function(t) { return t.status === "completed"; });
+    var activeTasks = memberTasks.filter(function(t) {
+      return t.status !== "completed" && t.status !== "cancelled";
+    });
+    var overdueTasks = memberTasks.filter(function(t) { return isOverdue(t); });
+
+    // On-time analysis
+    var onTime = 0, late = 0, early = 0;
+    completedTasks.forEach(function(t) {
+      if (!t.dueDate) return;
+      var dueDate = new Date(t.dueDate + "T23:59:59");
+      // Estimate completion date from flags or use due date
+      var completionFlags = data.flags.filter(function(f) {
+        return f.taskId === t.id && f.color === "green";
+      });
+      if (completionFlags.length > 0) {
+        var completedDate = new Date(completionFlags[0].createdAt);
+        if (completedDate <= dueDate) {
+          var daysBefore = Math.floor((dueDate - completedDate) / 86400000);
+          if (daysBefore >= 2) early++;
+          else onTime++;
+        } else {
+          late++;
+        }
+      } else {
+        onTime++; // Assume on-time if no tracking data
+      }
+    });
+
+    // Review quality breakdown
+    var reviews = { extraordinary: 0, perfect: 0, acceptable: 0, below: 0, blunder: 0 };
+    completedTasks.forEach(function(t) {
+      if (t.reviewResult && reviews.hasOwnProperty(t.reviewResult)) {
+        reviews[t.reviewResult]++;
+      }
+    });
+    var totalReviewed = reviews.extraordinary + reviews.perfect + reviews.acceptable + reviews.below + reviews.blunder;
+    var goodReviews = reviews.extraordinary + reviews.perfect;
+    var badReviews = reviews.below + reviews.blunder;
+    var qualityRate = totalReviewed > 0 ? Math.round((goodReviews / totalReviewed) * 100) : -1;
+
+    // Important task performance
+    var importantTasks = memberTasks.filter(function(t) { return t.weightage === "important"; });
+    var importantCompleted = importantTasks.filter(function(t) { return t.status === "completed"; });
+    var importantGood = importantCompleted.filter(function(t) {
+      return t.reviewResult === "perfect" || t.reviewResult === "extraordinary";
+    });
+    var importantBad = importantCompleted.filter(function(t) {
+      return t.reviewResult === "below" || t.reviewResult === "blunder";
+    });
+
+    // Category analysis via linked flags
+    var catPerformance = {};
+    data.flags.filter(function(f) { return f.memberId === m.id; }).forEach(function(f) {
+      var cat = f.category || "";
+      if (!cat && f.taskId) {
+        // Try to infer category from task
+        var linkedTask = data.tasks.find(function(t) { return t.id === f.taskId; });
+        if (linkedTask) cat = "task-linked";
+      }
+      if (!cat) cat = "general";
+      if (!catPerformance[cat]) catPerformance[cat] = { green: 0, red: 0, taskTitles: [] };
+      if (f.color === "green") catPerformance[cat].green += f.count;
+      else catPerformance[cat].red += f.count;
+      if (f.taskId) {
+        var t = data.tasks.find(function(t2) { return t2.id === f.taskId; });
+        if (t && catPerformance[cat].taskTitles.indexOf(t.title) === -1) {
+          catPerformance[cat].taskTitles.push(t.title);
+        }
+      }
+    });
+
+    // Find failed task titles (below/blunder reviews)
+    var failedTasks = completedTasks.filter(function(t) {
+      return t.reviewResult === "below" || t.reviewResult === "blunder";
+    });
+    var excellentTasks = completedTasks.filter(function(t) {
+      return t.reviewResult === "perfect" || t.reviewResult === "extraordinary";
+    });
+
+    // Signals and zone
     var flags = getMemberFlags(m.id);
     var eff = getEffectiveFlags(m.id);
     var trend = getMemberTrend(m.id);
     var zone = getMemberZone(m.id);
-    var redAlert = isRedAlert(m.id);
-    var monthlyWarn = getMonthlyRedWarning(m.id);
     var role = data.roles.find(function(r) { return r.id === m.roleId; });
-    var activeTasks = data.tasks.filter(function(t) {
-      return t.assigneeId === m.id && t.status !== "completed" && t.status !== "cancelled";
-    }).length;
-    var hasLeadershipFlag = data.flags.some(function(f) {
-      return f.memberId === m.id && f.reason && f.reason.indexOf("Leadership") !== -1;
-    });
+
     return {
       member: m,
+      role: role,
+      roleName: role ? role.name : "Unassigned",
+      memberTasks: memberTasks,
+      completedTasks: completedTasks,
+      activeTasks: activeTasks,
+      overdueTasks: overdueTasks,
+      onTime: onTime,
+      late: late,
+      early: early,
+      reviews: reviews,
+      totalReviewed: totalReviewed,
+      goodReviews: goodReviews,
+      badReviews: badReviews,
+      qualityRate: qualityRate,
+      importantTasks: importantTasks,
+      importantGood: importantGood,
+      importantBad: importantBad,
+      catPerformance: catPerformance,
+      failedTasks: failedTasks,
+      excellentTasks: excellentTasks,
       green: flags.green,
       red: flags.red,
       effNet: eff.green - eff.red,
       trend: trend,
       zone: zone,
-      redAlert: redAlert,
-      monthlyWarn: monthlyWarn,
-      role: role,
-      roleName: role ? role.name : "Unassigned",
-      activeTasks: activeTasks,
-      hasLeadershipFlag: hasLeadershipFlag,
-      decayActive: eff.decayActive
+      redAlert: isRedAlert(m.id),
+      decayActive: eff.decayActive,
+      hasLeadership: data.flags.some(function(f) {
+        return f.memberId === m.id && f.reason && f.reason.indexOf("Leadership") !== -1;
+      })
     };
   });
 
-  // === 1. Leadership Training Candidates ===
-  // Strong performers in thriving zone — prioritize those without leadership recognition
-  var leadershipPool = memberAnalytics.filter(function(ma) {
-    return ma.effNet >= 2 && ma.zone === "green";
-  }).sort(function(a, b) {
-    // Prioritize: no leadership flag first, then by net score
-    if (a.hasLeadershipFlag !== b.hasLeadershipFlag) return a.hasLeadershipFlag ? 1 : -1;
-    return b.effNet - a.effNet;
-  });
+  // =============================================
+  // TIER 2: Signal-Task Correlation Engine
+  // =============================================
 
-  leadershipPool.slice(0, 3).forEach(function(ma) {
-    var trendLabel = ma.trend === "rising" ? "accelerating" : (ma.trend === "falling" ? "needs attention" : "steady");
-    if (!ma.hasLeadershipFlag) {
+  memberProfiles.forEach(function(mp) {
+    var name = escapeHtml(mp.member.name);
+    var totalTasks = mp.completedTasks.length;
+    var onTimePct = totalTasks > 0 ? Math.round(((mp.onTime + mp.early) / totalTasks) * 100) : -1;
+    var dataPoints = totalTasks + mp.green + mp.red;
+    var confidence = dataPoints >= 8 ? "High" : (dataPoints >= 4 ? "Med" : "Low");
+    var confClass = confidence === "High" ? "high" : (confidence === "Med" ? "med" : "low");
+
+    // =============================================
+    // TIER 3: Predictive Suggestions
+    // =============================================
+
+    // --- 1. TASK PERFORMANCE ALERT ---
+    // Members with bad review rate or high late delivery
+    if (mp.badReviews >= 2 && mp.totalReviewed >= 3) {
+      var badPct = Math.round((mp.badReviews / mp.totalReviewed) * 100);
+      var failedNames = mp.failedTasks.slice(0, 3).map(function(t) { return t.title; });
+      var patternText = mp.badReviews + " of " + mp.totalReviewed + " reviewed tasks rated below expectation (" + badPct + "%)";
+      var evidenceText = "Failed: " + failedNames.join(", ");
+      var trendText = mp.trend === "falling" ? "Declining — was " + (mp.zone === "red" ? "already" : "moving toward") + " red zone" :
+                      (mp.trend === "rising" ? "Improving — trajectory is positive despite past failures" : "Steady — pattern is persisting without change");
+      var actionText = mp.badReviews >= 3
+        ? "Schedule a focused 1:1 this week. Ask about blockers and skill gaps — not performance. Consider pairing with a mentor for the next 2 tasks."
+        : "Review the failed tasks together. Identify if this is a skill gap, resource issue, or unclear expectations. Adjust task assignment accordingly.";
+
       insights.push({
-        type: "leadership",
-        icon: icons.crown,
-        tag: "Leadership Training",
-        text: "Consider <strong>" + escapeHtml(ma.member.name) + "</strong> for leadership development",
-        reason: "Net +" + ma.effNet + " (" + trendLabel + "). Strong performer without formal leadership recognition yet. Investing here amplifies culture."
-      });
-    } else {
-      insights.push({
-        type: "leadership",
-        icon: icons.crown,
-        tag: "Deepen Leadership",
-        text: "Continue investing in <strong>" + escapeHtml(ma.member.name) + "</strong>'s leadership growth",
-        reason: "Net +" + ma.effNet + " (" + trendLabel + "). Already shows leadership qualities — consider expanded mentorship scope or cross-team ownership."
+        type: "alert",
+        tag: "Task Performance Alert",
+        memberName: name,
+        pattern: patternText,
+        evidence: evidenceText,
+        trendLine: trendText,
+        action: actionText,
+        confidence: confidence,
+        confClass: confClass,
+        priority: mp.badReviews >= 3 ? 1 : 2,
+        zone: mp.zone
       });
     }
-  });
 
-  // === 2. Structured Support Plan ===
-  // Members in red zone, red alerts, or declining trends
-  var supportNeeded = memberAnalytics.filter(function(ma) {
-    return ma.redAlert || ma.zone === "red" || (ma.trend === "falling" && ma.effNet < 0);
-  }).sort(function(a, b) { return a.effNet - b.effNet; });
+    // --- 2. OVERLOAD WARNING ---
+    // Too many active tasks OR active + overdue combination
+    if (mp.activeTasks.length >= 4 || (mp.activeTasks.length >= 3 && mp.overdueTasks.length >= 1)) {
+      var importantActive = mp.activeTasks.filter(function(t) { return t.weightage === "important"; }).length;
+      var patternText2 = mp.activeTasks.length + " active tasks" +
+        (mp.overdueTasks.length > 0 ? " (" + mp.overdueTasks.length + " past due)" : "") +
+        (importantActive > 0 ? " — " + importantActive + " marked Important" : "");
+      var evidenceText2 = "Active: " + mp.activeTasks.slice(0, 3).map(function(t) { return t.title; }).join(", ");
+      var trendText2 = mp.trend === "falling"
+        ? "Performance declining — overload may be the root cause"
+        : "Currently stable but workload exceeds sustainable threshold";
 
-  supportNeeded.forEach(function(ma) {
-    var reasonParts = [];
-    if (ma.redAlert) reasonParts.push("red zone for 2+ consecutive months");
-    if (ma.trend === "falling") reasonParts.push("declining trajectory");
-    if (ma.monthlyWarn) reasonParts.push("multiple red signals this month");
-    if (reasonParts.length === 0 && ma.zone === "red") reasonParts.push("currently in red zone");
-    insights.push({
-      type: "support",
-      icon: icons.heart,
-      tag: "Needs Support Plan",
-      text: "<strong>" + escapeHtml(ma.member.name) + "</strong> would benefit from a structured support conversation",
-      reason: capitalizeFirst(reasonParts.join(", ")) + ". Net signal: " + ma.effNet + ". A 1:1 to understand blockers could shift this trajectory."
+      insights.push({
+        type: "overload",
+        tag: "Overload Warning",
+        memberName: name,
+        pattern: patternText2,
+        evidence: evidenceText2,
+        trendLine: trendText2,
+        action: "Redistribute " + (mp.overdueTasks.length > 0 ? "the past-due tasks immediately" : "at least 1 task") +
+          ". Prioritize the Important items and defer or reassign the rest. Check in to prevent burnout.",
+        confidence: confidence,
+        confClass: confClass,
+        priority: mp.overdueTasks.length >= 2 ? 1 : 3,
+        zone: mp.zone
+      });
+    }
+
+    // --- 3. SKILL GAP DETECTED ---
+    // Repeated red signals in same category
+    Object.keys(mp.catPerformance).forEach(function(cat) {
+      var cp = mp.catPerformance[cat];
+      if (cp.red >= 2 && cat !== "general" && cat !== "task-linked") {
+        var catLabel = getCategoryLabel(cat);
+        var ratio = cp.green > 0 ? (cp.green + " green / " + cp.red + " red") : (cp.red + " red signals, 0 green");
+        var taskContext = cp.taskTitles.length > 0 ? "Related: " + cp.taskTitles.slice(0, 2).join(", ") : "";
+
+        insights.push({
+          type: "skillgap",
+          tag: "Skill Gap Detected",
+          memberName: name,
+          pattern: cp.red + " red signals in " + catLabel + " category",
+          evidence: ratio + (taskContext ? ". " + taskContext : ""),
+          trendLine: "Repeated pattern suggests a structural gap, not a one-time issue",
+          action: "Invest in targeted " + catLabel.toLowerCase() + " training or pair with someone strong in this area. Reduce " + catLabel.toLowerCase() + "-heavy assignments until skills develop.",
+          confidence: cp.red >= 3 ? "High" : "Med",
+          confClass: cp.red >= 3 ? "high" : "med",
+          priority: cp.red >= 3 ? 2 : 4,
+          zone: mp.zone
+        });
+      }
+    });
+
+    // --- 4. RISING STAR ---
+    // Consistent excellent reviews + green zone
+    if (mp.goodReviews >= 3 && mp.qualityRate >= 70 && mp.zone === "green") {
+      var starTasks = mp.excellentTasks.slice(0, 3).map(function(t) {
+        return t.title + (t.reviewResult === "extraordinary" ? " (Extraordinary)" : "");
+      });
+
+      insights.push({
+        type: "star",
+        tag: "Rising Star",
+        memberName: name,
+        pattern: mp.goodReviews + " of " + mp.totalReviewed + " tasks rated Perfect or Extraordinary (" + mp.qualityRate + "% quality)",
+        evidence: "Excelled at: " + starTasks.join(", "),
+        trendLine: mp.trend === "rising" ? "Accelerating — consistently improving over time" :
+                  (mp.trend === "flat" ? "Steady excellence — reliable high performer" : "Watch closely — slight dip in an otherwise strong performer"),
+        action: mp.hasLeadership
+          ? "Already recognized as a leader. Consider expanded scope — cross-team mentorship, tech lead role, or ownership of a key initiative."
+          : "Recognize publicly. Consider for leadership development, mentorship pairing, or ownership of higher-impact projects.",
+        confidence: confidence,
+        confClass: confClass,
+        priority: 3,
+        zone: mp.zone
+      });
+    }
+
+    // --- 5. BURNOUT RISK ---
+    // High performer (green zone) with too many tasks
+    if (mp.zone === "green" && mp.effNet >= 2 && mp.activeTasks.length >= 3) {
+      insights.push({
+        type: "burnout",
+        tag: "Burnout Risk",
+        memberName: name,
+        pattern: "High performer (net +" + mp.effNet + ") carrying " + mp.activeTasks.length + " active tasks",
+        evidence: mp.activeTasks.slice(0, 3).map(function(t) { return t.title; }).join(", "),
+        trendLine: mp.trend === "falling"
+          ? "Already showing signs of decline — act now before it accelerates"
+          : "Currently stable but workload is unsustainable long-term",
+        action: "High performers leave when overloaded and under-recognized. Rebalance workload to " +
+          Math.max(1, mp.activeTasks.length - 2) + " tasks. Acknowledge their contributions publicly.",
+        confidence: confidence,
+        confClass: confClass,
+        priority: mp.trend === "falling" ? 2 : 4,
+        zone: mp.zone
+      });
+    }
+
+    // --- 6. IMPORTANT TASK FAILURE ---
+    // Failed important tasks specifically
+    if (mp.importantBad.length >= 1) {
+      var impFailedNames = mp.importantBad.map(function(t) { return t.title; });
+      insights.push({
+        type: "alert",
+        tag: "Important Task Failure",
+        memberName: name,
+        pattern: mp.importantBad.length + " Important-weighted task" + (mp.importantBad.length > 1 ? "s" : "") + " rated below expectation",
+        evidence: "Failed: " + impFailedNames.join(", "),
+        trendLine: mp.zone === "red"
+          ? "In red zone — Important task failures compound the concern"
+          : "Zone is " + mp.zone + " but Important tasks demand higher scrutiny",
+        action: "Important tasks reflect business-critical work. Review what went wrong in a blameless post-mortem. Ensure this person has adequate support and clarity before the next high-stakes assignment.",
+        confidence: "High",
+        confClass: "high",
+        priority: 1,
+        zone: mp.zone
+      });
+    }
+
+    // --- 7. RECOVERY OPPORTUNITY ---
+    // Red/orange zone but trend is rising, or decay active with positive net
+    if ((mp.zone === "red" || mp.zone === "yellow") && (mp.trend === "rising" || mp.decayActive) && mp.effNet >= -1) {
+      var recentGood = mp.excellentTasks.filter(function(t) {
+        return t.createdAt && (now - new Date(t.createdAt)) / 86400000 < 90;
+      });
+
+      insights.push({
+        type: "recovery",
+        tag: "Recovery In Progress",
+        memberName: name,
+        pattern: "Zone: " + mp.zone + " but trajectory is improving (net " + (mp.effNet >= 0 ? "+" : "") + mp.effNet + ")",
+        evidence: recentGood.length > 0
+          ? "Recent wins: " + recentGood.slice(0, 2).map(function(t) { return t.title; }).join(", ")
+          : (mp.decayActive ? "Signal recovery active — old red signals losing weight" : "Trend shifting positive"),
+        trendLine: "This person is turning things around. Momentum is fragile at this stage.",
+        action: "Acknowledge the improvement explicitly. Assign 1 winnable task to build confidence. Avoid heavy criticism — reinforce the positive trajectory.",
+        confidence: confidence,
+        confClass: confClass,
+        priority: 3,
+        zone: mp.zone
+      });
+    }
+
+    // --- 8. CATEGORY STRENGTH ---
+    // Person excels in a specific category
+    Object.keys(mp.catPerformance).forEach(function(cat) {
+      var cp = mp.catPerformance[cat];
+      if (cp.green >= 3 && cp.red === 0 && cat !== "general" && cat !== "task-linked") {
+        var catLabel = getCategoryLabel(cat);
+        insights.push({
+          type: "strength",
+          tag: "Category Strength",
+          memberName: name,
+          pattern: cp.green + " green signals in " + catLabel + " with zero red",
+          evidence: cp.taskTitles.length > 0 ? "Tasks: " + cp.taskTitles.slice(0, 2).join(", ") : "Consistent excellence in " + catLabel,
+          trendLine: "Reliable strength area — leverage for high-impact " + catLabel.toLowerCase() + " work",
+          action: "Route " + catLabel.toLowerCase() + "-heavy tasks to " + name + ". Consider them as a subject-matter mentor for teammates struggling in this category.",
+          confidence: cp.green >= 4 ? "High" : "Med",
+          confClass: cp.green >= 4 ? "high" : "med",
+          priority: 5,
+          zone: mp.zone
+        });
+      }
     });
   });
 
-  // === 3. Role Realignment Consideration ===
-  // Members with deep negative scores — may need role change
-  var realignCandidates = memberAnalytics.filter(function(ma) {
-    return ma.effNet <= -3 && !ma.decayActive;
-  }).sort(function(a, b) { return a.effNet - b.effNet; });
-
-  realignCandidates.forEach(function(ma) {
-    var trendLabel = ma.trend === "falling" ? "declining" : (ma.trend === "rising" ? "improving" : "persistent");
-    insights.push({
-      type: "realign",
-      icon: icons.shuffle,
-      tag: "Consider Role Realignment",
-      text: "Evaluate whether <strong>" + escapeHtml(ma.member.name) + "</strong>'s current role is the right fit",
-      reason: trendLabel.charAt(0).toUpperCase() + trendLabel.slice(1) + " pattern (net " + ma.effNet + ") in " + escapeHtml(ma.roleName) + " role. This may indicate a skills-to-role mismatch rather than a performance issue."
-    });
-  });
-
-  // === 4. Department Attention ===
-  // Roles with negative average net scores or many members in red zone
+  // --- 9. TEAM/DEPARTMENT PATTERNS ---
   data.roles.forEach(function(role) {
-    var roleMembers = memberAnalytics.filter(function(ma) { return ma.member.roleId === role.id; });
-    if (roleMembers.length < 2) return;
+    var teamMembers = memberProfiles.filter(function(mp) { return mp.member.roleId === role.id; });
+    if (teamMembers.length < 2) return;
 
-    var totalNet = 0;
-    var redCount = 0;
-    roleMembers.forEach(function(ma) {
-      totalNet += ma.effNet;
-      if (ma.zone === "red") redCount++;
+    // Team on-time rate
+    var teamCompleted = 0, teamOnTime = 0, teamBad = 0, teamGood = 0;
+    var teamRedCount = 0;
+    teamMembers.forEach(function(mp) {
+      teamCompleted += mp.completedTasks.length;
+      teamOnTime += mp.onTime + mp.early;
+      teamBad += mp.badReviews;
+      teamGood += mp.goodReviews;
+      if (mp.zone === "red") teamRedCount++;
     });
-    var avgNet = totalNet / roleMembers.length;
-    var redPct = Math.round((redCount / roleMembers.length) * 100);
 
-    if (avgNet < 0 || redPct >= 50) {
-      var reasons = [];
-      if (avgNet < 0) reasons.push("avg net signal " + avgNet.toFixed(1));
-      if (redPct >= 50) reasons.push(redPct + "% of team in red zone");
+    var teamOnTimePct = teamCompleted > 0 ? Math.round((teamOnTime / teamCompleted) * 100) : -1;
+    var teamQualityPct = (teamBad + teamGood) > 0 ? Math.round((teamGood / (teamBad + teamGood)) * 100) : -1;
+    var teamRedPct = Math.round((teamRedCount / teamMembers.length) * 100);
+
+    // Underperforming department
+    if (teamQualityPct !== -1 && (teamQualityPct < 50 || teamRedPct >= 50)) {
+      var worstMembers = teamMembers.filter(function(mp) { return mp.zone === "red"; })
+        .map(function(mp) { return mp.member.name; });
+
       insights.push({
         type: "department",
-        icon: icons.alert,
-        tag: "Team Attention",
-        text: "The <strong>" + escapeHtml(role.name) + "</strong> team needs focused attention",
-        reason: capitalizeFirst(reasons.join(". ")) + ". Review workload distribution, tooling, or process clarity within this group."
+        tag: "Department Needs Attention",
+        memberName: escapeHtml(role.name) + " Team",
+        pattern: "Quality rate: " + teamQualityPct + "%" +
+          (teamOnTimePct !== -1 ? " | On-time: " + teamOnTimePct + "%" : "") +
+          " | " + teamRedPct + "% in red zone",
+        evidence: worstMembers.length > 0 ? "Members in red: " + worstMembers.join(", ") : "No individual red alerts but team metrics are low",
+        trendLine: "Department-level patterns often indicate process or resource issues, not individual failures",
+        action: "Hold a team retrospective focused on blockers. Review workload distribution, tooling gaps, and process clarity. Consider cross-team pairing.",
+        confidence: teamCompleted >= 6 ? "High" : "Med",
+        confClass: teamCompleted >= 6 ? "high" : "med",
+        priority: 2,
+        zone: "red"
+      });
+    }
+
+    // High-performing department
+    if (teamQualityPct >= 80 && teamRedCount === 0 && teamCompleted >= 4) {
+      insights.push({
+        type: "teamwin",
+        tag: "High-Performing Team",
+        memberName: escapeHtml(role.name) + " Team",
+        pattern: teamQualityPct + "% quality rate across " + teamCompleted + " tasks | 0% in red zone",
+        evidence: "All " + teamMembers.length + " members in green or orange zone",
+        trendLine: "Team culture is strong — this is the benchmark for other departments",
+        action: "Recognize the entire team publicly. Document their practices as a playbook for other departments. Consider stretch goals to maintain momentum.",
+        confidence: "High",
+        confClass: "high",
+        priority: 5,
+        zone: "green"
       });
     }
   });
 
-  // === 5. High Performers to Retain ===
-  // Top performers (high net score) — regardless of trend
-  var topPerformers = memberAnalytics.filter(function(ma) {
-    return ma.effNet >= 3;
-  }).sort(function(a, b) { return b.effNet - a.effNet; });
+  // Sort insights by priority (lower number = higher priority)
+  insights.sort(function(a, b) { return a.priority - b.priority; });
 
-  topPerformers.forEach(function(ma) {
-    var burnoutRisk = ma.activeTasks >= 3;
-    var trendLabel = ma.trend === "rising" ? "accelerating" : (ma.trend === "falling" ? "watch closely" : "steady");
-    insights.push({
-      type: "retain",
-      icon: icons.star,
-      tag: burnoutRisk ? "Retention + Burnout Risk" : "Key Contributor",
-      text: "<strong>" + escapeHtml(ma.member.name) + "</strong> is a culture anchor — " + (burnoutRisk ? "watch for overload" : "invest in their growth"),
-      reason: "Net +" + ma.effNet + ", " + trendLabel + ", " + ma.activeTasks + " active task" + (ma.activeTasks !== 1 ? "s" : "") + ". " +
-        (burnoutRisk ? "High performers leave when overloaded and under-recognized. Rebalance workload." : "Consider expanded responsibilities or mentorship roles.")
-    });
-  });
-
-  // === 6. Recovery Spotlight ===
-  // Members with decay active who are improving
-  var recoveryCandidates = memberAnalytics.filter(function(ma) {
-    return ma.decayActive && ma.effNet >= 0;
-  });
-
-  recoveryCandidates.forEach(function(ma) {
-    insights.push({
-      type: "leadership",
-      icon: icons.refresh,
-      tag: "Recovery Success",
-      text: "<strong>" + escapeHtml(ma.member.name) + "</strong> has recovered — acknowledge the turnaround",
-      reason: "Signal recovery active after 2+ clean months. Net signal now +" + ma.effNet + ". Public acknowledgment reinforces the behavior you want to see repeated."
-    });
-  });
-
-  // Render insights
+  // =============================================
+  // RENDER
+  // =============================================
   if (insights.length === 0) {
-    el.innerHTML = '<div class="insights-empty">Not enough signal data to generate predictions yet. Insights appear as patterns emerge.</div>';
+    el.innerHTML = '<div class="insights-empty">Not enough task and signal data to generate predictions yet. Complete tasks and add signals to see actionable insights.</div>';
     return;
   }
 
-  el.innerHTML = "";
+  // Summary bar
+  var alertCount = insights.filter(function(i) { return i.type === "alert" || i.type === "overload"; }).length;
+  var positiveCount = insights.filter(function(i) { return i.type === "star" || i.type === "recovery" || i.type === "strength" || i.type === "teamwin"; }).length;
+  var watchCount = insights.filter(function(i) { return i.type === "burnout" || i.type === "skillgap" || i.type === "department"; }).length;
+
+  var summaryHtml = '<div class="pi-summary">' +
+    '<div class="pi-summary-stat pi-summary-alert">' +
+      '<span class="pi-summary-num">' + alertCount + '</span>' +
+      '<span class="pi-summary-label">Action Needed</span>' +
+    '</div>' +
+    '<div class="pi-summary-stat pi-summary-watch">' +
+      '<span class="pi-summary-num">' + watchCount + '</span>' +
+      '<span class="pi-summary-label">Watch</span>' +
+    '</div>' +
+    '<div class="pi-summary-stat pi-summary-positive">' +
+      '<span class="pi-summary-num">' + positiveCount + '</span>' +
+      '<span class="pi-summary-label">Positive</span>' +
+    '</div>' +
+    '<div class="pi-summary-stat pi-summary-total">' +
+      '<span class="pi-summary-num">' + insights.length + '</span>' +
+      '<span class="pi-summary-label">Total Insights</span>' +
+    '</div>' +
+  '</div>';
+
+  var cardsHtml = '';
   insights.forEach(function(ins) {
-    var card = document.createElement("div");
-    card.className = "insight-card insight-card-type-" + ins.type;
-    card.innerHTML =
-      '<div class="insight-card-header">' +
-        '<div class="insight-icon ' + ins.type + '">' + ins.icon + '</div>' +
-        '<div class="insight-tag ' + ins.type + '">' + ins.tag + '</div>' +
-      '</div>' +
-      '<div class="insight-card-body">' +
-        '<div class="insight-text">' + ins.text + '</div>' +
-        '<div class="insight-reason">' + ins.reason + '</div>' +
+    var zoneClass = ins.zone === "green" ? "pi-zone-green" : (ins.zone === "red" ? "pi-zone-red" : "pi-zone-orange");
+    cardsHtml +=
+      '<div class="pi-card pi-card-' + ins.type + '">' +
+        '<div class="pi-card-top">' +
+          '<div class="pi-tag pi-tag-' + ins.type + '">' + ins.tag + '</div>' +
+          '<span class="pi-confidence pi-conf-' + ins.confClass + '">' + ins.confidence + ' confidence</span>' +
+        '</div>' +
+        '<div class="pi-card-name">' + ins.memberName + '</div>' +
+        '<div class="pi-card-rows">' +
+          '<div class="pi-row">' +
+            '<span class="pi-row-label">Pattern</span>' +
+            '<span class="pi-row-value">' + ins.pattern + '</span>' +
+          '</div>' +
+          '<div class="pi-row">' +
+            '<span class="pi-row-label">Evidence</span>' +
+            '<span class="pi-row-value">' + ins.evidence + '</span>' +
+          '</div>' +
+          '<div class="pi-row">' +
+            '<span class="pi-row-label">Trend</span>' +
+            '<span class="pi-row-value">' + ins.trendLine + '</span>' +
+          '</div>' +
+        '</div>' +
+        '<div class="pi-card-action">' +
+          '<div class="pi-action-label">Suggested Action</div>' +
+          '<div class="pi-action-text">' + ins.action + '</div>' +
+        '</div>' +
       '</div>';
-    el.appendChild(card);
   });
+
+  el.innerHTML = summaryHtml + '<div class="pi-grid">' + cardsHtml + '</div>';
 }
 
 function capitalizeFirst(str) {
