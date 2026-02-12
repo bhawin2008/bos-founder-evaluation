@@ -149,7 +149,8 @@ ul {
   transition: color 0.2s, background 0.2s;
 }
 
-.nav-link:hover {
+.nav-link:hover,
+.nav-link.active {
   color: var(--black);
   background: var(--gray-100);
 }
@@ -193,6 +194,27 @@ ul {
 
 .nav-toggle.active span:last-child {
   transform: rotate(-45deg) translate(3px, -3px);
+}
+
+/* ==================== Page Header (sub-pages) ==================== */
+
+.page-header {
+  padding: 150px 0 64px;
+}
+
+.page-title {
+  font-size: 3rem;
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: -1.5px;
+  margin-bottom: 16px;
+}
+
+.page-sub {
+  font-size: 1.125rem;
+  color: var(--gray-500);
+  line-height: 1.75;
+  max-width: 540px;
 }
 
 /* ==================== Hero ==================== */
@@ -682,6 +704,133 @@ ul {
   color: var(--gray-400);
 }
 
+/* ==================== Overview Cards (Home) ==================== */
+
+.overview-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+}
+
+.overview-card {
+  display: block;
+  padding: 32px 28px;
+  border: 1px solid var(--gray-200);
+  border-radius: 12px;
+  text-decoration: none;
+  color: inherit;
+  position: relative;
+  transition: border-color 0.2s, transform 0.2s;
+}
+
+.overview-card:hover {
+  border-color: var(--yellow);
+  transform: translateY(-2px);
+}
+
+.overview-icon {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--gray-100);
+  border-radius: 10px;
+  color: var(--gray-600);
+  margin-bottom: 16px;
+}
+
+.overview-card h3 {
+  font-size: 1.0625rem;
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+
+.overview-card p {
+  font-size: 0.875rem;
+  color: var(--gray-500);
+  line-height: 1.6;
+}
+
+.overview-arrow {
+  position: absolute;
+  top: 32px;
+  right: 28px;
+  font-size: 1.2rem;
+  color: var(--gray-300);
+  transition: color 0.2s, transform 0.2s;
+}
+
+.overview-card:hover .overview-arrow {
+  color: var(--yellow-d);
+  transform: translateX(4px);
+}
+
+/* ==================== Application Form ==================== */
+
+.form-wrapper {
+  max-width: 560px;
+}
+
+.apply-form {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.form-group label {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--gray-700);
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+  font-family: var(--font);
+  font-size: 0.9375rem;
+  padding: 12px 16px;
+  background: var(--white);
+  border: 1px solid var(--gray-200);
+  border-radius: 8px;
+  color: var(--black);
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+  border-color: var(--yellow-d);
+}
+
+.form-group input::placeholder,
+.form-group textarea::placeholder {
+  color: var(--gray-400);
+}
+
+.form-group select {
+  cursor: pointer;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg width='12' height='8' viewBox='0 0 12 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1.5L6 6.5L11 1.5' stroke='%23A3A3A3' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 16px center;
+  padding-right: 40px;
+}
+
+.form-group textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
 /* ==================== Scroll Animations ==================== */
 
 .fade-up {
@@ -747,6 +896,14 @@ ul {
     display: none;
   }
 
+  .page-title {
+    font-size: 2.2rem;
+  }
+
+  .overview-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
   .footer-top {
     flex-direction: column;
     gap: 40px;
@@ -807,9 +964,18 @@ ul {
     font-size: 1.75rem;
   }
 
+  .page-header {
+    padding: 120px 0 48px;
+  }
+
+  .page-title {
+    font-size: 1.8rem;
+  }
+
   .what-grid,
   .filter-grid,
-  .philosophy-grid {
+  .philosophy-grid,
+  .overview-grid {
     grid-template-columns: 1fr;
     gap: 32px;
   }
