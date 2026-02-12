@@ -1629,6 +1629,8 @@ function renderDashboard() {
       activityEl.innerHTML = '<div class="empty-state-sm">No signals recorded yet</div>';
     } else {
       var now = new Date();
+      var memberMap = {};
+      data.members.forEach(function(m) { memberMap[m.id] = m.name; });
       var weeks = [];
       for (var wi = 3; wi >= 0; wi--) {
         var weekDays = [];
@@ -1637,13 +1639,15 @@ function renderDashboard() {
           d.setDate(d.getDate() - (wi * 7 + di));
           var dayKey = d.toISOString().split("T")[0];
           var gCount = 0, rCount = 0;
+          var dayFlags = [];
           data.flags.forEach(function(f) {
             if (f.createdAt && f.createdAt.split("T")[0] === dayKey) {
               if (f.color === "green") gCount += f.count;
               else rCount += f.count;
+              dayFlags.push(f);
             }
           });
-          weekDays.push({ date: dayKey, day: d.toLocaleDateString("en-US", { weekday: "short" }).charAt(0), green: gCount, red: rCount, total: gCount + rCount });
+          weekDays.push({ date: dayKey, day: d.toLocaleDateString("en-US", { weekday: "short" }).charAt(0), green: gCount, red: rCount, total: gCount + rCount, flags: dayFlags });
         }
         weeks.push(weekDays);
       }
@@ -1654,7 +1658,23 @@ function renderDashboard() {
           var level = day.total === 0 ? 'level-0' : day.total <= 2 ? 'level-1' : day.total <= 4 ? 'level-2' : 'level-3';
           var color = day.green > day.red ? 'activity-green' : day.red > day.green ? 'activity-red' : 'activity-neutral';
           if (day.total === 0) color = '';
-          gridHtml += '<div class="activity-cell ' + level + ' ' + color + '" title="' + day.date + ': ' + day.green + ' strong, ' + day.red + ' weak"></div>';
+          var displayDate = new Date(day.date + "T12:00:00").toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" });
+          var tipLines = ['<strong>' + displayDate + '</strong>'];
+          if (day.total === 0) {
+            tipLines.push('<span class="at-muted">No signals</span>');
+          } else {
+            tipLines.push('<span class="at-count">' + day.green + ' strong, ' + day.red + ' weak</span>');
+            day.flags.forEach(function(f) {
+              var mName = memberMap[f.memberId] || "Unknown";
+              var sigType = f.color === "green" ? "&#x25B2;" : "&#x25BC;";
+              var sigCls = f.color === "green" ? "at-strong" : "at-weak";
+              var line = '<span class="' + sigCls + '">' + sigType + '</span> ' + mName;
+              if (f.category) line += ' <span class="at-cat">' + f.category + '</span>';
+              if (f.reason) line += ' &mdash; ' + f.reason;
+              tipLines.push(line);
+            });
+          }
+          gridHtml += '<div class="activity-cell ' + level + ' ' + color + '"><div class="activity-tip">' + tipLines.join('<br>') + '</div></div>';
         });
       });
       gridHtml += '</div>';

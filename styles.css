@@ -532,11 +532,50 @@ h1, h2, h3, h4 { color: var(--text-heading); font-weight: 600; }
   gap: 3px;
 }
 .activity-cell {
+  position: relative;
   aspect-ratio: 1;
   border-radius: 2px;
   background: var(--bg-subtle);
   transition: background var(--duration) var(--ease);
+  cursor: pointer;
 }
+.activity-cell:hover { opacity: 0.85; transform: scale(1.25); z-index: 10; }
+.activity-tip {
+  display: none;
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  box-shadow: 0 8px 24px rgba(0,0,0,.15);
+  padding: 10px 14px;
+  min-width: 200px;
+  max-width: 280px;
+  font-size: 0.73rem;
+  line-height: 1.6;
+  color: var(--text);
+  white-space: normal;
+  text-align: left;
+  z-index: 100;
+  pointer-events: none;
+}
+.activity-cell:hover .activity-tip { display: block; }
+/* keep tip on screen for cells near left/right edges */
+.activity-cell:first-child .activity-tip,
+.activity-cell:nth-child(2) .activity-tip { left: 0; transform: none; }
+.activity-cell:last-child .activity-tip,
+.activity-cell:nth-last-child(2) .activity-tip { left: auto; right: 0; transform: none; }
+/* tip for bottom rows: show above (default) — for top rows, show below */
+.activity-grid .activity-cell:nth-child(-n+7) .activity-tip {
+  bottom: auto; top: calc(100% + 8px);
+}
+.at-strong { color: var(--zone-g); font-weight: 600; }
+.at-weak { color: var(--zone-r); font-weight: 600; }
+.at-cat { background: var(--bg-subtle); border-radius: 3px; padding: 1px 5px; font-size: 0.68rem; color: var(--text-secondary); }
+.at-count { font-weight: 600; color: var(--text-secondary); }
+.at-muted { color: var(--text-muted); font-style: italic; }
 .activity-cell.level-0 { background: var(--bg-subtle); }
 .activity-cell.level-1.activity-green { background: #BBF7D0; }
 .activity-cell.level-2.activity-green { background: #4ADE80; }
