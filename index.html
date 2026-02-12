@@ -81,18 +81,74 @@
           </div>
         </div>
 
+        <!-- Quick Action Summary -->
+        <div id="dash-actions" class="dash-actions-bar"></div>
+
+        <!-- Culture Pulse + Signal Activity Feed -->
         <div class="dashboard-sections">
           <div class="dashboard-section">
-            <h3>Culture Health Distribution</h3>
-            <div id="dashboard-zone-dist"></div>
+            <h3>Culture Pulse</h3>
+            <div id="dash-pulse"></div>
           </div>
+          <div class="dashboard-section">
+            <h3>Signal Activity <span class="section-info-icon" title="Daily signal recording rhythm over the last 4 weeks. Helps ensure the system is being used consistently."><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg></span></h3>
+            <div id="dash-activity"></div>
+          </div>
+        </div>
+
+        <!-- Top Performers + Needs Coaching -->
+        <div class="dashboard-sections">
+          <div class="dashboard-section">
+            <h3>Top Performers</h3>
+            <div id="dash-top-performers"></div>
+          </div>
+          <div class="dashboard-section">
+            <h3>Needs Coaching</h3>
+            <div id="dash-needs-coaching"></div>
+          </div>
+        </div>
+
+        <!-- Task Quality Breakdown + Category Heatmap -->
+        <div class="dashboard-sections">
+          <div class="dashboard-section">
+            <h3>Task Completion Quality</h3>
+            <div id="dash-quality"></div>
+          </div>
+          <div class="dashboard-section">
+            <h3>Category Heatmap <span class="section-info-icon" title="Signal concentration by category over the last 3 months. Darker = more signals. Helps spot systemic patterns."><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg></span></h3>
+            <div id="dash-cat-heatmap"></div>
+          </div>
+        </div>
+
+        <!-- Department Comparison + Blunder Tracker -->
+        <div class="dashboard-sections">
+          <div class="dashboard-section">
+            <h3>Department Comparison</h3>
+            <div id="dash-dept-compare"></div>
+          </div>
+          <div class="dashboard-section">
+            <h3>Blunder &amp; Incident Tracker</h3>
+            <div id="dash-blunder-tracker"></div>
+          </div>
+        </div>
+
+        <!-- Culture Momentum Trend + Recovery Watchlist -->
+        <div class="dashboard-sections">
           <div class="dashboard-section">
             <h3>Culture Momentum Trend <span class="section-info-icon" title="Shows how team members are moving between Strong, Steady, and Weak zones over the last 6 months. Tracks culture direction, not just position."><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg></span></h3>
             <div id="dashboard-trend"></div>
           </div>
           <div class="dashboard-section">
-            <h3>Support Signals <span class="section-info-icon" title="Members in the Weak Zone for 2+ consecutive months. These are coaching cues — they invite a conversation, not a consequence."><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg></span></h3>
-            <div id="dashboard-alerts"></div>
+            <h3>Recovery Watchlist <span class="section-info-icon" title="Members close to or recently recovered from signal decay. 2 clean months (no weak signals) activates -50% decay on older signals."><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg></span></h3>
+            <div id="dash-recovery"></div>
+          </div>
+        </div>
+
+        <!-- Team Signal Board + Attention Board -->
+        <div class="dashboard-sections">
+          <div class="dashboard-section">
+            <h3>Team Signal Board</h3>
+            <div id="dashboard-flag-status"></div>
           </div>
           <div class="dashboard-section">
             <div class="section-header-row">
@@ -100,14 +156,6 @@
               <button id="attn-view-more-btn" class="attn-view-more" style="display:none;" onclick="toggleAttentionBoard()">View More</button>
             </div>
             <div id="dashboard-overdue"></div>
-          </div>
-          <div class="dashboard-section">
-            <h3>Department Health Map <span class="section-info-icon" title="Pie chart showing culture health distribution across departments/roles. Based on average net score (strong minus weak signals) per department."><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg></span></h3>
-            <div id="dashboard-heatmap"></div>
-          </div>
-          <div class="dashboard-section">
-            <h3>Team Signal Board</h3>
-            <div id="dashboard-flag-status"></div>
           </div>
         </div>
 
