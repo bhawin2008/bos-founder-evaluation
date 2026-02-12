@@ -1871,7 +1871,7 @@ function switchSignalTab(tab) {
 }
 
 function renderPredictiveInsights() {
-  var el = document.getElementById("dashboard-insights");
+  var el = document.getElementById("insights-content");
   if (!el) return;
   if (data.members.length === 0) {
     el.innerHTML = '<div class="insights-empty">Add team members and signals to generate insights</div>';
