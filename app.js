@@ -388,8 +388,7 @@ function getMonthKey(dateStr) {
 
 function getMonthLabel(key) {
   var parts = key.split("-");
-  var d = new Date(parts[0], parts[1] - 1, 1);
-  return d.toLocaleDateString("en-US", { month: "short", year: "numeric" });
+  return String(parts[1]).padStart(2, "0") + "-" + String(parts[0]).slice(-2);
 }
 
 function getMemberZoneAtMonth(memberId, monthKey) {
@@ -830,7 +829,8 @@ function showMemberFlags(memberId) {
     flagEntries.forEach(function(f) {
       var item = document.createElement("div");
       item.className = "flag-history-item";
-      var dateStr = new Date(f.createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+      var fd = new Date(f.createdAt);
+      var dateStr = String(fd.getDate()).padStart(2,"0") + "-" + String(fd.getMonth()+1).padStart(2,"0") + "-" + String(fd.getFullYear()).slice(-2);
       var noteHtml = f.note ? '<span class="flag-history-note">' + escapeHtml(f.note) + '</span>' : '';
       var catHtml = f.category ? '<span class="flag-category-badge">' + escapeHtml(getCategoryLabel(f.category)) + '</span>' : '';
       item.innerHTML =
@@ -1658,7 +1658,8 @@ function renderDashboard() {
           var level = day.total === 0 ? 'level-0' : day.total <= 2 ? 'level-1' : day.total <= 4 ? 'level-2' : 'level-3';
           var color = day.green > day.red ? 'activity-green' : day.red > day.green ? 'activity-red' : 'activity-neutral';
           if (day.total === 0) color = '';
-          var displayDate = new Date(day.date + "T12:00:00").toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" });
+          var _dd = new Date(day.date + "T12:00:00");
+          var displayDate = String(_dd.getDate()).padStart(2,"0") + "-" + String(_dd.getMonth()+1).padStart(2,"0") + "-" + String(_dd.getFullYear()).slice(-2);
           var tipLines = ['<strong>' + displayDate + '</strong>'];
           if (day.total === 0) {
             tipLines.push('<span class="at-muted">No signals</span>');
@@ -2729,8 +2730,10 @@ function formatStatus(status) {
 
 function formatDate(dateStr) {
   var parts = dateStr.split("-");
-  var date = new Date(parts[0], parts[1] - 1, parts[2]);
-  return date.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+  var dd = String(parts[2]).padStart(2, "0");
+  var mm = String(parts[1]).padStart(2, "0");
+  var yy = String(parts[0]).slice(-2);
+  return dd + "-" + mm + "-" + yy;
 }
 
 function populateRoleDropdown(selectId) {

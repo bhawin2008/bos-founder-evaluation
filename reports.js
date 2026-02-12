@@ -156,7 +156,7 @@ function populateReportFilters() {
   var months = rptGetMonths().reverse();
   months.forEach(function(mk) {
     var parts = mk.split("-");
-    var label = new Date(parts[0], parts[1] - 1).toLocaleDateString("en-US", { month: "long", year: "numeric" });
+    var label = String(parts[1]).padStart(2, "0") + "-" + String(parts[0]).slice(-2);
     monthSel.innerHTML += '<option value="' + mk + '">' + label + '</option>';
   });
   monthSel.value = curVal;
@@ -277,7 +277,7 @@ function rptSparkline(canvasId, dataPoints, color) {
 
 function rptMonthLabel(mk) {
   var parts = mk.split("-");
-  return new Date(parts[0], parts[1] - 1).toLocaleDateString("en-US", { month: "short", year: "numeric" });
+  return String(parts[1]).padStart(2, "0") + "-" + String(parts[0]).slice(-2);
 }
 
 // ==================== A) Monthly Culture Health Report ====================
