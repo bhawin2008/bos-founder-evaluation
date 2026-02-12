@@ -81,6 +81,36 @@
           </div>
         </div>
 
+        <div class="dashboard-sections">
+          <div class="dashboard-section">
+            <h3>Culture Health Distribution</h3>
+            <div id="dashboard-zone-dist"></div>
+          </div>
+          <div class="dashboard-section">
+            <h3>Culture Momentum Trend <span class="section-info-icon" title="Shows how team members are moving between Strong, Steady, and Weak zones over the last 6 months. Tracks culture direction, not just position."><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg></span></h3>
+            <div id="dashboard-trend"></div>
+          </div>
+          <div class="dashboard-section">
+            <h3>Support Signals <span class="section-info-icon" title="Members in the Weak Zone for 2+ consecutive months. These are coaching cues — they invite a conversation, not a consequence."><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg></span></h3>
+            <div id="dashboard-alerts"></div>
+          </div>
+          <div class="dashboard-section">
+            <div class="section-header-row">
+              <h3>Attention Board <span class="section-info-icon" title="Important + Past Due tasks are prioritized at the top. All overdue tasks are shown below. Overdue tasks may generate weak signals for assigned members."><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg></span></h3>
+              <button id="attn-view-more-btn" class="attn-view-more" style="display:none;" onclick="toggleAttentionBoard()">View More</button>
+            </div>
+            <div id="dashboard-overdue"></div>
+          </div>
+          <div class="dashboard-section">
+            <h3>Department Health Map <span class="section-info-icon" title="Pie chart showing culture health distribution across departments/roles. Based on average net score (strong minus weak signals) per department."><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg></span></h3>
+            <div id="dashboard-heatmap"></div>
+          </div>
+          <div class="dashboard-section">
+            <h3>Team Signal Board</h3>
+            <div id="dashboard-flag-status"></div>
+          </div>
+        </div>
+
         <div class="stats-grid">
           <div class="stat-card">
             <div class="stat-value" id="stat-members">0</div>
@@ -92,43 +122,13 @@
           </div>
           <div class="stat-card">
             <div class="stat-value stat-value-green" id="stat-green-flags">0</div>
-            <div class="stat-label">Culture Momentum <span class="section-info-icon" title="Net score across all members (green signals minus red signals). Positive = healthy culture momentum."><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg></span></div>
-            <div class="stat-sub" id="stat-green-flags-sub">green signals</div>
+            <div class="stat-label">Culture Momentum</div>
+            <div class="stat-sub" id="stat-green-flags-sub">strong signals</div>
           </div>
           <div class="stat-card">
             <div class="stat-value stat-value-amber" id="stat-red-flags">0</div>
-            <div class="stat-label">Stability Index <span class="section-info-icon" title="Percentage of green signals relative to total signals. Higher = more stable culture health."><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg></span></div>
-            <div class="stat-sub" id="stat-red-flags-sub">red signals</div>
-          </div>
-        </div>
-
-        <div class="dashboard-sections">
-          <div class="dashboard-section">
-            <h3>Culture Health Distribution</h3>
-            <div id="dashboard-zone-dist"></div>
-          </div>
-          <div class="dashboard-section">
-            <h3>Culture Momentum Trend <span class="section-info-icon" title="Shows how team members are moving between Green, Orange, and Red zones over the last 6 months. Tracks culture direction, not just position."><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg></span></h3>
-            <div id="dashboard-trend"></div>
-          </div>
-          <div class="dashboard-section">
-            <h3>Support Signals <span class="section-info-icon" title="Members in the Red Zone for 2+ consecutive months. These are coaching cues — they invite a conversation, not a consequence."><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg></span></h3>
-            <div id="dashboard-alerts"></div>
-          </div>
-          <div class="dashboard-section">
-            <div class="section-header-row">
-              <h3>Attention Board <span class="section-info-icon" title="Important + Past Due tasks are prioritized at the top. All overdue tasks are shown below. Overdue tasks may generate red signals for assigned members."><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg></span></h3>
-              <button id="attn-view-more-btn" class="attn-view-more" style="display:none;" onclick="toggleAttentionBoard()">View More</button>
-            </div>
-            <div id="dashboard-overdue"></div>
-          </div>
-          <div class="dashboard-section">
-            <h3>Department Health Map <span class="section-info-icon" title="Pie chart showing culture health distribution across departments/roles. Based on average net score (strength minus red signals) per department."><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg></span></h3>
-            <div id="dashboard-heatmap"></div>
-          </div>
-          <div class="dashboard-section">
-            <h3>Team Signal Board</h3>
-            <div id="dashboard-flag-status"></div>
+            <div class="stat-label">Stability Index</div>
+            <div class="stat-sub" id="stat-red-flags-sub">weak signals</div>
           </div>
         </div>
 
@@ -141,7 +141,7 @@
             </div>
             <div class="psychology-item">
               <div class="psychology-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg></div>
-              <div class="psychology-text"><strong>Signals, Not Judgments</strong> — "Red signal" instead of "red flag." Language shapes perception. We present data for reflection, not reaction.</div>
+              <div class="psychology-text"><strong>Signals, Not Judgments</strong> — "Weak signal" instead of "red flag." Language shapes perception. We present data for reflection, not reaction.</div>
             </div>
             <div class="psychology-item">
               <div class="psychology-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div>
@@ -230,7 +230,7 @@
         </div>
 
         <div class="rules-section">
-          <h3 class="rules-section-title rules-title-red">Red Signals (Growth)</h3>
+          <h3 class="rules-section-title rules-title-red">Weak Signals (Growth)</h3>
           <div class="rules-grid">
             <div class="rule-card rule-card-red">
               <div class="rule-icon-wrap red">
@@ -239,7 +239,7 @@
               </div>
               <div class="rule-info">
                 <div class="rule-name">Missed Deadline</div>
-                <div class="rule-desc">If a task passes its due date, <strong>1 red signal</strong> is automatically recorded. This surfaces where support or capacity adjustments may be needed.</div>
+                <div class="rule-desc">If a task passes its due date, <strong>1 weak signal</strong> is automatically recorded. This surfaces where support or capacity adjustments may be needed.</div>
               </div>
             </div>
             <div class="rule-card rule-card-red">
@@ -249,7 +249,7 @@
               </div>
               <div class="rule-info">
                 <div class="rule-name">Needs Support</div>
-                <div class="rule-desc">If a task is completed but the result needs improvement, <strong>1 red signal</strong> is recorded. This is a coaching cue, not a judgment.</div>
+                <div class="rule-desc">If a task is completed but the result needs improvement, <strong>1 weak signal</strong> is recorded. This is a coaching cue, not a judgment.</div>
               </div>
             </div>
             <div class="rule-card rule-card-red">
@@ -259,7 +259,7 @@
               </div>
               <div class="rule-info">
                 <div class="rule-name">Blunder</div>
-                <div class="rule-desc">When a task is completed but with notable mistakes or poor quality, <strong>2 red signals</strong> are recorded. This is a stronger coaching cue indicating repeated or avoidable errors.</div>
+                <div class="rule-desc">When a task is completed but with notable mistakes or poor quality, <strong>2 weak signals</strong> are recorded. This is a stronger coaching cue indicating repeated or avoidable errors.</div>
               </div>
             </div>
             <div class="rule-card rule-card-red">
@@ -269,14 +269,14 @@
               </div>
               <div class="rule-info">
                 <div class="rule-name">Critical Incident</div>
-                <div class="rule-desc">For serious process failures, <strong>3 red signals</strong> are recorded. This indicates a systemic issue requiring attention, not individual blame.</div>
+                <div class="rule-desc">For serious process failures, <strong>3 weak signals</strong> are recorded. This indicates a systemic issue requiring attention, not individual blame.</div>
               </div>
             </div>
           </div>
         </div>
 
         <div class="rules-section">
-          <h3 class="rules-section-title rules-title-green">Green Signals (Strength)</h3>
+          <h3 class="rules-section-title rules-title-green">Strong Signals (Strength)</h3>
           <div class="rules-grid">
             <div class="rule-card rule-card-green">
               <div class="rule-icon-wrap green">
@@ -285,7 +285,7 @@
               </div>
               <div class="rule-info">
                 <div class="rule-name">Completed with Excellence</div>
-                <div class="rule-desc">When a task is completed and meets all expectations, <strong>1 green signal</strong> is recorded. Recognizes consistent, reliable delivery.</div>
+                <div class="rule-desc">When a task is completed and meets all expectations, <strong>1 strong signal</strong> is recorded. Recognizes consistent, reliable delivery.</div>
               </div>
             </div>
             <div class="rule-card rule-card-green">
@@ -295,7 +295,7 @@
               </div>
               <div class="rule-info">
                 <div class="rule-name">Exceptional Contribution</div>
-                <div class="rule-desc">When work exceeds expectations and creates outsized impact, <strong>2 green signals</strong> are recorded. Celebrates innovation and initiative.</div>
+                <div class="rule-desc">When work exceeds expectations and creates outsized impact, <strong>2 strong signals</strong> are recorded. Celebrates innovation and initiative.</div>
               </div>
             </div>
           </div>
@@ -311,7 +311,7 @@
               </div>
               <div class="rule-info">
                 <div class="rule-name">Leadership Signal</div>
-                <div class="rule-desc">Mentoring, cross-team collaboration, or being positively referenced by peers earns <strong>+1 green signal per criterion</strong>. Measures leadership maturity, not just output.</div>
+                <div class="rule-desc">Mentoring, cross-team collaboration, or being positively referenced by peers earns <strong>+1 strong signal per criterion</strong>. Measures leadership maturity, not just output.</div>
               </div>
             </div>
             <div class="rule-card">
@@ -321,7 +321,7 @@
               </div>
               <div class="rule-info">
                 <div class="rule-name">Monthly Attention Signal</div>
-                <div class="rule-desc"><strong>2+ red signals in a single month</strong> triggers an attention badge. This is a pattern indicator, not a punishment — it invites a conversation.</div>
+                <div class="rule-desc"><strong>2+ weak signals in a single month</strong> triggers an attention badge. This is a pattern indicator, not a punishment — it invites a conversation.</div>
               </div>
             </div>
             <div class="rule-card">
@@ -331,7 +331,7 @@
               </div>
               <div class="rule-info">
                 <div class="rule-name">Signal Recovery</div>
-                <div class="rule-desc"><strong>2 consecutive clean months</strong> (no red signals) reduces all older red signals to <strong>50% weight</strong>. Sustained improvement is rewarded with a clean slate path.</div>
+                <div class="rule-desc"><strong>2 consecutive clean months</strong> (no weak signals) reduces all older weak signals to <strong>50% weight</strong>. Sustained improvement is rewarded with a clean slate path.</div>
               </div>
             </div>
           </div>
@@ -346,7 +346,7 @@
             </div>
             <div class="rules-how-item">
               <div class="rules-how-number">2</div>
-              <div class="rules-how-text"><strong>Automatic detection</strong> surfaces tasks past due. A red signal is recorded as a coaching cue.</div>
+              <div class="rules-how-text"><strong>Automatic detection</strong> surfaces tasks past due. A weak signal is recorded as a coaching cue.</div>
             </div>
             <div class="rules-how-item">
               <div class="rules-how-number">3</div>
@@ -354,7 +354,7 @@
             </div>
             <div class="rules-how-item">
               <div class="rules-how-number">4</div>
-              <div class="rules-how-text"><strong>Review completions</strong> thoughtfully. Rate quality to assign strength or red signals.</div>
+              <div class="rules-how-text"><strong>Review completions</strong> thoughtfully. Rate quality to assign strength or weak signals.</div>
             </div>
             <div class="rules-how-item">
               <div class="rules-how-number">5</div>
@@ -362,7 +362,7 @@
             </div>
             <div class="rules-how-item">
               <div class="rules-how-number">6</div>
-              <div class="rules-how-text"><strong>Signal Recovery</strong> — 2 clean months automatically halves old red signal weight. <strong>Monthly Attention</strong> activates when patterns emerge.</div>
+              <div class="rules-how-text"><strong>Signal Recovery</strong> — 2 clean months automatically halves old weak signal weight. <strong>Monthly Attention</strong> activates when patterns emerge.</div>
             </div>
             <div class="rules-how-item">
               <div class="rules-how-number">7</div>
@@ -451,17 +451,17 @@
               </thead>
               <tbody>
                 <tr class="manual-row-green">
-                  <td><span class="manual-zone-badge manual-zone-green">Green</span></td>
+                  <td><span class="manual-zone-badge manual-zone-green">Strong</span></td>
                   <td>Net Score &ge; 3</td>
                   <td>Strong culture contributor. Consistent delivery and positive signals.</td>
                 </tr>
                 <tr class="manual-row-amber">
-                  <td><span class="manual-zone-badge manual-zone-orange">Orange</span></td>
+                  <td><span class="manual-zone-badge manual-zone-orange">Steady</span></td>
                   <td>Net Score 0 to 2</td>
                   <td>Neutral or developing. May need coaching or clearer expectations.</td>
                 </tr>
                 <tr class="manual-row-red">
-                  <td><span class="manual-zone-badge manual-zone-red">Red</span></td>
+                  <td><span class="manual-zone-badge manual-zone-red">Weak</span></td>
                   <td>Net Score &lt; 0</td>
                   <td>Growth area. Requires a 1-on-1 conversation, not punishment.</td>
                 </tr>
@@ -482,22 +482,22 @@
               <tbody>
                 <tr>
                   <td>Net Score</td>
-                  <td>Effective green signals &minus; Effective red signals</td>
+                  <td>Effective strong signals &minus; Effective weak signals</td>
                   <td>Determines zone placement and culture health</td>
                 </tr>
                 <tr>
                   <td>Signal Recovery</td>
-                  <td>2 consecutive clean months (no red signals)</td>
-                  <td>All older red signals reduced to 50% weight</td>
+                  <td>2 consecutive clean months (no weak signals)</td>
+                  <td>All older weak signals reduced to 50% weight</td>
                 </tr>
                 <tr>
                   <td>Monthly Attention</td>
-                  <td>2+ red signals in a single calendar month</td>
+                  <td>2+ weak signals in a single calendar month</td>
                   <td>Attention badge appears — triggers a coaching conversation</td>
                 </tr>
                 <tr>
                   <td>Risk Alert</td>
-                  <td>Assigning a task to a member with 2+ same-category or keyword-matching red signals this month</td>
+                  <td>Assigning a task to a member with 2+ same-category or keyword-matching weak signals this month</td>
                   <td>Warning shown on task form — still allows assignment</td>
                 </tr>
                 <tr>
@@ -514,11 +514,11 @@
             <div class="manual-decisions">
               <div class="manual-decision">
                 <div class="manual-decision-q">Task completed, work exceeded expectations?</div>
-                <div class="manual-decision-a"><span class="manual-tag manual-tag-green">Exceptional Contribution</span> +2 Green Signals</div>
+                <div class="manual-decision-a"><span class="manual-tag manual-tag-green">Exceptional Contribution</span> +2 Strong Signals</div>
               </div>
               <div class="manual-decision">
                 <div class="manual-decision-q">Task completed, met all requirements?</div>
-                <div class="manual-decision-a"><span class="manual-tag manual-tag-green">Completed with Excellence</span> +1 Green Signal</div>
+                <div class="manual-decision-a"><span class="manual-tag manual-tag-green">Completed with Excellence</span> +1 Strong Signal</div>
               </div>
               <div class="manual-decision">
                 <div class="manual-decision-q">Task completed, no quality assessment needed?</div>
@@ -526,15 +526,15 @@
               </div>
               <div class="manual-decision">
                 <div class="manual-decision-q">Task completed, but work needs improvement?</div>
-                <div class="manual-decision-a"><span class="manual-tag manual-tag-red">Needs Support</span> +1 Red Signal</div>
+                <div class="manual-decision-a"><span class="manual-tag manual-tag-red">Needs Support</span> +1 Weak Signal</div>
               </div>
               <div class="manual-decision">
                 <div class="manual-decision-q">Task completed, but with notable mistakes or poor quality?</div>
-                <div class="manual-decision-a"><span class="manual-tag manual-tag-red">Blunder</span> +2 Red Signals</div>
+                <div class="manual-decision-a"><span class="manual-tag manual-tag-red">Blunder</span> +2 Weak Signals</div>
               </div>
               <div class="manual-decision">
                 <div class="manual-decision-q">Serious process failure or systemic breakdown?</div>
-                <div class="manual-decision-a"><span class="manual-tag manual-tag-red-severe">Critical Incident</span> +3 Red Signals</div>
+                <div class="manual-decision-a"><span class="manual-tag manual-tag-red-severe">Critical Incident</span> +3 Weak Signals</div>
               </div>
               <div class="manual-decision">
                 <div class="manual-decision-q">Member mentored, collaborated cross-team, or got peer recognition?</div>
@@ -580,7 +580,7 @@
           <button class="rpt-tab" onclick="switchReportTab('movement')">Zone Movement</button>
           <button class="rpt-tab" onclick="switchReportTab('risk')">Risk Radar</button>
           <button class="rpt-tab" onclick="switchReportTab('leadership')">Leadership Pipeline</button>
-          <button class="rpt-tab" onclick="switchReportTab('department')">Department Culture</button>
+          <button class="rpt-tab" onclick="switchReportTab('department')">Department Health</button>
           <button class="rpt-tab" onclick="switchReportTab('quarterly')">Quarterly Intelligence</button>
         </div>
 
@@ -681,7 +681,7 @@
               </div>
               <h4>Key Principles</h4>
               <ul>
-                <li><strong>Signals, Not Judgments</strong> — "Red signal" instead of "red flag." Language shapes perception.</li>
+                <li><strong>Signals, Not Judgments</strong> — "Weak signal" instead of "red flag." Language shapes perception.</li>
                 <li><strong>Culture Momentum</strong> — We measure direction (trends), not just position (snapshots).</li>
                 <li><strong>Psychological Safety</strong> — Calm dashboards produce better leadership decisions.</li>
                 <li><strong>Leadership Maturity</strong> — Clean signals for deliberate, accountable decisions.</li>
@@ -690,8 +690,8 @@
               <ul>
                 <li><strong>Team Members</strong> — Your team roster with roles and status</li>
                 <li><strong>Tasks</strong> — Work assignments with deadlines and quality review</li>
-                <li><strong>Signals</strong> — Green and Red culture indicators</li>
-                <li><strong>Zones</strong> — Green / Orange / Red health classification per member</li>
+                <li><strong>Signals</strong> — Strong and Weak culture indicators</li>
+                <li><strong>Zones</strong> — Strong / Steady / Weak health classification per member</li>
                 <li><strong>Reports</strong> — Executive-level analytics and culture intelligence</li>
               </ul>
             </div>
@@ -758,7 +758,7 @@
                   <div class="mnl-nav-card-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg></div>
                   <div class="mnl-nav-card-info">
                     <strong>Signal Framework</strong>
-                    <span>Visual reference of all signal rules — red signals, green signals, culture mechanics, and how the system works.</span>
+                    <span>Visual reference of all signal rules — weak signals, strong signals, culture mechanics, and how the system works.</span>
                   </div>
                 </div>
                 <div class="mnl-nav-card">
@@ -797,7 +797,7 @@
               <p>Each member card displays:</p>
               <ul>
                 <li><strong>Zone Badge</strong> — Green, Orange, or Red based on net score</li>
-                <li><strong>Net Score</strong> — Effective green signals minus effective red signals</li>
+                <li><strong>Net Score</strong> — Effective strong signals minus effective weak signals</li>
                 <li><strong>Role</strong> — The assigned department/role</li>
                 <li><strong>Trend Indicator</strong> — Accelerating, Steady, or Needs Attention</li>
               </ul>
@@ -806,7 +806,7 @@
               <div class="mnl-action-list">
                 <div class="mnl-action-item">
                   <span class="mnl-action-icon mnl-action-green">Star</span>
-                  <span><strong>Exceptional Contribution</strong> — Record +2 green signals for outstanding work</span>
+                  <span><strong>Exceptional Contribution</strong> — Record +2 strong signals for outstanding work</span>
                 </div>
                 <div class="mnl-action-item">
                   <span class="mnl-action-icon mnl-action-amber">Crown</span>
@@ -814,7 +814,7 @@
                 </div>
                 <div class="mnl-action-item">
                   <span class="mnl-action-icon mnl-action-red">Alert</span>
-                  <span><strong>Critical Incident</strong> — Log a serious process failure (+3 red signals)</span>
+                  <span><strong>Critical Incident</strong> — Log a serious process failure (+3 weak signals)</span>
                 </div>
                 <div class="mnl-action-item">
                   <span class="mnl-action-icon mnl-action-blue">History</span>
@@ -848,7 +848,7 @@
                 <li>Click <strong>Save Task</strong></li>
               </ol>
               <div class="mnl-highlight-box mnl-highlight-amber">
-                <strong>Risk Alert:</strong> When assigning a task, the system checks if the member has 2+ red signals in the same category or with matching keywords this month. A warning will appear but you can still assign the task.
+                <strong>Risk Alert:</strong> When assigning a task, the system checks if the member has 2+ weak signals in the same category or with matching keywords this month. A warning will appear but you can still assign the task.
               </div>
 
               <h4>Task Statuses</h4>
@@ -879,7 +879,7 @@
             <div class="mnl-section-num">05</div>
             <div class="mnl-section-title-wrap">
               <h3 class="mnl-section-title">Signal System</h3>
-              <p class="mnl-section-subtitle">Understanding green and red signals</p>
+              <p class="mnl-section-subtitle">Understanding green and weak signals</p>
             </div>
             <div class="mnl-section-chevron"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></div>
           </div>
@@ -889,7 +889,7 @@
 
               <div class="mnl-two-col">
                 <div class="mnl-col-card mnl-col-green">
-                  <h4>Green Signals</h4>
+                  <h4>Strong Signals</h4>
                   <p>Positive indicators of culture contribution and quality work.</p>
                   <ul>
                     <li><strong>Exceptional Contribution</strong> — +2 signals (exceeds expectations)</li>
@@ -898,7 +898,7 @@
                   </ul>
                 </div>
                 <div class="mnl-col-card mnl-col-red">
-                  <h4>Red Signals</h4>
+                  <h4>Weak Signals</h4>
                   <p>Coaching cues indicating areas for support and development.</p>
                   <ul>
                     <li><strong>Missed Deadline</strong> — +1 signal (automatic)</li>
@@ -911,7 +911,7 @@
 
               <h4>How Signals Are Created</h4>
               <ul>
-                <li><strong>Automatically</strong> — Missed deadlines generate red signals when a task passes its due date</li>
+                <li><strong>Automatically</strong> — Missed deadlines generate weak signals when a task passes its due date</li>
                 <li><strong>Via Task Review</strong> — When marking a task as completed, the reviewer selects a quality assessment</li>
                 <li><strong>Manually</strong> — Extraordinary contributions, leadership signals, and critical incidents can be logged from member cards</li>
               </ul>
@@ -928,7 +928,7 @@
             <div class="mnl-section-num">06</div>
             <div class="mnl-section-title-wrap">
               <h3 class="mnl-section-title">Zone Classification</h3>
-              <p class="mnl-section-subtitle">Green, Orange, and Red zone thresholds</p>
+              <p class="mnl-section-subtitle">Strong, Steady, and Weak zone thresholds</p>
             </div>
             <div class="mnl-section-chevron"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></div>
           </div>
@@ -936,26 +936,26 @@
             <div class="mnl-content-block">
               <p>Every team member is classified into a zone based on their <strong>Net Score</strong>:</p>
               <div class="mnl-formula-box">
-                <strong>Net Score</strong> = Effective Green Signals &minus; Effective Red Signals
+                <strong>Net Score</strong> = Effective Strong Signals &minus; Effective Weak Signals
               </div>
 
               <div class="mnl-zone-cards">
                 <div class="mnl-zone-card mnl-zone-card-green">
-                  <div class="mnl-zone-badge-lg mnl-zbg-green">GREEN</div>
+                  <div class="mnl-zone-badge-lg mnl-zbg-green">STRONG</div>
                   <div class="mnl-zone-info">
                     <div class="mnl-zone-condition">Net Score &ge; 3</div>
                     <p>Strong culture contributor. Consistent delivery and positive signals. This member is thriving and may be a candidate for leadership recognition.</p>
                   </div>
                 </div>
                 <div class="mnl-zone-card mnl-zone-card-orange">
-                  <div class="mnl-zone-badge-lg mnl-zbg-orange">ORANGE</div>
+                  <div class="mnl-zone-badge-lg mnl-zbg-orange">STEADY</div>
                   <div class="mnl-zone-info">
                     <div class="mnl-zone-condition">Net Score 0 to 2</div>
                     <p>Neutral or developing. May need coaching or clearer expectations. Not a problem — just an area to watch and support proactively.</p>
                   </div>
                 </div>
                 <div class="mnl-zone-card mnl-zone-card-red">
-                  <div class="mnl-zone-badge-lg mnl-zbg-red">RED</div>
+                  <div class="mnl-zone-badge-lg mnl-zbg-red">WEAK</div>
                   <div class="mnl-zone-info">
                     <div class="mnl-zone-condition">Net Score &lt; 0</div>
                     <p>Growth area. This is a coaching cue, not a punishment. Requires a 1-on-1 conversation to understand blockers and provide support.</p>
@@ -964,7 +964,7 @@
               </div>
 
               <div class="mnl-highlight-box mnl-highlight-accent">
-                <strong>Important:</strong> Zones are about <em>culture health direction</em>, not individual value. A Red zone means the system has detected patterns that need attention — it's an invitation to help, not to judge.
+                <strong>Important:</strong> Zones are about <em>culture health direction</em>, not individual value. A Weak zone means the system has detected patterns that need attention — it's an invitation to help, not to judge.
               </div>
             </div>
           </div>
@@ -989,12 +989,12 @@
               <div class="mnl-review-options">
                 <div class="mnl-review-opt mnl-review-green">
                   <span class="mnl-review-opt-label">Exceptional Contribution</span>
-                  <span class="mnl-review-opt-result">+2 Green Signals</span>
+                  <span class="mnl-review-opt-result">+2 Strong Signals</span>
                   <p>Work exceeded expectations and created outsized impact.</p>
                 </div>
                 <div class="mnl-review-opt mnl-review-green">
                   <span class="mnl-review-opt-label">Completed with Excellence</span>
-                  <span class="mnl-review-opt-result">+1 Green Signal</span>
+                  <span class="mnl-review-opt-result">+1 Strong Signal</span>
                   <p>Work met all requirements with solid delivery.</p>
                 </div>
                 <div class="mnl-review-opt mnl-review-neutral">
@@ -1004,12 +1004,12 @@
                 </div>
                 <div class="mnl-review-opt mnl-review-red">
                   <span class="mnl-review-opt-label">Needs Support</span>
-                  <span class="mnl-review-opt-result">+1 Red Signal</span>
+                  <span class="mnl-review-opt-result">+1 Weak Signal</span>
                   <p>Work needs improvement — a coaching cue.</p>
                 </div>
                 <div class="mnl-review-opt mnl-review-red-severe">
                   <span class="mnl-review-opt-label">Blunder</span>
-                  <span class="mnl-review-opt-result">+2 Red Signals</span>
+                  <span class="mnl-review-opt-result">+2 Weak Signals</span>
                   <p>Notable mistakes or poor quality — a stronger coaching cue.</p>
                 </div>
               </div>
@@ -1041,23 +1041,23 @@
                 <div class="mnl-mechanic-card">
                   <div class="mnl-mechanic-icon mnl-mechanic-accent"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg></div>
                   <h4>Signal Recovery</h4>
-                  <div class="mnl-mechanic-rule">Rule: 2 consecutive clean months (no red signals)</div>
-                  <div class="mnl-mechanic-effect">Effect: All older red signals reduced to <strong>50% weight</strong></div>
+                  <div class="mnl-mechanic-rule">Rule: 2 consecutive clean months (no weak signals)</div>
+                  <div class="mnl-mechanic-effect">Effect: All older weak signals reduced to <strong>50% weight</strong></div>
                   <p>This rewards sustained improvement and provides a path to a clean slate. Members who demonstrate consistent positive behavior are not permanently penalized by older signals.</p>
                 </div>
 
                 <div class="mnl-mechanic-card">
                   <div class="mnl-mechanic-icon mnl-mechanic-amber"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div>
                   <h4>Monthly Attention Signal</h4>
-                  <div class="mnl-mechanic-rule">Rule: 2+ red signals in a single calendar month</div>
+                  <div class="mnl-mechanic-rule">Rule: 2+ weak signals in a single calendar month</div>
                   <div class="mnl-mechanic-effect">Effect: Attention badge appears on the member's card</div>
-                  <p>This is a pattern indicator, not a punishment. When a member accumulates multiple red signals in one month, it invites a 1-on-1 coaching conversation to understand what's happening.</p>
+                  <p>This is a pattern indicator, not a punishment. When a member accumulates multiple weak signals in one month, it invites a 1-on-1 coaching conversation to understand what's happening.</p>
                 </div>
 
                 <div class="mnl-mechanic-card">
                   <div class="mnl-mechanic-icon mnl-mechanic-red"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div>
                   <h4>Smart Risk Alert</h4>
-                  <div class="mnl-mechanic-rule">Rule: Assigning a task to a member with 2+ same-category or keyword-matching red signals this month</div>
+                  <div class="mnl-mechanic-rule">Rule: Assigning a task to a member with 2+ same-category or keyword-matching weak signals this month</div>
                   <div class="mnl-mechanic-effect">Effect: Warning shown on the task form (assignment still allowed)</div>
                   <p>The system proactively warns you when assigning work to someone who may be struggling in a related area. This helps leaders make informed decisions about workload distribution.</p>
                 </div>
@@ -1066,8 +1066,8 @@
                   <div class="mnl-mechanic-icon mnl-mechanic-green"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></div>
                   <h4>Overdue Auto-Detection</h4>
                   <div class="mnl-mechanic-rule">Rule: Task passes its due date without completion</div>
-                  <div class="mnl-mechanic-effect">Effect: +1 red signal automatically recorded</div>
-                  <p>The system checks for overdue tasks and automatically records a red signal. This ensures accountability without manual intervention. Overdue tasks also appear in the Dashboard's Attention Board.</p>
+                  <div class="mnl-mechanic-effect">Effect: +1 weak signal automatically recorded</div>
+                  <p>The system checks for overdue tasks and automatically records a weak signal. This ensures accountability without manual intervention. Overdue tasks also appear in the Dashboard's Attention Board.</p>
                 </div>
               </div>
 
@@ -1115,15 +1115,15 @@
                 </div>
                 <div class="mnl-dash-metric">
                   <strong>Stability Index</strong>
-                  <span>Percentage of green signals relative to total. Higher = more stable.</span>
+                  <span>Percentage of strong signals relative to total. Higher = more stable.</span>
                 </div>
               </div>
 
               <h4>Dashboard Sections</h4>
               <ul>
-                <li><strong>Culture Health Distribution</strong> — Pie chart showing Green / Orange / Red zone split</li>
+                <li><strong>Culture Health Distribution</strong> — Pie chart showing Strong / Steady / Weak zone split</li>
                 <li><strong>Culture Momentum Trend</strong> — 6-month trend showing zone movement over time</li>
-                <li><strong>Support Signals</strong> — Members in Red Zone for 2+ consecutive months</li>
+                <li><strong>Support Signals</strong> — Members in Weak Zone for 2+ consecutive months</li>
                 <li><strong>Attention Board</strong> — Tasks that have passed their due date</li>
                 <li><strong>Department Health Map</strong> — Pie chart of culture health by department/role</li>
                 <li><strong>Team Signal Board</strong> — Individual member zone status with tabs (All, Green, Orange, Red)</li>
@@ -1161,14 +1161,14 @@
                 </div>
                 <div class="mnl-report-card">
                   <h4>3. Risk Radar</h4>
-                  <p>Members currently at risk (red zone this month), consecutive red zone tracking, department risk density, and category breakdown of red signals.</p>
+                  <p>Members currently at risk (red zone this month), consecutive red zone tracking, department risk density, and category breakdown of weak signals.</p>
                 </div>
                 <div class="mnl-report-card">
                   <h4>4. Leadership Pipeline</h4>
                   <p>Identifies leadership candidates (sustained green zone), high-potential members, and tracks green momentum. Helps with succession planning.</p>
                 </div>
                 <div class="mnl-report-card">
-                  <h4>5. Department Culture</h4>
+                  <h4>5. Department Health</h4>
                   <p>Department health cards with zone counts, health matrix heatmap across months, and department momentum sparklines. Identifies which departments need attention.</p>
                 </div>
                 <div class="mnl-report-card">
@@ -1263,9 +1263,9 @@
                   <tr><th>Zone</th><th>Net Score</th><th>Meaning</th></tr>
                 </thead>
                 <tbody>
-                  <tr class="mnl-ref-row-green"><td><span class="mnl-zone-pill mnl-pill-green">Green</span></td><td>&ge; 3</td><td>Strong culture contributor — thriving</td></tr>
-                  <tr class="mnl-ref-row-amber"><td><span class="mnl-zone-pill mnl-pill-orange">Orange</span></td><td>0 to 2</td><td>Developing — watch and support</td></tr>
-                  <tr class="mnl-ref-row-red"><td><span class="mnl-zone-pill mnl-pill-red">Red</span></td><td>&lt; 0</td><td>Growth area — coaching conversation needed</td></tr>
+                  <tr class="mnl-ref-row-green"><td><span class="mnl-zone-pill mnl-pill-green">Strong</span></td><td>&ge; 3</td><td>Strong culture contributor — thriving</td></tr>
+                  <tr class="mnl-ref-row-amber"><td><span class="mnl-zone-pill mnl-pill-orange">Steady</span></td><td>0 to 2</td><td>Developing — watch and support</td></tr>
+                  <tr class="mnl-ref-row-red"><td><span class="mnl-zone-pill mnl-pill-red">Weak</span></td><td>&lt; 0</td><td>Growth area — coaching conversation needed</td></tr>
                 </tbody>
               </table>
 
@@ -1314,12 +1314,12 @@
                   <tr><th>Metric</th><th>Formula</th><th>Used In</th></tr>
                 </thead>
                 <tbody>
-                  <tr><td><strong>Net Score</strong></td><td>Effective green signals &minus; Effective red signals</td><td>Zone classification, member cards</td></tr>
+                  <tr><td><strong>Net Score</strong></td><td>Effective strong signals &minus; Effective weak signals</td><td>Zone classification, member cards</td></tr>
                   <tr><td><strong>Culture Momentum Index</strong></td><td>Average net score across filtered members</td><td>Reports: Health, Quarterly</td></tr>
-                  <tr><td><strong>Risk Index</strong></td><td>% of members in Red zone</td><td>Reports: Health, Risk Radar</td></tr>
-                  <tr><td><strong>Stability Score</strong></td><td>% of members in Green zone</td><td>Reports: Health, Quarterly</td></tr>
+                  <tr><td><strong>Risk Index</strong></td><td>% of members in Weak zone</td><td>Reports: Health, Risk Radar</td></tr>
+                  <tr><td><strong>Stability Score</strong></td><td>% of members in Strong zone</td><td>Reports: Health, Quarterly</td></tr>
                   <tr><td><strong>Net Improvement</strong></td><td>% of members who improved zone month-over-month</td><td>Reports: Health, Quarterly</td></tr>
-                  <tr><td><strong>Signal Recovery</strong></td><td>2 clean months &rarr; 50% weight on old red signals</td><td>Net Score calculation</td></tr>
+                  <tr><td><strong>Signal Recovery</strong></td><td>2 clean months &rarr; 50% weight on old weak signals</td><td>Net Score calculation</td></tr>
                 </tbody>
               </table>
             </div>
@@ -1526,12 +1526,12 @@
         <button class="flag-option-btn green-flag" onclick="selectReviewOption('extraordinary')">
           <span class="flag-icon green"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></span>
           <span class="flag-option-label">Exceptional Contribution</span>
-          <span class="flag-option-desc">+2 Green Signals</span>
+          <span class="flag-option-desc">+2 Strong Signals</span>
         </button>
         <button class="flag-option-btn green-flag" onclick="selectReviewOption('perfect')">
           <span class="flag-icon green"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></span>
           <span class="flag-option-label">Completed with Excellence</span>
-          <span class="flag-option-desc">+1 Green Signal</span>
+          <span class="flag-option-desc">+1 Strong Signal</span>
         </button>
         <button class="flag-option-btn neutral-flag" onclick="selectReviewOption('none')">
           <span class="flag-icon neutral"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
@@ -1541,12 +1541,12 @@
         <button class="flag-option-btn red-flag" onclick="selectReviewOption('below')">
           <span class="flag-icon red"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></span>
           <span class="flag-option-label">Needs Support</span>
-          <span class="flag-option-desc">+1 Red Signal</span>
+          <span class="flag-option-desc">+1 Weak Signal</span>
         </button>
         <button class="flag-option-btn red-flag-severe" onclick="selectReviewOption('blunder')">
           <span class="flag-icon red-severe"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></span>
           <span class="flag-option-label">Blunder</span>
-          <span class="flag-option-desc">+2 Red Signals</span>
+          <span class="flag-option-desc">+2 Weak Signals</span>
         </button>
       </div>
       <div id="review-category-section" class="review-category-section" style="display:none;">
@@ -1576,7 +1576,7 @@
         <button class="modal-close" onclick="closeModal('blunder-modal')">&times;</button>
       </div>
       <p class="review-task-name" id="blunder-task-name"></p>
-      <p class="confirm-text">This will record <strong style="color: var(--accent-red);">3 red signals</strong> indicating a significant process issue that needs attention.</p>
+      <p class="confirm-text">This will record <strong style="color: var(--accent-red);">3 weak signals</strong> indicating a significant process issue that needs attention.</p>
       <div class="form-group" style="margin-top: 16px;">
         <label for="blunder-category">Category</label>
         <select id="blunder-category">
@@ -1589,7 +1589,7 @@
       </div>
       <div class="form-actions">
         <button class="btn-secondary" onclick="closeModal('blunder-modal')">Cancel</button>
-        <button class="btn-danger" onclick="submitBlunder()">Log Incident (3 Red Signals)</button>
+        <button class="btn-danger" onclick="submitBlunder()">Log Incident (3 Weak Signals)</button>
       </div>
     </div>
   </div>
@@ -1602,7 +1602,7 @@
         <button class="modal-close" onclick="closeModal('extraordinary-modal')">&times;</button>
       </div>
       <p class="review-task-name" id="extraordinary-task-name"></p>
-      <p class="confirm-text">This will record <strong style="color: var(--accent-green);">2 green signals</strong> recognizing exceptional contribution on this task.</p>
+      <p class="confirm-text">This will record <strong style="color: var(--accent-green);">2 strong signals</strong> recognizing exceptional contribution on this task.</p>
       <div class="form-group" style="margin-top: 16px;">
         <label for="extraordinary-category">Category</label>
         <select id="extraordinary-category">
@@ -1615,7 +1615,7 @@
       </div>
       <div class="form-actions">
         <button class="btn-secondary" onclick="closeModal('extraordinary-modal')">Cancel</button>
-        <button class="btn-primary" onclick="submitExtraordinary()">Record 2 Green Signals</button>
+        <button class="btn-primary" onclick="submitExtraordinary()">Record 2 Strong Signals</button>
       </div>
     </div>
   </div>

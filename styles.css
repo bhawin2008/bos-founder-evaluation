@@ -355,7 +355,8 @@ h1, h2, h3, h4 { color: var(--text-heading); font-weight: 600; }
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: var(--sp-3);
-  margin-bottom: var(--sp-4);
+  margin-top: var(--sp-3);
+  margin-bottom: var(--sp-3);
 }
 
 .stat-card {
@@ -3211,6 +3212,9 @@ select {
   display: grid; grid-template-columns: 1fr 1fr;
   gap: var(--sp-5); margin-bottom: var(--sp-5);
 }
+.rpt-sections-3 {
+  grid-template-columns: 1fr 1fr 1fr;
+}
 .rpt-section {
   background: var(--bg-card); border: 1px solid var(--border-color);
   border-radius: var(--radius-lg); padding: var(--sp-5);
@@ -4314,6 +4318,7 @@ select {
   .main-content { padding: var(--sp-4); }
   .rpt-kpi-grid-4, .rpt-kpi-grid-5 { grid-template-columns: repeat(2, 1fr); }
   .rpt-sections { grid-template-columns: 1fr; }
+  .rpt-sections-3 { grid-template-columns: 1fr; }
   .rpt-dept-grid { grid-template-columns: 1fr; }
   .rpt-tabs { gap: 0; }
   .rpt-tab { padding: 8px 10px; font-size: 0.7rem; }

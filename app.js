@@ -625,6 +625,12 @@ function submitReview() {
   if (catEl) category = catEl.value;
   if (noteEl) note = noteEl.value.trim();
 
+  if (quality === "blunder" && !category) {
+    alert("Please select a category for blunder reviews.");
+    if (catEl) catEl.focus();
+    return;
+  }
+
   task.status = "completed";
   task.reviewResult = quality;
 
@@ -759,6 +765,13 @@ function submitBlunder() {
 
   var note = document.getElementById("blunder-note").value.trim();
   var category = document.getElementById("blunder-category").value;
+
+  if (!category) {
+    alert("Please select a category for critical incidents.");
+    document.getElementById("blunder-category").focus();
+    return;
+  }
+
   var reason = "Critical incident: " + contextName;
 
   addFlag(memberId, taskId, "red", 3, reason, note, category);
@@ -790,11 +803,11 @@ function showMemberFlags(memberId) {
     '<div class="flags-summary-row">' +
       '<div class="flags-summary-item green">' +
         '<span class="flags-summary-count">' + flags.green + '</span>' +
-        '<span class="flags-summary-label">Green Signals</span>' +
+        '<span class="flags-summary-label">Strong Signals</span>' +
       '</div>' +
       '<div class="flags-summary-item red">' +
         '<span class="flags-summary-count">' + flags.red + (eff.decayActive ? '<span style="font-size:0.5em;opacity:0.7"> → ' + eff.red + '</span>' : '') + '</span>' +
-        '<span class="flags-summary-label">Red Signals' + (eff.decayActive ? ' (recovered)' : '') + '</span>' +
+        '<span class="flags-summary-label">Weak Signals' + (eff.decayActive ? ' (recovered)' : '') + '</span>' +
       '</div>' +
       '<div class="flags-summary-item net ' + (effNet >= 0 ? 'green' : 'red') + '">' +
         '<span class="flags-summary-count">' + (effNet > 0 ? '+' : '') + effNet + '</span>' +
@@ -804,7 +817,7 @@ function showMemberFlags(memberId) {
     '<div class="flags-meta-row">' +
       '<span class="trend-badge ' + trendCls + '">' + trendLabel + '</span>' +
       (eff.decayActive ? '<span class="decay-badge">Recovery Active (' + eff.cleanStreak + ' clean months → -50% old signals)</span>' : '') +
-      (monthlyWarn ? '<span class="monthly-warning-badge">Attention: 2+ Red Signals This Month</span>' : '') +
+      (monthlyWarn ? '<span class="monthly-warning-badge">Attention: 2+ Weak Signals This Month</span>' : '') +
     '</div>';
 
   var historyList = document.getElementById("flags-history-list");
@@ -1057,7 +1070,7 @@ function renderMembers() {
         '</div>' +
         '<div class="member-stat">' +
           '<div class="member-zone-dot ' + zoneClass + '"></div>' +
-          '<span class="member-stat-label">' + (zone === "green" ? "Green" : (zone === "red" ? "Red" : "Orange")) + ' Zone</span>' +
+          '<span class="member-stat-label">' + (zone === "green" ? "Strong" : (zone === "red" ? "Weak" : "Steady")) + ' Zone</span>' +
         '</div>' +
       '</div>' +
       '<div class="member-card-meta">' +
@@ -1065,8 +1078,8 @@ function renderMembers() {
         '<span class="status-badge status-' + member.status + '">' + formatStatus(member.status) + '</span>' +
       '</div>' +
       '<div class="member-card-actions">' +
-        '<button class="member-action-btn member-action-green" onclick="openExtraordinaryForMember(\'' + member.id + '\')" title="Recognize Exceptional Work (+2 Green Signals)">' + icons.star + ' Recognize</button>' +
-        '<button class="member-action-btn member-action-red" onclick="openBlunderForMember(\'' + member.id + '\')" title="Log Critical Incident (+3 Red Signals)">' + icons.alert + ' Log Incident</button>' +
+        '<button class="member-action-btn member-action-green" onclick="openExtraordinaryForMember(\'' + member.id + '\')" title="Recognize Exceptional Work (+2 Strong Signals)">' + icons.star + ' Recognize</button>' +
+        '<button class="member-action-btn member-action-red" onclick="openBlunderForMember(\'' + member.id + '\')" title="Log Critical Incident (+3 Weak Signals)">' + icons.alert + ' Log Incident</button>' +
         '<button class="member-action-btn member-action-leadership" onclick="openLeadership(\'' + member.id + '\')" title="Leadership Signal">' + icons.crown + ' Leadership</button>' +
         '<div class="member-card-icons">' +
           '<button class="btn-icon" onclick="showMemberFlags(\'' + member.id + '\')" title="View Signal History"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></button>' +
@@ -1173,7 +1186,7 @@ function checkAssigneeRisk() {
     if (catCounts[cat] >= 2) {
       warnings.push({
         type: "category",
-        text: "This member has <strong>" + catCounts[cat] + " red signals</strong> in <strong>" + getCategoryLabel(cat) + "</strong> this month. Consider support or reassignment."
+        text: "This member has <strong>" + catCounts[cat] + " weak signals</strong> in <strong>" + getCategoryLabel(cat) + "</strong> this month. Consider support or reassignment."
       });
     }
   });
@@ -1207,7 +1220,7 @@ function checkAssigneeRisk() {
     if (matchedKeywords.length > 0) {
       warnings.push({
         type: "keyword",
-        text: "Keyword overlap with recent red signals: <strong>" + matchedKeywords.join(", ") + "</strong>. This member has struggled with similar work this month."
+        text: "Keyword overlap with recent weak signals: <strong>" + matchedKeywords.join(", ") + "</strong>. This member has struggled with similar work this month."
       });
     }
   }
@@ -1512,9 +1525,9 @@ function renderDashboard() {
   document.getElementById("stat-members").textContent = data.members.length;
   document.getElementById("stat-tasks").textContent = activeTasks.length;
   document.getElementById("stat-green-flags").textContent = (cultureMomentum > 0 ? "+" : "") + cultureMomentum;
-  document.getElementById("stat-green-flags-sub").textContent = totalGreen + " green signals";
+  document.getElementById("stat-green-flags-sub").textContent = totalGreen + " strong signals";
   document.getElementById("stat-red-flags").textContent = stabilityIndex + "%";
-  document.getElementById("stat-red-flags-sub").textContent = totalRed + " red signals";
+  document.getElementById("stat-red-flags-sub").textContent = totalRed + " weak signals";
 
   // === Zone Distribution (uses date-filtered flags) ===
   var zoneDistEl = document.getElementById("dashboard-zone-dist");
@@ -1539,17 +1552,17 @@ function renderDashboard() {
           '<div class="zone-card-box zone-card-green">' +
             '<div class="zone-card-count">' + greenCount + '</div>' +
             '<div class="zone-card-pct">' + gPct + '%</div>' +
-            '<div class="zone-card-label">Green Zone</div>' +
+            '<div class="zone-card-label">Strong Zone</div>' +
           '</div>' +
           '<div class="zone-card-box zone-card-orange">' +
             '<div class="zone-card-count">' + yellowCount + '</div>' +
             '<div class="zone-card-pct">' + yPct + '%</div>' +
-            '<div class="zone-card-label">Orange Zone</div>' +
+            '<div class="zone-card-label">Steady Zone</div>' +
           '</div>' +
           '<div class="zone-card-box zone-card-red">' +
             '<div class="zone-card-count">' + redCount + '</div>' +
             '<div class="zone-card-pct">' + rPct + '%</div>' +
-            '<div class="zone-card-label">Red Zone</div>' +
+            '<div class="zone-card-label">Weak Zone</div>' +
           '</div>' +
         '</div>';
     }
@@ -1599,9 +1612,9 @@ function renderDashboard() {
         chartCols +=
           '<div class="vbar-col">' +
             '<div class="vbar-stack">' +
-              (rPct > 0 ? '<div class="vbar-seg vbar-red" style="height:' + rPct + '%" title="Red ' + rPct + '%"><span class="vbar-val">' + rPct + '%</span></div>' : '') +
-              (yPct > 0 ? '<div class="vbar-seg vbar-orange" style="height:' + yPct + '%" title="Orange ' + yPct + '%"><span class="vbar-val">' + yPct + '%</span></div>' : '') +
-              (gPct > 0 ? '<div class="vbar-seg vbar-green" style="height:' + gPct + '%" title="Green ' + gPct + '%"><span class="vbar-val">' + gPct + '%</span></div>' : '') +
+              (rPct > 0 ? '<div class="vbar-seg vbar-red" style="height:' + rPct + '%" title="Weak ' + rPct + '%"><span class="vbar-val">' + rPct + '%</span></div>' : '') +
+              (yPct > 0 ? '<div class="vbar-seg vbar-orange" style="height:' + yPct + '%" title="Steady ' + yPct + '%"><span class="vbar-val">' + yPct + '%</span></div>' : '') +
+              (gPct > 0 ? '<div class="vbar-seg vbar-green" style="height:' + gPct + '%" title="Strong ' + gPct + '%"><span class="vbar-val">' + gPct + '%</span></div>' : '') +
             '</div>' +
             '<span class="vbar-label">' + getMonthLabel(mo) + '</span>' +
           '</div>';
@@ -1610,9 +1623,9 @@ function renderDashboard() {
       trendEl.innerHTML =
         '<div class="vbar-chart">' + chartCols + '</div>' +
         '<div class="vbar-legend">' +
-          '<span class="vbar-legend-item"><span class="vbar-legend-dot vbar-green"></span>Green</span>' +
-          '<span class="vbar-legend-item"><span class="vbar-legend-dot vbar-orange"></span>Orange</span>' +
-          '<span class="vbar-legend-item"><span class="vbar-legend-dot vbar-red"></span>Red</span>' +
+          '<span class="vbar-legend-item"><span class="vbar-legend-dot vbar-green"></span>Strong</span>' +
+          '<span class="vbar-legend-item"><span class="vbar-legend-dot vbar-orange"></span>Steady</span>' +
+          '<span class="vbar-legend-item"><span class="vbar-legend-dot vbar-red"></span>Weak</span>' +
         '</div>';
     }
   }
@@ -1742,20 +1755,20 @@ function renderDashboard() {
 
       var greenMembers = memberFlagData.filter(function(mf) { return mf.zone === "green"; });
       var orangeMembers = memberFlagData.filter(function(mf) { return mf.zone === "yellow"; });
-      var redMembers = memberFlagData.filter(function(mf) { return mf.zone === "red"; });
+      var redMembers = memberFlagData.filter(function(mf) { return mf.zone === "red"; }).sort(function(a, b) { return a.effNet - b.effNet; });
 
       var activeTab = (flagStatusEl.dataset.activeTab) || "green";
 
       var tabsHtml =
         '<div class="signal-board-tabs">' +
           '<button class="signal-tab signal-tab-green' + (activeTab === "green" ? " active" : "") + '" onclick="switchSignalTab(\'green\')">' +
-            '<span class="signal-tab-dot zone-green"></span> Green <span class="signal-tab-count">' + greenMembers.length + '</span>' +
+            '<span class="signal-tab-dot zone-green"></span> Strong <span class="signal-tab-count">' + greenMembers.length + '</span>' +
           '</button>' +
           '<button class="signal-tab signal-tab-orange' + (activeTab === "orange" ? " active" : "") + '" onclick="switchSignalTab(\'orange\')">' +
-            '<span class="signal-tab-dot zone-orange"></span> Orange <span class="signal-tab-count">' + orangeMembers.length + '</span>' +
+            '<span class="signal-tab-dot zone-orange"></span> Steady <span class="signal-tab-count">' + orangeMembers.length + '</span>' +
           '</button>' +
           '<button class="signal-tab signal-tab-red' + (activeTab === "red" ? " active" : "") + '" onclick="switchSignalTab(\'red\')">' +
-            '<span class="signal-tab-dot zone-red"></span> Red <span class="signal-tab-count">' + redMembers.length + '</span>' +
+            '<span class="signal-tab-dot zone-red"></span> Weak <span class="signal-tab-count">' + redMembers.length + '</span>' +
           '</button>' +
         '</div>';
 
@@ -2031,7 +2044,7 @@ function renderPredictiveInsights() {
       var failedNames = mp.failedTasks.slice(0, 3).map(function(t) { return t.title; });
       var patternText = mp.badReviews + " of " + mp.totalReviewed + " reviewed tasks rated below expectation (" + badPct + "%)";
       var evidenceText = "Failed: " + failedNames.join(", ");
-      var trendText = mp.trend === "falling" ? "Declining — was " + (mp.zone === "red" ? "already" : "moving toward") + " red zone" :
+      var trendText = mp.trend === "falling" ? "Declining — was " + (mp.zone === "red" ? "already" : "moving toward") + " weak zone" :
                       (mp.trend === "rising" ? "Improving — trajectory is positive despite past failures" : "Steady — pattern is persisting without change");
       var actionText = mp.badReviews >= 3
         ? "Schedule a focused 1:1 this week. Ask about blockers and skill gaps — not performance. Consider pairing with a mentor for the next 2 tasks."
@@ -2081,19 +2094,19 @@ function renderPredictiveInsights() {
     }
 
     // --- 3. SKILL GAP DETECTED ---
-    // Repeated red signals in same category
+    // Repeated weak signals in same category
     Object.keys(mp.catPerformance).forEach(function(cat) {
       var cp = mp.catPerformance[cat];
       if (cp.red >= 2 && cat !== "general" && cat !== "task-linked") {
         var catLabel = getCategoryLabel(cat);
-        var ratio = cp.green > 0 ? (cp.green + " green / " + cp.red + " red") : (cp.red + " red signals, 0 green");
+        var ratio = cp.green > 0 ? (cp.green + " green / " + cp.red + " red") : (cp.red + " weak signals, 0 green");
         var taskContext = cp.taskTitles.length > 0 ? "Related: " + cp.taskTitles.slice(0, 2).join(", ") : "";
 
         insights.push({
           type: "skillgap",
           tag: "Skill Gap Detected",
           memberName: name,
-          pattern: cp.red + " red signals in " + catLabel + " category",
+          pattern: cp.red + " weak signals in " + catLabel + " category",
           evidence: ratio + (taskContext ? ". " + taskContext : ""),
           trendLine: "Repeated pattern suggests a structural gap, not a one-time issue",
           action: "Invest in targeted " + catLabel.toLowerCase() + " training or pair with someone strong in this area. Reduce " + catLabel.toLowerCase() + "-heavy assignments until skills develop.",
@@ -2162,7 +2175,7 @@ function renderPredictiveInsights() {
         pattern: mp.importantBad.length + " Important-weighted task" + (mp.importantBad.length > 1 ? "s" : "") + " rated below expectation",
         evidence: "Failed: " + impFailedNames.join(", "),
         trendLine: mp.zone === "red"
-          ? "In red zone — Important task failures compound the concern"
+          ? "In weak zone — Important task failures compound the concern"
           : "Zone is " + mp.zone + " but Important tasks demand higher scrutiny",
         action: "Important tasks reflect business-critical work. Review what went wrong in a blameless post-mortem. Ensure this person has adequate support and clarity before the next high-stakes assignment.",
         confidence: "High",
@@ -2186,7 +2199,7 @@ function renderPredictiveInsights() {
         pattern: "Zone: " + mp.zone + " but trajectory is improving (net " + (mp.effNet >= 0 ? "+" : "") + mp.effNet + ")",
         evidence: recentGood.length > 0
           ? "Recent wins: " + recentGood.slice(0, 2).map(function(t) { return t.title; }).join(", ")
-          : (mp.decayActive ? "Signal recovery active — old red signals losing weight" : "Trend shifting positive"),
+          : (mp.decayActive ? "Signal recovery active — old weak signals losing weight" : "Trend shifting positive"),
         trendLine: "This person is turning things around. Momentum is fragile at this stage.",
         action: "Acknowledge the improvement explicitly. Assign 1 winnable task to build confidence. Avoid heavy criticism — reinforce the positive trajectory.",
         confidence: confidence,
@@ -2206,7 +2219,7 @@ function renderPredictiveInsights() {
           type: "strength",
           tag: "Category Strength",
           memberName: name,
-          pattern: cp.green + " green signals in " + catLabel + " with zero red",
+          pattern: cp.green + " strong signals in " + catLabel + " with zero red",
           evidence: cp.taskTitles.length > 0 ? "Tasks: " + cp.taskTitles.slice(0, 2).join(", ") : "Consistent excellence in " + catLabel,
           trendLine: "Reliable strength area — leverage for high-impact " + catLabel.toLowerCase() + " work",
           action: "Route " + catLabel.toLowerCase() + "-heavy tasks to " + name + ". Consider them as a subject-matter mentor for teammates struggling in this category.",
@@ -2250,7 +2263,7 @@ function renderPredictiveInsights() {
         memberName: escapeHtml(role.name) + " Team",
         pattern: "Quality rate: " + teamQualityPct + "%" +
           (teamOnTimePct !== -1 ? " | On-time: " + teamOnTimePct + "%" : "") +
-          " | " + teamRedPct + "% in red zone",
+          " | " + teamRedPct + "% in weak zone",
         evidence: worstMembers.length > 0 ? "Members in red: " + worstMembers.join(", ") : "No individual red alerts but team metrics are low",
         trendLine: "Department-level patterns often indicate process or resource issues, not individual failures",
         action: "Hold a team retrospective focused on blockers. Review workload distribution, tooling gaps, and process clarity. Consider cross-team pairing.",
@@ -2267,8 +2280,8 @@ function renderPredictiveInsights() {
         type: "teamwin",
         tag: "High-Performing Team",
         memberName: escapeHtml(role.name) + " Team",
-        pattern: teamQualityPct + "% quality rate across " + teamCompleted + " tasks | 0% in red zone",
-        evidence: "All " + teamMembers.length + " members in green or orange zone",
+        pattern: teamQualityPct + "% quality rate across " + teamCompleted + " tasks | 0% in weak zone",
+        evidence: "All " + teamMembers.length + " members in strong or steady zone",
         trendLine: "Team culture is strong — this is the benchmark for other departments",
         action: "Recognize the entire team publicly. Document their practices as a playbook for other departments. Consider stretch goals to maintain momentum.",
         confidence: "High",
