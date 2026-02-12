@@ -1091,7 +1091,7 @@ function renderMembers() {
   });
 }
 
-// ==================== Voice Input ====================
+// ==================== Voice Input (Title field mic) ====================
 
 var voiceRecognition = null;
 var voiceActive = false;
@@ -1100,20 +1100,15 @@ function toggleVoiceInput() {
   var SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
   if (!SpeechRecognition) {
     var statusEl = document.getElementById("voice-status");
-    if (statusEl) statusEl.textContent = "Voice input not supported in this browser. Use Chrome or Edge.";
+    if (statusEl) statusEl.textContent = "Voice not supported. Use Chrome or Edge.";
     return;
   }
-
-  if (voiceActive && voiceRecognition) {
-    voiceRecognition.stop();
-    return;
-  }
+  if (voiceActive && voiceRecognition) { voiceRecognition.stop(); return; }
 
   voiceRecognition = new SpeechRecognition();
   voiceRecognition.lang = "en-US";
   voiceRecognition.interimResults = true;
   voiceRecognition.continuous = false;
-  voiceRecognition.maxAlternatives = 1;
 
   var btn = document.getElementById("voice-task-btn");
   var statusEl = document.getElementById("voice-status");
@@ -1125,40 +1120,344 @@ function toggleVoiceInput() {
 
   voiceRecognition.onresult = function(event) {
     var transcript = "";
-    for (var i = 0; i < event.results.length; i++) {
-      transcript += event.results[i][0].transcript;
-    }
+    for (var i = 0; i < event.results.length; i++) transcript += event.results[i][0].transcript;
     titleInput.value = transcript.charAt(0).toUpperCase() + transcript.slice(1);
     titleInput.dispatchEvent(new Event("input"));
     if (event.results[0].isFinal) {
-      statusEl.textContent = "Done — title filled!";
-      setTimeout(function() { statusEl.textContent = ""; }, 2500);
+      statusEl.textContent = "Done!";
+      setTimeout(function() { statusEl.textContent = ""; }, 2000);
     }
   };
-
   voiceRecognition.onerror = function(event) {
-    voiceActive = false;
-    btn.classList.remove("voice-recording");
-    if (event.error === "not-allowed") {
-      statusEl.textContent = "Microphone access denied. Allow it in browser settings.";
-    } else if (event.error === "no-speech") {
-      statusEl.textContent = "No speech detected. Try again.";
-    } else {
-      statusEl.textContent = "Error: " + event.error;
-    }
+    voiceActive = false; btn.classList.remove("voice-recording");
+    statusEl.textContent = event.error === "not-allowed" ? "Mic denied." : event.error === "no-speech" ? "No speech." : "Error: " + event.error;
     setTimeout(function() { statusEl.textContent = ""; }, 3000);
   };
-
   voiceRecognition.onend = function() {
-    voiceActive = false;
-    btn.classList.remove("voice-recording");
-    if (statusEl.textContent === "Listening...") {
-      statusEl.textContent = "No speech detected. Tap mic and speak.";
-      setTimeout(function() { statusEl.textContent = ""; }, 2500);
+    voiceActive = false; btn.classList.remove("voice-recording");
+    if (statusEl.textContent === "Listening...") { statusEl.textContent = "No speech detected."; setTimeout(function() { statusEl.textContent = ""; }, 2000); }
+  };
+  voiceRecognition.start();
+}
+
+// ==================== Voice Task Creator (Full Flow) ====================
+
+var vtc = {
+  step: 1,
+  title: "",
+  assigneeId: "",
+  assigneeName: "",
+  dueDate: "",
+  weightage: "not-important",
+  priority: "medium",
+  recognition: null,
+  listening: false
+};
+
+var vtcSteps = [
+  { id: 1, field: "title",   prompt: "Tap the mic and say the task title", micEnabled: true },
+  { id: 2, field: "assignee", prompt: "Say the team member's name to assign", micEnabled: true },
+  { id: 3, field: "dueDate", prompt: "Say the due date (e.g. \"March 15\" or \"next Friday\")", micEnabled: true },
+  { id: 4, field: "weightage", prompt: "Say \"important\" or \"not important\"", micEnabled: true },
+  { id: 5, field: "confirm", prompt: "Review your task and tap Create Task", micEnabled: false }
+];
+
+function openVoiceTaskCreator() {
+  vtc.step = 1; vtc.title = ""; vtc.assigneeId = ""; vtc.assigneeName = "";
+  vtc.dueDate = ""; vtc.weightage = "not-important"; vtc.priority = "medium";
+  document.getElementById("vtc-modal").classList.add("active");
+  vtcRenderStep();
+}
+
+function closeVoiceTaskCreator() {
+  if (vtc.recognition) { try { vtc.recognition.stop(); } catch(e){} }
+  vtc.listening = false;
+  document.getElementById("vtc-modal").classList.remove("active");
+}
+
+function vtcRenderStep() {
+  var stepDef = vtcSteps[vtc.step - 1];
+  // Update step indicators
+  document.querySelectorAll(".vtc-step").forEach(function(el) {
+    var s = parseInt(el.getAttribute("data-step"));
+    el.classList.toggle("active", s === vtc.step);
+    el.classList.toggle("done", s < vtc.step);
+  });
+  document.querySelectorAll(".vtc-step-line").forEach(function(el, i) {
+    el.classList.toggle("done", i + 1 < vtc.step);
+  });
+
+  document.getElementById("vtc-prompt").textContent = stepDef.prompt;
+  document.getElementById("vtc-mic-btn").style.display = stepDef.micEnabled ? "" : "none";
+  document.getElementById("vtc-mic-hint").style.display = stepDef.micEnabled ? "" : "none";
+  document.getElementById("vtc-mic-btn").classList.remove("vtc-recording");
+  document.getElementById("vtc-date-input").style.display = "none";
+
+  // Back button
+  document.getElementById("vtc-back-btn").style.display = vtc.step > 1 ? "" : "none";
+  // Skip button (for optional fields: due date)
+  document.getElementById("vtc-skip-btn").style.display = (vtc.step === 3) ? "" : "none";
+  // Next button
+  document.getElementById("vtc-next-btn").style.display = (vtc.step < 5) ? "" : "none";
+  // Save button
+  document.getElementById("vtc-save-btn").style.display = (vtc.step === 5) ? "" : "none";
+
+  // Render captured value and choices
+  var capturedEl = document.getElementById("vtc-captured");
+  var choicesEl = document.getElementById("vtc-choices");
+  capturedEl.innerHTML = "";
+  choicesEl.innerHTML = "";
+
+  if (vtc.step === 1) {
+    if (vtc.title) capturedEl.innerHTML = '<div class="vtc-val">' + escapeHtml(vtc.title) + '</div>';
+  } else if (vtc.step === 2) {
+    if (vtc.assigneeName) capturedEl.innerHTML = '<div class="vtc-val">' + escapeHtml(vtc.assigneeName) + '</div>';
+    // Show member chips for quick tap
+    var html = '<div class="vtc-chip-label">Or tap to select:</div><div class="vtc-chips">';
+    data.members.forEach(function(m) {
+      var sel = vtc.assigneeId === m.id ? " vtc-chip-active" : "";
+      html += '<button type="button" class="vtc-chip' + sel + '" onclick="vtcPickMember(\'' + m.id + '\',\'' + escapeHtml(m.name).replace(/'/g, "\\'") + '\')">' + escapeHtml(m.name) + '</button>';
+    });
+    html += '</div>';
+    choicesEl.innerHTML = html;
+  } else if (vtc.step === 3) {
+    if (vtc.dueDate) capturedEl.innerHTML = '<div class="vtc-val">' + formatDate(vtc.dueDate) + '</div>';
+    // Also show date picker as fallback
+    var dateInput = document.getElementById("vtc-date-input");
+    dateInput.style.display = "block";
+    dateInput.value = vtc.dueDate;
+    dateInput.onchange = function() { vtc.dueDate = this.value; vtcRenderStep(); };
+  } else if (vtc.step === 4) {
+    var wLabel = vtc.weightage === "important" ? "Important" : "Not Important";
+    capturedEl.innerHTML = '<div class="vtc-val">' + wLabel + '</div>';
+    choicesEl.innerHTML =
+      '<div class="vtc-chip-label">Or tap to select:</div><div class="vtc-chips">' +
+      '<button type="button" class="vtc-chip' + (vtc.weightage === "important" ? " vtc-chip-active" : "") + '" onclick="vtcPickWeightage(\'important\')">Important</button>' +
+      '<button type="button" class="vtc-chip' + (vtc.weightage === "not-important" ? " vtc-chip-active" : "") + '" onclick="vtcPickWeightage(\'not-important\')">Not Important</button>' +
+      '<button type="button" class="vtc-chip' + (vtc.priority === "high" ? " vtc-chip-active" : "") + '" onclick="vtcPickPriority(\'high\')">High Priority</button>' +
+      '<button type="button" class="vtc-chip' + (vtc.priority === "medium" ? " vtc-chip-active" : "") + '" onclick="vtcPickPriority(\'medium\')">Medium Priority</button>' +
+      '<button type="button" class="vtc-chip' + (vtc.priority === "low" ? " vtc-chip-active" : "") + '" onclick="vtcPickPriority(\'low\')">Low Priority</button>' +
+      '</div>';
+  } else if (vtc.step === 5) {
+    var assignLabel = vtc.assigneeName || "Unassigned";
+    var dueLabel = vtc.dueDate ? formatDate(vtc.dueDate) : "No due date";
+    var wLabel2 = vtc.weightage === "important" ? "Important" : "Not Important";
+    var pLabel = vtc.priority.charAt(0).toUpperCase() + vtc.priority.slice(1);
+    capturedEl.innerHTML =
+      '<div class="vtc-summary">' +
+        '<div class="vtc-summary-row"><span class="vtc-summary-label">Title</span><span class="vtc-summary-val">' + escapeHtml(vtc.title) + '</span></div>' +
+        '<div class="vtc-summary-row"><span class="vtc-summary-label">Assignee</span><span class="vtc-summary-val">' + escapeHtml(assignLabel) + '</span></div>' +
+        '<div class="vtc-summary-row"><span class="vtc-summary-label">Due Date</span><span class="vtc-summary-val">' + dueLabel + '</span></div>' +
+        '<div class="vtc-summary-row"><span class="vtc-summary-label">Weightage</span><span class="vtc-summary-val">' + wLabel2 + '</span></div>' +
+        '<div class="vtc-summary-row"><span class="vtc-summary-label">Priority</span><span class="vtc-summary-val">' + pLabel + '</span></div>' +
+      '</div>';
+  }
+}
+
+function vtcToggleMic() {
+  var SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SpeechRecognition) {
+    document.getElementById("vtc-mic-hint").textContent = "Voice not supported. Use Chrome or Edge.";
+    return;
+  }
+  if (vtc.listening && vtc.recognition) { vtc.recognition.stop(); return; }
+
+  vtc.recognition = new SpeechRecognition();
+  vtc.recognition.lang = "en-US";
+  vtc.recognition.interimResults = true;
+  vtc.recognition.continuous = false;
+
+  var btn = document.getElementById("vtc-mic-btn");
+  var hint = document.getElementById("vtc-mic-hint");
+  vtc.listening = true;
+  btn.classList.add("vtc-recording");
+  hint.textContent = "Listening...";
+
+  vtc.recognition.onresult = function(event) {
+    var transcript = "";
+    for (var i = 0; i < event.results.length; i++) transcript += event.results[i][0].transcript;
+    transcript = transcript.trim();
+    if (!event.results[0].isFinal) {
+      hint.textContent = '"' + transcript + '"';
+      return;
     }
+    vtcProcessVoice(transcript);
   };
 
-  voiceRecognition.start();
+  vtc.recognition.onerror = function(event) {
+    vtc.listening = false; btn.classList.remove("vtc-recording");
+    hint.textContent = event.error === "not-allowed" ? "Mic access denied." : event.error === "no-speech" ? "No speech heard. Tap mic again." : "Error: " + event.error;
+  };
+
+  vtc.recognition.onend = function() {
+    vtc.listening = false; btn.classList.remove("vtc-recording");
+    if (hint.textContent === "Listening...") hint.textContent = "No speech. Tap mic to try again.";
+  };
+
+  vtc.recognition.start();
+}
+
+function vtcProcessVoice(transcript) {
+  var hint = document.getElementById("vtc-mic-hint");
+
+  if (vtc.step === 1) {
+    vtc.title = transcript.charAt(0).toUpperCase() + transcript.slice(1);
+    hint.textContent = "Got it!";
+    vtcRenderStep();
+  } else if (vtc.step === 2) {
+    var spoken = transcript.toLowerCase().trim();
+    var bestMatch = null; var bestScore = 0;
+    data.members.forEach(function(m) {
+      var mName = m.name.toLowerCase();
+      // Exact match
+      if (spoken === mName || spoken.indexOf(mName) !== -1 || mName.indexOf(spoken) !== -1) {
+        var score = mName === spoken ? 100 : 50;
+        if (score > bestScore) { bestScore = score; bestMatch = m; }
+      }
+      // First name match
+      var firstName = mName.split(" ")[0];
+      if (spoken === firstName || spoken.indexOf(firstName) !== -1) {
+        if (40 > bestScore) { bestScore = 40; bestMatch = m; }
+      }
+      // Last name match
+      var nameParts = mName.split(" ");
+      if (nameParts.length > 1) {
+        var lastName = nameParts[nameParts.length - 1];
+        if (spoken === lastName || spoken.indexOf(lastName) !== -1) {
+          if (35 > bestScore) { bestScore = 35; bestMatch = m; }
+        }
+      }
+    });
+    if (bestMatch) {
+      vtc.assigneeId = bestMatch.id;
+      vtc.assigneeName = bestMatch.name;
+      hint.textContent = "Matched: " + bestMatch.name;
+    } else {
+      hint.textContent = 'Couldn\'t match "' + transcript + '". Tap a name below or try again.';
+    }
+    vtcRenderStep();
+  } else if (vtc.step === 3) {
+    var parsed = vtcParseDate(transcript);
+    if (parsed) {
+      vtc.dueDate = parsed;
+      hint.textContent = "Date set!";
+    } else {
+      hint.textContent = 'Couldn\'t parse "' + transcript + '". Use the date picker or try again.';
+    }
+    vtcRenderStep();
+  } else if (vtc.step === 4) {
+    var lower = transcript.toLowerCase();
+    if (lower.indexOf("not important") !== -1 || lower.indexOf("not-important") !== -1 || lower.indexOf("unimportant") !== -1) {
+      vtc.weightage = "not-important";
+      hint.textContent = "Set to Not Important";
+    } else if (lower.indexOf("important") !== -1) {
+      vtc.weightage = "important";
+      hint.textContent = "Set to Important";
+    }
+    if (lower.indexOf("high") !== -1) { vtc.priority = "high"; hint.textContent += " | High Priority"; }
+    else if (lower.indexOf("medium") !== -1) { vtc.priority = "medium"; hint.textContent += " | Medium Priority"; }
+    else if (lower.indexOf("low") !== -1) { vtc.priority = "low"; hint.textContent += " | Low Priority"; }
+    vtcRenderStep();
+  }
+}
+
+function vtcParseDate(spoken) {
+  var lower = spoken.toLowerCase().trim();
+  var now = new Date();
+  // "tomorrow"
+  if (lower === "tomorrow") { var d = new Date(now); d.setDate(d.getDate() + 1); return vtcFmtDate(d); }
+  // "today"
+  if (lower === "today") return vtcFmtDate(now);
+  // "next monday", "next friday", etc.
+  var dayNames = ["sunday","monday","tuesday","wednesday","thursday","friday","saturday"];
+  var nextMatch = lower.match(/next\s+(sunday|monday|tuesday|wednesday|thursday|friday|saturday)/);
+  if (nextMatch) {
+    var targetDay = dayNames.indexOf(nextMatch[1]);
+    var d2 = new Date(now); var diff = (targetDay - d2.getDay() + 7) % 7; if (diff === 0) diff = 7;
+    d2.setDate(d2.getDate() + diff); return vtcFmtDate(d2);
+  }
+  // "in X days"
+  var inDays = lower.match(/in\s+(\d+)\s+day/);
+  if (inDays) { var d3 = new Date(now); d3.setDate(d3.getDate() + parseInt(inDays[1])); return vtcFmtDate(d3); }
+  // "in X weeks"
+  var inWeeks = lower.match(/in\s+(\d+)\s+week/);
+  if (inWeeks) { var d4 = new Date(now); d4.setDate(d4.getDate() + parseInt(inWeeks[1]) * 7); return vtcFmtDate(d4); }
+  // "March 15", "15 March", "March 15 2026", "15th March"
+  var months = ["january","february","march","april","may","june","july","august","september","october","november","december"];
+  for (var mi = 0; mi < months.length; mi++) {
+    if (lower.indexOf(months[mi]) !== -1) {
+      var numMatch = lower.match(/(\d{1,2})/);
+      if (numMatch) {
+        var day = parseInt(numMatch[1]);
+        var yearMatch = lower.match(/(20\d{2})/);
+        var year = yearMatch ? parseInt(yearMatch[1]) : now.getFullYear();
+        var d5 = new Date(year, mi, day);
+        if (d5 < now && !yearMatch) d5.setFullYear(d5.getFullYear() + 1);
+        return vtcFmtDate(d5);
+      }
+    }
+  }
+  // "15/3", "15/3/26", "15-3-26"
+  var slashMatch = lower.match(/(\d{1,2})[\/\-](\d{1,2})(?:[\/\-](\d{2,4}))?/);
+  if (slashMatch) {
+    var sd = parseInt(slashMatch[1]), sm = parseInt(slashMatch[2]) - 1;
+    var sy = slashMatch[3] ? (slashMatch[3].length === 2 ? 2000 + parseInt(slashMatch[3]) : parseInt(slashMatch[3])) : now.getFullYear();
+    return vtcFmtDate(new Date(sy, sm, sd));
+  }
+  return null;
+}
+
+function vtcFmtDate(d) {
+  return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0");
+}
+
+function vtcPickMember(id, name) {
+  vtc.assigneeId = id; vtc.assigneeName = name;
+  vtcRenderStep();
+}
+
+function vtcPickWeightage(w) {
+  vtc.weightage = w;
+  vtcRenderStep();
+}
+
+function vtcPickPriority(p) {
+  vtc.priority = p;
+  vtcRenderStep();
+}
+
+function vtcNext() {
+  if (vtc.step === 1 && !vtc.title) { document.getElementById("vtc-mic-hint").textContent = "Please say or type a task title first."; return; }
+  if (vtc.step === 2 && !vtc.assigneeId) { document.getElementById("vtc-mic-hint").textContent = "Please select or say a member name."; return; }
+  if (vtc.step < 5) { vtc.step++; vtcRenderStep(); }
+}
+
+function vtcBack() {
+  if (vtc.step > 1) { vtc.step--; vtcRenderStep(); }
+}
+
+function vtcSkip() {
+  vtc.step++; vtcRenderStep();
+}
+
+function vtcSave() {
+  if (!vtc.title) return;
+  var task = {
+    id: generateId(),
+    title: vtc.title,
+    description: "",
+    notes: "",
+    assigneeId: vtc.assigneeId,
+    priority: vtc.priority,
+    weightage: vtc.weightage,
+    dueDate: vtc.dueDate,
+    status: "pending",
+    createdAt: new Date().toISOString()
+  };
+  data.tasks.push(task);
+  saveData(data);
+  closeVoiceTaskCreator();
+  refreshAll();
 }
 
 // ==================== Tasks ====================

@@ -243,6 +243,10 @@
               </div>
             </div>
             <button class="btn-primary" onclick="openModal('task-modal')">+ Add Task</button>
+            <button class="btn-voice-task" onclick="openVoiceTaskCreator()" title="Create task using voice">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+              Voice Task
+            </button>
           </div>
         </div>
 
@@ -1530,6 +1534,59 @@
           <button type="submit" class="btn-primary">Save Task</button>
         </div>
       </form>
+    </div>
+  </div>
+
+  <!-- Voice Task Creator Modal -->
+  <div id="vtc-modal" class="modal-overlay">
+    <div class="modal vtc-modal">
+      <div class="modal-header">
+        <h3>Voice Task Creator</h3>
+        <button class="modal-close" onclick="closeVoiceTaskCreator()">&times;</button>
+      </div>
+      <div class="vtc-body">
+        <!-- Steps progress -->
+        <div class="vtc-steps">
+          <div class="vtc-step active" data-step="1"><span class="vtc-step-num">1</span><span class="vtc-step-label">Title</span></div>
+          <div class="vtc-step-line"></div>
+          <div class="vtc-step" data-step="2"><span class="vtc-step-num">2</span><span class="vtc-step-label">Assignee</span></div>
+          <div class="vtc-step-line"></div>
+          <div class="vtc-step" data-step="3"><span class="vtc-step-num">3</span><span class="vtc-step-label">Due Date</span></div>
+          <div class="vtc-step-line"></div>
+          <div class="vtc-step" data-step="4"><span class="vtc-step-num">4</span><span class="vtc-step-label">Weightage</span></div>
+          <div class="vtc-step-line"></div>
+          <div class="vtc-step" data-step="5"><span class="vtc-step-num">5</span><span class="vtc-step-label">Confirm</span></div>
+        </div>
+
+        <!-- Prompt area -->
+        <div class="vtc-prompt" id="vtc-prompt">Tap the mic and say the task title</div>
+
+        <!-- Big mic button -->
+        <div class="vtc-mic-area">
+          <button type="button" class="vtc-mic-btn" id="vtc-mic-btn" onclick="vtcToggleMic()">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+            <span class="vtc-mic-pulse"></span>
+          </button>
+          <div class="vtc-mic-hint" id="vtc-mic-hint">Tap to speak</div>
+        </div>
+
+        <!-- Captured value display -->
+        <div class="vtc-captured" id="vtc-captured"></div>
+
+        <!-- Choices area for assignee/weightage steps -->
+        <div class="vtc-choices" id="vtc-choices"></div>
+
+        <!-- Date picker for due date step -->
+        <input type="date" id="vtc-date-input" class="vtc-date-input" style="display:none;">
+
+        <!-- Navigation -->
+        <div class="vtc-nav">
+          <button type="button" class="btn-secondary vtc-nav-btn" id="vtc-back-btn" onclick="vtcBack()" style="display:none;">Back</button>
+          <button type="button" class="btn-secondary vtc-nav-btn" id="vtc-skip-btn" onclick="vtcSkip()" style="display:none;">Skip</button>
+          <button type="button" class="btn-primary vtc-nav-btn" id="vtc-next-btn" onclick="vtcNext()" style="display:none;">Next</button>
+          <button type="button" class="btn-primary vtc-nav-btn" id="vtc-save-btn" onclick="vtcSave()" style="display:none;">Create Task</button>
+        </div>
+      </div>
     </div>
   </div>
 
