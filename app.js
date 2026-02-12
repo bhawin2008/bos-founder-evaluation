@@ -1140,10 +1140,9 @@ function toggleVoiceInput() {
   voiceRecognition.start();
 }
 
-// ==================== Voice Task Creator (Full Flow) ====================
+// ==================== Voice Task Creator (Single-Shot) ====================
 
 var vtc = {
-  step: 1,
   title: "",
   assigneeId: "",
   assigneeName: "",
@@ -1154,104 +1153,24 @@ var vtc = {
   listening: false
 };
 
-var vtcSteps = [
-  { id: 1, field: "title",   prompt: "Tap the mic and say the task title", micEnabled: true },
-  { id: 2, field: "assignee", prompt: "Say the team member's name to assign", micEnabled: true },
-  { id: 3, field: "dueDate", prompt: "Say the due date (e.g. \"March 15\" or \"next Friday\")", micEnabled: true },
-  { id: 4, field: "weightage", prompt: "Say \"important\" or \"not important\"", micEnabled: true },
-  { id: 5, field: "confirm", prompt: "Review your task and tap Create Task", micEnabled: false }
-];
-
 function openVoiceTaskCreator() {
-  vtc.step = 1; vtc.title = ""; vtc.assigneeId = ""; vtc.assigneeName = "";
+  vtc.title = ""; vtc.assigneeId = ""; vtc.assigneeName = "";
   vtc.dueDate = ""; vtc.weightage = "not-important"; vtc.priority = "medium";
   document.getElementById("vtc-modal").classList.add("active");
-  vtcRenderStep();
+  document.getElementById("vtc-prompt").textContent = "Tap the mic and say everything in one go";
+  document.getElementById("vtc-mic-hint").textContent = "Tap to speak";
+  document.getElementById("vtc-transcript").textContent = "";
+  document.getElementById("vtc-parsed").style.display = "none";
+  document.getElementById("vtc-nav").style.display = "none";
+  document.getElementById("vtc-inline-edit").style.display = "none";
+  document.getElementById("vtc-mic-btn").classList.remove("vtc-recording");
+  document.getElementById("vtc-mic-btn").style.display = "";
 }
 
 function closeVoiceTaskCreator() {
   if (vtc.recognition) { try { vtc.recognition.stop(); } catch(e){} }
   vtc.listening = false;
   document.getElementById("vtc-modal").classList.remove("active");
-}
-
-function vtcRenderStep() {
-  var stepDef = vtcSteps[vtc.step - 1];
-  // Update step indicators
-  document.querySelectorAll(".vtc-step").forEach(function(el) {
-    var s = parseInt(el.getAttribute("data-step"));
-    el.classList.toggle("active", s === vtc.step);
-    el.classList.toggle("done", s < vtc.step);
-  });
-  document.querySelectorAll(".vtc-step-line").forEach(function(el, i) {
-    el.classList.toggle("done", i + 1 < vtc.step);
-  });
-
-  document.getElementById("vtc-prompt").textContent = stepDef.prompt;
-  document.getElementById("vtc-mic-btn").style.display = stepDef.micEnabled ? "" : "none";
-  document.getElementById("vtc-mic-hint").style.display = stepDef.micEnabled ? "" : "none";
-  document.getElementById("vtc-mic-btn").classList.remove("vtc-recording");
-  document.getElementById("vtc-date-input").style.display = "none";
-
-  // Back button
-  document.getElementById("vtc-back-btn").style.display = vtc.step > 1 ? "" : "none";
-  // Skip button (for optional fields: due date)
-  document.getElementById("vtc-skip-btn").style.display = (vtc.step === 3) ? "" : "none";
-  // Next button
-  document.getElementById("vtc-next-btn").style.display = (vtc.step < 5) ? "" : "none";
-  // Save button
-  document.getElementById("vtc-save-btn").style.display = (vtc.step === 5) ? "" : "none";
-
-  // Render captured value and choices
-  var capturedEl = document.getElementById("vtc-captured");
-  var choicesEl = document.getElementById("vtc-choices");
-  capturedEl.innerHTML = "";
-  choicesEl.innerHTML = "";
-
-  if (vtc.step === 1) {
-    if (vtc.title) capturedEl.innerHTML = '<div class="vtc-val">' + escapeHtml(vtc.title) + '</div>';
-  } else if (vtc.step === 2) {
-    if (vtc.assigneeName) capturedEl.innerHTML = '<div class="vtc-val">' + escapeHtml(vtc.assigneeName) + '</div>';
-    // Show member chips for quick tap
-    var html = '<div class="vtc-chip-label">Or tap to select:</div><div class="vtc-chips">';
-    data.members.forEach(function(m) {
-      var sel = vtc.assigneeId === m.id ? " vtc-chip-active" : "";
-      html += '<button type="button" class="vtc-chip' + sel + '" onclick="vtcPickMember(\'' + m.id + '\',\'' + escapeHtml(m.name).replace(/'/g, "\\'") + '\')">' + escapeHtml(m.name) + '</button>';
-    });
-    html += '</div>';
-    choicesEl.innerHTML = html;
-  } else if (vtc.step === 3) {
-    if (vtc.dueDate) capturedEl.innerHTML = '<div class="vtc-val">' + formatDate(vtc.dueDate) + '</div>';
-    // Also show date picker as fallback
-    var dateInput = document.getElementById("vtc-date-input");
-    dateInput.style.display = "block";
-    dateInput.value = vtc.dueDate;
-    dateInput.onchange = function() { vtc.dueDate = this.value; vtcRenderStep(); };
-  } else if (vtc.step === 4) {
-    var wLabel = vtc.weightage === "important" ? "Important" : "Not Important";
-    capturedEl.innerHTML = '<div class="vtc-val">' + wLabel + '</div>';
-    choicesEl.innerHTML =
-      '<div class="vtc-chip-label">Or tap to select:</div><div class="vtc-chips">' +
-      '<button type="button" class="vtc-chip' + (vtc.weightage === "important" ? " vtc-chip-active" : "") + '" onclick="vtcPickWeightage(\'important\')">Important</button>' +
-      '<button type="button" class="vtc-chip' + (vtc.weightage === "not-important" ? " vtc-chip-active" : "") + '" onclick="vtcPickWeightage(\'not-important\')">Not Important</button>' +
-      '<button type="button" class="vtc-chip' + (vtc.priority === "high" ? " vtc-chip-active" : "") + '" onclick="vtcPickPriority(\'high\')">High Priority</button>' +
-      '<button type="button" class="vtc-chip' + (vtc.priority === "medium" ? " vtc-chip-active" : "") + '" onclick="vtcPickPriority(\'medium\')">Medium Priority</button>' +
-      '<button type="button" class="vtc-chip' + (vtc.priority === "low" ? " vtc-chip-active" : "") + '" onclick="vtcPickPriority(\'low\')">Low Priority</button>' +
-      '</div>';
-  } else if (vtc.step === 5) {
-    var assignLabel = vtc.assigneeName || "Unassigned";
-    var dueLabel = vtc.dueDate ? formatDate(vtc.dueDate) : "No due date";
-    var wLabel2 = vtc.weightage === "important" ? "Important" : "Not Important";
-    var pLabel = vtc.priority.charAt(0).toUpperCase() + vtc.priority.slice(1);
-    capturedEl.innerHTML =
-      '<div class="vtc-summary">' +
-        '<div class="vtc-summary-row"><span class="vtc-summary-label">Title</span><span class="vtc-summary-val">' + escapeHtml(vtc.title) + '</span></div>' +
-        '<div class="vtc-summary-row"><span class="vtc-summary-label">Assignee</span><span class="vtc-summary-val">' + escapeHtml(assignLabel) + '</span></div>' +
-        '<div class="vtc-summary-row"><span class="vtc-summary-label">Due Date</span><span class="vtc-summary-val">' + dueLabel + '</span></div>' +
-        '<div class="vtc-summary-row"><span class="vtc-summary-label">Weightage</span><span class="vtc-summary-val">' + wLabel2 + '</span></div>' +
-        '<div class="vtc-summary-row"><span class="vtc-summary-label">Priority</span><span class="vtc-summary-val">' + pLabel + '</span></div>' +
-      '</div>';
-  }
 }
 
 function vtcToggleMic() {
@@ -1265,110 +1184,191 @@ function vtcToggleMic() {
   vtc.recognition = new SpeechRecognition();
   vtc.recognition.lang = "en-US";
   vtc.recognition.interimResults = true;
-  vtc.recognition.continuous = false;
+  vtc.recognition.continuous = true;
 
   var btn = document.getElementById("vtc-mic-btn");
   var hint = document.getElementById("vtc-mic-hint");
+  var transcriptEl = document.getElementById("vtc-transcript");
   vtc.listening = true;
   btn.classList.add("vtc-recording");
-  hint.textContent = "Listening...";
+  hint.textContent = "Listening... tap mic again when done";
+  transcriptEl.textContent = "";
+  document.getElementById("vtc-parsed").style.display = "none";
+  document.getElementById("vtc-nav").style.display = "none";
+
+  var finalTranscript = "";
 
   vtc.recognition.onresult = function(event) {
-    var transcript = "";
-    for (var i = 0; i < event.results.length; i++) transcript += event.results[i][0].transcript;
-    transcript = transcript.trim();
-    if (!event.results[0].isFinal) {
-      hint.textContent = '"' + transcript + '"';
-      return;
+    var interim = "";
+    finalTranscript = "";
+    for (var i = 0; i < event.results.length; i++) {
+      if (event.results[i].isFinal) finalTranscript += event.results[i][0].transcript;
+      else interim += event.results[i][0].transcript;
     }
-    vtcProcessVoice(transcript);
+    transcriptEl.innerHTML = '<span class="vtc-trans-final">' + escapeHtml(finalTranscript) + '</span>' +
+      (interim ? '<span class="vtc-trans-interim">' + escapeHtml(interim) + '</span>' : '');
   };
 
   vtc.recognition.onerror = function(event) {
     vtc.listening = false; btn.classList.remove("vtc-recording");
-    hint.textContent = event.error === "not-allowed" ? "Mic access denied." : event.error === "no-speech" ? "No speech heard. Tap mic again." : "Error: " + event.error;
+    hint.textContent = event.error === "not-allowed" ? "Mic access denied. Allow in browser settings." : event.error === "no-speech" ? "No speech heard. Tap mic again." : "Error: " + event.error;
   };
 
   vtc.recognition.onend = function() {
     vtc.listening = false; btn.classList.remove("vtc-recording");
-    if (hint.textContent === "Listening...") hint.textContent = "No speech. Tap mic to try again.";
+    if (finalTranscript) {
+      vtcParseSentence(finalTranscript.trim());
+    } else {
+      hint.textContent = "No speech captured. Tap mic to try again.";
+    }
   };
 
   vtc.recognition.start();
 }
 
-function vtcProcessVoice(transcript) {
-  var hint = document.getElementById("vtc-mic-hint");
+// ---- Smart single-sentence parser ----
 
-  if (vtc.step === 1) {
-    vtc.title = transcript.charAt(0).toUpperCase() + transcript.slice(1);
-    hint.textContent = "Got it!";
-    vtcRenderStep();
-  } else if (vtc.step === 2) {
-    var spoken = transcript.toLowerCase().trim();
-    var bestMatch = null; var bestScore = 0;
+function vtcParseSentence(raw) {
+  var hint = document.getElementById("vtc-mic-hint");
+  hint.textContent = "Parsing...";
+  var lower = raw.toLowerCase();
+  var remaining = raw;
+
+  // 1) Extract weightage: "important" / "not important"
+  vtc.weightage = "not-important";
+  vtc.priority = "medium";
+  var weightPatterns = [
+    { re: /\b(not important|not-important|unimportant)\b/i, w: "not-important" },
+    { re: /\b(important)\b/i, w: "important" }
+  ];
+  for (var wi = 0; wi < weightPatterns.length; wi++) {
+    var wm = remaining.match(weightPatterns[wi].re);
+    if (wm) { vtc.weightage = weightPatterns[wi].w; remaining = remaining.replace(wm[0], " "); break; }
+  }
+
+  // Extract priority
+  var priPatterns = [
+    { re: /\b(high priority|high-priority)\b/i, p: "high" },
+    { re: /\b(low priority|low-priority)\b/i, p: "low" },
+    { re: /\b(medium priority|medium-priority)\b/i, p: "medium" }
+  ];
+  for (var pi = 0; pi < priPatterns.length; pi++) {
+    var pm = remaining.match(priPatterns[pi].re);
+    if (pm) { vtc.priority = priPatterns[pi].p; remaining = remaining.replace(pm[0], " "); break; }
+  }
+
+  // 2) Extract due date patterns
+  vtc.dueDate = "";
+  var datePatterns = [
+    /\b(?:due|by|before|on)\s+(tomorrow)\b/i,
+    /\b(?:due|by|before|on)\s+(today)\b/i,
+    /\b(?:due|by|before|on)\s+(next\s+(?:sunday|monday|tuesday|wednesday|thursday|friday|saturday))\b/i,
+    /\b(?:due|by|before|on)\s+((?:january|february|march|april|may|june|july|august|september|october|november|december)\s+\d{1,2}(?:\s*(?:st|nd|rd|th))?(?:\s+\d{4})?)\b/i,
+    /\b(?:due|by|before|on)\s+(\d{1,2}(?:st|nd|rd|th)?\s+(?:january|february|march|april|may|june|july|august|september|october|november|december)(?:\s+\d{4})?)\b/i,
+    /\b(?:due|by|before|on)\s+(in\s+\d+\s+(?:day|days|week|weeks))\b/i,
+    /\b(?:due|by|before|on)\s+(\d{1,2}[\/\-]\d{1,2}(?:[\/\-]\d{2,4})?)\b/i,
+    /\b(tomorrow)\b/i,
+    /\b(next\s+(?:sunday|monday|tuesday|wednesday|thursday|friday|saturday))\b/i,
+    /\b(in\s+\d+\s+(?:day|days|week|weeks))\b/i,
+    /\b((?:january|february|march|april|may|june|july|august|september|october|november|december)\s+\d{1,2}(?:\s*(?:st|nd|rd|th))?(?:\s+\d{4})?)\b/i,
+    /\b(\d{1,2}(?:st|nd|rd|th)?\s+(?:january|february|march|april|may|june|july|august|september|october|november|december)(?:\s+\d{4})?)\b/i
+  ];
+  for (var di = 0; di < datePatterns.length; di++) {
+    var dm = remaining.match(datePatterns[di]);
+    if (dm) {
+      var parsed = vtcParseDate(dm[1]);
+      if (parsed) {
+        vtc.dueDate = parsed;
+        remaining = remaining.replace(dm[0], " ");
+        break;
+      }
+    }
+  }
+
+  // 3) Extract assignee: "assign to X", "for X", "to X"
+  vtc.assigneeId = ""; vtc.assigneeName = "";
+  var assignPatterns = [
+    /\b(?:assign(?:ed)?(?:\s+(?:it|this))?\s+to|assigned?\s+to)\s+(.+?)(?:\s+(?:due|by|before|on|important|not important|high priority|low priority|medium priority)|\s*$)/i,
+    /\b(?:for)\s+(.+?)(?:\s+(?:due|by|before|on|important|not important|high priority|low priority|medium priority)|\s*$)/i
+  ];
+  for (var ai = 0; ai < assignPatterns.length; ai++) {
+    var am = remaining.match(assignPatterns[ai]);
+    if (am) {
+      var nameGuess = am[1].trim();
+      var matched = vtcMatchMember(nameGuess);
+      if (matched) {
+        vtc.assigneeId = matched.id;
+        vtc.assigneeName = matched.name;
+      }
+      remaining = remaining.replace(am[0], " ");
+      break;
+    }
+  }
+
+  // If no pattern matched, try scanning for any member name in the sentence
+  if (!vtc.assigneeId) {
+    var bestMatch = null; var bestLen = 0;
     data.members.forEach(function(m) {
-      var mName = m.name.toLowerCase();
-      // Exact match
-      if (spoken === mName || spoken.indexOf(mName) !== -1 || mName.indexOf(spoken) !== -1) {
-        var score = mName === spoken ? 100 : 50;
-        if (score > bestScore) { bestScore = score; bestMatch = m; }
+      var mLower = m.name.toLowerCase();
+      var idx = remaining.toLowerCase().indexOf(mLower);
+      if (idx !== -1 && mLower.length > bestLen) {
+        bestLen = mLower.length; bestMatch = m;
       }
-      // First name match
-      var firstName = mName.split(" ")[0];
-      if (spoken === firstName || spoken.indexOf(firstName) !== -1) {
-        if (40 > bestScore) { bestScore = 40; bestMatch = m; }
-      }
-      // Last name match
-      var nameParts = mName.split(" ");
-      if (nameParts.length > 1) {
-        var lastName = nameParts[nameParts.length - 1];
-        if (spoken === lastName || spoken.indexOf(lastName) !== -1) {
-          if (35 > bestScore) { bestScore = 35; bestMatch = m; }
-        }
+      // Also try first name
+      var firstName = mLower.split(" ")[0];
+      if (firstName.length >= 3 && remaining.toLowerCase().indexOf(firstName) !== -1 && firstName.length > bestLen) {
+        bestLen = firstName.length; bestMatch = m;
       }
     });
     if (bestMatch) {
       vtc.assigneeId = bestMatch.id;
       vtc.assigneeName = bestMatch.name;
-      hint.textContent = "Matched: " + bestMatch.name;
-    } else {
-      hint.textContent = 'Couldn\'t match "' + transcript + '". Tap a name below or try again.';
+      // Remove matched name from remaining for cleaner title
+      var nameRe = new RegExp("\\b" + bestMatch.name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + "\\b", "i");
+      remaining = remaining.replace(nameRe, " ");
+      // Also remove leading "assign to", "for", etc.
+      remaining = remaining.replace(/\b(?:assign(?:ed)?\s+(?:it\s+)?to|for)\s*/i, " ");
     }
-    vtcRenderStep();
-  } else if (vtc.step === 3) {
-    var parsed = vtcParseDate(transcript);
-    if (parsed) {
-      vtc.dueDate = parsed;
-      hint.textContent = "Date set!";
-    } else {
-      hint.textContent = 'Couldn\'t parse "' + transcript + '". Use the date picker or try again.';
-    }
-    vtcRenderStep();
-  } else if (vtc.step === 4) {
-    var lower = transcript.toLowerCase();
-    if (lower.indexOf("not important") !== -1 || lower.indexOf("not-important") !== -1 || lower.indexOf("unimportant") !== -1) {
-      vtc.weightage = "not-important";
-      hint.textContent = "Set to Not Important";
-    } else if (lower.indexOf("important") !== -1) {
-      vtc.weightage = "important";
-      hint.textContent = "Set to Important";
-    }
-    if (lower.indexOf("high") !== -1) { vtc.priority = "high"; hint.textContent += " | High Priority"; }
-    else if (lower.indexOf("medium") !== -1) { vtc.priority = "medium"; hint.textContent += " | Medium Priority"; }
-    else if (lower.indexOf("low") !== -1) { vtc.priority = "low"; hint.textContent += " | Low Priority"; }
-    vtcRenderStep();
   }
+
+  // 4) Whatever remains is the title
+  // Clean up filler words
+  remaining = remaining.replace(/\b(due|by|before|on|assign(?:ed)?\s*(?:it)?\s*to|for)\b/gi, " ");
+  remaining = remaining.replace(/\s{2,}/g, " ").trim();
+  vtc.title = remaining ? remaining.charAt(0).toUpperCase() + remaining.slice(1) : "";
+
+  vtcShowParsed();
+}
+
+function vtcMatchMember(nameGuess) {
+  var spoken = nameGuess.toLowerCase().trim();
+  var bestMatch = null; var bestScore = 0;
+  data.members.forEach(function(m) {
+    var mName = m.name.toLowerCase();
+    if (spoken === mName) { bestScore = 100; bestMatch = m; }
+    else if (mName.indexOf(spoken) !== -1 || spoken.indexOf(mName) !== -1) {
+      if (50 > bestScore) { bestScore = 50; bestMatch = m; }
+    }
+    var firstName = mName.split(" ")[0];
+    if (spoken === firstName || spoken.indexOf(firstName) !== -1) {
+      if (40 > bestScore) { bestScore = 40; bestMatch = m; }
+    }
+    var parts = mName.split(" ");
+    if (parts.length > 1) {
+      var lastName = parts[parts.length - 1];
+      if (spoken === lastName || spoken.indexOf(lastName) !== -1) {
+        if (35 > bestScore) { bestScore = 35; bestMatch = m; }
+      }
+    }
+  });
+  return bestMatch;
 }
 
 function vtcParseDate(spoken) {
-  var lower = spoken.toLowerCase().trim();
+  var lower = spoken.toLowerCase().trim().replace(/(\d+)(?:st|nd|rd|th)/g, "$1");
   var now = new Date();
-  // "tomorrow"
   if (lower === "tomorrow") { var d = new Date(now); d.setDate(d.getDate() + 1); return vtcFmtDate(d); }
-  // "today"
   if (lower === "today") return vtcFmtDate(now);
-  // "next monday", "next friday", etc.
   var dayNames = ["sunday","monday","tuesday","wednesday","thursday","friday","saturday"];
   var nextMatch = lower.match(/next\s+(sunday|monday|tuesday|wednesday|thursday|friday|saturday)/);
   if (nextMatch) {
@@ -1376,13 +1376,10 @@ function vtcParseDate(spoken) {
     var d2 = new Date(now); var diff = (targetDay - d2.getDay() + 7) % 7; if (diff === 0) diff = 7;
     d2.setDate(d2.getDate() + diff); return vtcFmtDate(d2);
   }
-  // "in X days"
   var inDays = lower.match(/in\s+(\d+)\s+day/);
   if (inDays) { var d3 = new Date(now); d3.setDate(d3.getDate() + parseInt(inDays[1])); return vtcFmtDate(d3); }
-  // "in X weeks"
   var inWeeks = lower.match(/in\s+(\d+)\s+week/);
   if (inWeeks) { var d4 = new Date(now); d4.setDate(d4.getDate() + parseInt(inWeeks[1]) * 7); return vtcFmtDate(d4); }
-  // "March 15", "15 March", "March 15 2026", "15th March"
   var months = ["january","february","march","april","may","june","july","august","september","october","november","december"];
   for (var mi = 0; mi < months.length; mi++) {
     if (lower.indexOf(months[mi]) !== -1) {
@@ -1397,7 +1394,6 @@ function vtcParseDate(spoken) {
       }
     }
   }
-  // "15/3", "15/3/26", "15-3-26"
   var slashMatch = lower.match(/(\d{1,2})[\/\-](\d{1,2})(?:[\/\-](\d{2,4}))?/);
   if (slashMatch) {
     var sd = parseInt(slashMatch[1]), sm = parseInt(slashMatch[2]) - 1;
@@ -1411,37 +1407,88 @@ function vtcFmtDate(d) {
   return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0");
 }
 
-function vtcPickMember(id, name) {
-  vtc.assigneeId = id; vtc.assigneeName = name;
-  vtcRenderStep();
+function vtcShowParsed() {
+  var hint = document.getElementById("vtc-mic-hint");
+  hint.textContent = "Parsed! Review below and create.";
+  document.getElementById("vtc-parsed").style.display = "";
+  document.getElementById("vtc-nav").style.display = "";
+  document.getElementById("vtc-inline-edit").style.display = "none";
+
+  // Title
+  var titleEl = document.getElementById("vtc-p-title");
+  titleEl.textContent = vtc.title || "(not captured)";
+  titleEl.className = "vtc-parsed-value" + (vtc.title ? "" : " vtc-parsed-miss");
+
+  // Assignee
+  var assignEl = document.getElementById("vtc-p-assignee");
+  assignEl.textContent = vtc.assigneeName || "(not captured)";
+  assignEl.className = "vtc-parsed-value" + (vtc.assigneeName ? "" : " vtc-parsed-miss");
+
+  // Due date
+  var dueEl = document.getElementById("vtc-p-due");
+  dueEl.textContent = vtc.dueDate ? formatDate(vtc.dueDate) : "(not captured)";
+  dueEl.className = "vtc-parsed-value" + (vtc.dueDate ? "" : " vtc-parsed-miss");
+
+  // Weightage
+  var weightEl = document.getElementById("vtc-p-weight");
+  weightEl.textContent = vtc.weightage === "important" ? "Important" : "Not Important";
+  weightEl.className = "vtc-parsed-value";
 }
 
-function vtcPickWeightage(w) {
-  vtc.weightage = w;
-  vtcRenderStep();
+// ---- Inline edit for each field ----
+function vtcEditField(field) {
+  var editArea = document.getElementById("vtc-inline-edit");
+  var content = document.getElementById("vtc-inline-content");
+  editArea.style.display = "";
+  var html = '';
+
+  if (field === "title") {
+    html = '<label class="vtc-edit-label">Task Title</label>' +
+      '<input type="text" class="vtc-edit-input" id="vtc-edit-val" value="' + escapeHtml(vtc.title) + '">' +
+      '<button type="button" class="btn-primary vtc-edit-save" onclick="vtc.title=document.getElementById(\'vtc-edit-val\').value.trim();vtcShowParsed();">Save</button>';
+  } else if (field === "assignee") {
+    html = '<label class="vtc-edit-label">Select Assignee</label><div class="vtc-chips">';
+    data.members.forEach(function(m) {
+      var sel = vtc.assigneeId === m.id ? " vtc-chip-active" : "";
+      html += '<button type="button" class="vtc-chip' + sel + '" onclick="vtc.assigneeId=\'' + m.id + '\';vtc.assigneeName=\'' + escapeHtml(m.name).replace(/'/g, "\\'") + '\';vtcShowParsed();">' + escapeHtml(m.name) + '</button>';
+    });
+    html += '</div>';
+  } else if (field === "due") {
+    html = '<label class="vtc-edit-label">Due Date</label>' +
+      '<input type="date" class="vtc-edit-input" id="vtc-edit-val" value="' + vtc.dueDate + '">' +
+      '<button type="button" class="btn-primary vtc-edit-save" onclick="vtc.dueDate=document.getElementById(\'vtc-edit-val\').value;vtcShowParsed();">Save</button>';
+  } else if (field === "weight") {
+    html = '<label class="vtc-edit-label">Weightage & Priority</label><div class="vtc-chips">' +
+      '<button type="button" class="vtc-chip' + (vtc.weightage === "important" ? " vtc-chip-active" : "") + '" onclick="vtc.weightage=\'important\';vtcShowParsed();">Important</button>' +
+      '<button type="button" class="vtc-chip' + (vtc.weightage === "not-important" ? " vtc-chip-active" : "") + '" onclick="vtc.weightage=\'not-important\';vtcShowParsed();">Not Important</button>' +
+      '<button type="button" class="vtc-chip' + (vtc.priority === "high" ? " vtc-chip-active" : "") + '" onclick="vtc.priority=\'high\';vtcShowParsed();">High</button>' +
+      '<button type="button" class="vtc-chip' + (vtc.priority === "medium" ? " vtc-chip-active" : "") + '" onclick="vtc.priority=\'medium\';vtcShowParsed();">Medium</button>' +
+      '<button type="button" class="vtc-chip' + (vtc.priority === "low" ? " vtc-chip-active" : "") + '" onclick="vtc.priority=\'low\';vtcShowParsed();">Low</button>' +
+      '</div>';
+  }
+  content.innerHTML = html;
 }
 
-function vtcPickPriority(p) {
-  vtc.priority = p;
-  vtcRenderStep();
-}
-
-function vtcNext() {
-  if (vtc.step === 1 && !vtc.title) { document.getElementById("vtc-mic-hint").textContent = "Please say or type a task title first."; return; }
-  if (vtc.step === 2 && !vtc.assigneeId) { document.getElementById("vtc-mic-hint").textContent = "Please select or say a member name."; return; }
-  if (vtc.step < 5) { vtc.step++; vtcRenderStep(); }
-}
-
-function vtcBack() {
-  if (vtc.step > 1) { vtc.step--; vtcRenderStep(); }
-}
-
-function vtcSkip() {
-  vtc.step++; vtcRenderStep();
+function vtcReset() {
+  vtc.title = ""; vtc.assigneeId = ""; vtc.assigneeName = "";
+  vtc.dueDate = ""; vtc.weightage = "not-important"; vtc.priority = "medium";
+  document.getElementById("vtc-prompt").textContent = "Tap the mic and say everything in one go";
+  document.getElementById("vtc-mic-hint").textContent = "Tap to speak";
+  document.getElementById("vtc-transcript").textContent = "";
+  document.getElementById("vtc-parsed").style.display = "none";
+  document.getElementById("vtc-nav").style.display = "none";
+  document.getElementById("vtc-inline-edit").style.display = "none";
 }
 
 function vtcSave() {
-  if (!vtc.title) return;
+  if (!vtc.title) {
+    document.getElementById("vtc-mic-hint").textContent = "Title is required. Tap Edit to add one.";
+    return;
+  }
+  if (!vtc.assigneeId) {
+    document.getElementById("vtc-mic-hint").textContent = "Assignee is required. Tap Edit to select.";
+    return;
+  }
   var task = {
     id: generateId(),
     title: vtc.title,
