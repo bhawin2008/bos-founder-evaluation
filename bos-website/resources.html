@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Resources – Business Operating System</title>
+  <meta name="description" content="Frameworks, playbooks, systems, and guides for IT founders. Filter by domain (marketing, leadership, technology, revenue) and resource type.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <!-- Navigation -->
+  <nav class="nav" id="nav">
+    <div class="container nav-inner">
+      <a href="index.html" class="nav-logo">BOS</a>
+      <div class="nav-links" id="nav-links">
+        <a href="about.html" class="nav-link">About</a>
+        <a href="programs.html" class="nav-link">Programs</a>
+        <a href="events.html" class="nav-link">Events</a>
+        <a href="framework.html" class="nav-link">Framework</a>
+        <a href="resources.html" class="nav-link active">Resources</a>
+        <a href="apply.html" class="nav-link nav-cta">Apply Now</a>
+      </div>
+      <button class="nav-toggle" id="nav-toggle" aria-label="Toggle menu">
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- Page Header -->
+  <section class="page-header-dark bg-gradient-mesh">
+    <div class="container">
+      <span class="section-label">Resources</span>
+      <h1 class="page-title">Founder knowledge base.</h1>
+      <p class="page-sub">Frameworks, playbooks, systems, and guides — all built by and for IT founders who build with structure.</p>
+    </div>
+  </section>
+
+  <!-- Filters + Resources Grid -->
+  <section class="section">
+    <div class="container">
+      <!-- Filter Controls -->
+      <div class="resources-filters">
+        <div class="filter-group" id="filter-domain">
+          <span class="filter-group-label">Domain</span>
+          <button class="filter-btn active" data-domain="all">All</button>
+          <button class="filter-btn" data-domain="marketing">Marketing</button>
+          <button class="filter-btn" data-domain="leadership">Leadership</button>
+          <button class="filter-btn" data-domain="technology">Technology</button>
+          <button class="filter-btn" data-domain="revenue">Revenue</button>
+          <button class="filter-btn" data-domain="operations">Operations</button>
+        </div>
+        <div class="filter-group" id="filter-type">
+          <span class="filter-group-label">Type</span>
+          <button class="filter-btn active" data-type="all">All</button>
+          <button class="filter-btn" data-type="blog">Blog</button>
+          <button class="filter-btn" data-type="framework">Framework</button>
+          <button class="filter-btn" data-type="system">System</button>
+          <button class="filter-btn" data-type="playbook">Playbook</button>
+          <button class="filter-btn" data-type="guide">Guide</button>
+        </div>
+      </div>
+
+      <!-- Resources Grid -->
+      <div class="resources-grid" id="resources-grid">
+
+        <!-- 1. The Positioning Playbook -->
+        <div class="resource-card" data-domain="marketing" data-type="playbook">
+          <div class="resource-card-color marketing"></div>
+          <div class="resource-card-body">
+            <div class="resource-card-tags">
+              <span class="tag tag-sm">Marketing</span>
+              <span class="tag tag-sm tag-outline">Playbook</span>
+            </div>
+            <h3>The Positioning Playbook</h3>
+            <p>How to carve out a defensible market position that makes you the obvious choice in your niche. Includes the BOS Positioning Canvas and real founder case studies.</p>
+            <div class="resource-card-footer">
+              <span class="resource-read-time">12 min read</span>
+              <span class="resource-arrow">&rarr;</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2. Revenue Engine Framework -->
+        <div class="resource-card" data-domain="revenue" data-type="framework">
+          <div class="resource-card-color revenue"></div>
+          <div class="resource-card-body">
+            <div class="resource-card-tags">
+              <span class="tag tag-sm">Revenue</span>
+              <span class="tag tag-sm tag-outline">Framework</span>
+            </div>
+            <h3>Revenue Engine Framework</h3>
+            <p>The complete system for building predictable revenue. Map your pipeline from awareness to close with specific metrics and conversion triggers at every stage.</p>
+            <div class="resource-card-footer">
+              <span class="resource-read-time">15 min read</span>
+              <span class="resource-arrow">&rarr;</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 3. From Founder to CEO -->
+        <div class="resource-card" data-domain="leadership" data-type="blog">
+          <div class="resource-card-color leadership"></div>
+          <div class="resource-card-body">
+            <div class="resource-card-tags">
+              <span class="tag tag-sm">Leadership</span>
+              <span class="tag tag-sm tag-outline">Blog</span>
+            </div>
+            <h3>From Founder to CEO: The Leadership Shift</h3>
+            <p>The hardest transition isn't product-market fit — it's becoming the leader your growing company needs. A candid look at what changes when you stop building and start leading.</p>
+            <div class="resource-card-footer">
+              <span class="resource-read-time">8 min read</span>
+              <span class="resource-arrow">&rarr;</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 4. Tech Stack Decision Matrix -->
+        <div class="resource-card" data-domain="technology" data-type="framework">
+          <div class="resource-card-color technology"></div>
+          <div class="resource-card-body">
+            <div class="resource-card-tags">
+              <span class="tag tag-sm">Technology</span>
+              <span class="tag tag-sm tag-outline">Framework</span>
+            </div>
+            <h3>Tech Stack Decision Matrix</h3>
+            <p>A structured framework for making technology decisions that scale. Evaluate build vs. buy, assess technical debt, and align your stack with business growth goals.</p>
+            <div class="resource-card-footer">
+              <span class="resource-read-time">10 min read</span>
+              <span class="resource-arrow">&rarr;</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 5. The 90-Day Hiring System -->
+        <div class="resource-card" data-domain="operations" data-type="system">
+          <div class="resource-card-color operations"></div>
+          <div class="resource-card-body">
+            <div class="resource-card-tags">
+              <span class="tag tag-sm">Operations</span>
+              <span class="tag tag-sm tag-outline">System</span>
+            </div>
+            <h3>The 90-Day Hiring System</h3>
+            <p>Stop hiring on gut feeling. This system covers role design, sourcing channels, structured interviews, cultural fit assessment, and 90-day onboarding — all in one playbook.</p>
+            <div class="resource-card-footer">
+              <span class="resource-read-time">18 min read</span>
+              <span class="resource-arrow">&rarr;</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 6. Content That Converts -->
+        <div class="resource-card" data-domain="marketing" data-type="guide">
+          <div class="resource-card-color marketing"></div>
+          <div class="resource-card-body">
+            <div class="resource-card-tags">
+              <span class="tag tag-sm">Marketing</span>
+              <span class="tag tag-sm tag-outline">Guide</span>
+            </div>
+            <h3>Content That Converts: The IT Founder's Guide</h3>
+            <p>How to create content that builds authority AND generates leads. The specific frameworks, formats, and distribution strategies that work for technical founders.</p>
+            <div class="resource-card-footer">
+              <span class="resource-read-time">14 min read</span>
+              <span class="resource-arrow">&rarr;</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 7. Pricing for Profit -->
+        <div class="resource-card" data-domain="revenue" data-type="playbook">
+          <div class="resource-card-color revenue"></div>
+          <div class="resource-card-body">
+            <div class="resource-card-tags">
+              <span class="tag tag-sm">Revenue</span>
+              <span class="tag tag-sm tag-outline">Playbook</span>
+            </div>
+            <h3>Pricing for Profit</h3>
+            <p>Most IT founders underprice by 30-50%. This playbook covers value-based pricing, packaging strategies, and the psychology of pricing for B2B tech services.</p>
+            <div class="resource-card-footer">
+              <span class="resource-read-time">11 min read</span>
+              <span class="resource-arrow">&rarr;</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 8. Building Culture in Remote Teams -->
+        <div class="resource-card" data-domain="leadership" data-type="blog">
+          <div class="resource-card-color leadership"></div>
+          <div class="resource-card-body">
+            <div class="resource-card-tags">
+              <span class="tag tag-sm">Leadership</span>
+              <span class="tag tag-sm tag-outline">Blog</span>
+            </div>
+            <h3>Building Culture in Remote Teams</h3>
+            <p>Culture doesn't happen by accident — especially in remote-first teams. How top BOS founders build strong team cultures across time zones without an office.</p>
+            <div class="resource-card-footer">
+              <span class="resource-read-time">7 min read</span>
+              <span class="resource-arrow">&rarr;</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 9. Scaling Infrastructure Without Burning Cash -->
+        <div class="resource-card" data-domain="technology" data-type="blog">
+          <div class="resource-card-color technology"></div>
+          <div class="resource-card-body">
+            <div class="resource-card-tags">
+              <span class="tag tag-sm">Technology</span>
+              <span class="tag tag-sm tag-outline">Blog</span>
+            </div>
+            <h3>Scaling Infrastructure Without Burning Cash</h3>
+            <p>How to scale your tech infrastructure 10x without 10x the cost. Practical approaches to cloud optimization, auto-scaling, and infrastructure-as-code.</p>
+            <div class="resource-card-footer">
+              <span class="resource-read-time">9 min read</span>
+              <span class="resource-arrow">&rarr;</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 10. The Weekly CEO Operating Rhythm -->
+        <div class="resource-card" data-domain="operations" data-type="system">
+          <div class="resource-card-color operations"></div>
+          <div class="resource-card-body">
+            <div class="resource-card-tags">
+              <span class="tag tag-sm">Operations</span>
+              <span class="tag tag-sm tag-outline">System</span>
+            </div>
+            <h3>The Weekly CEO Operating Rhythm</h3>
+            <p>The exact weekly schedule used by high-performing BOS founders. Time blocks for strategic thinking, team management, business development, and deep work.</p>
+            <div class="resource-card-footer">
+              <span class="resource-read-time">6 min read</span>
+              <span class="resource-arrow">&rarr;</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 11. From Services to Products -->
+        <div class="resource-card" data-domain="revenue" data-type="framework">
+          <div class="resource-card-color revenue"></div>
+          <div class="resource-card-body">
+            <div class="resource-card-tags">
+              <span class="tag tag-sm">Revenue</span>
+              <span class="tag tag-sm tag-outline">Framework</span>
+            </div>
+            <h3>From Services to Products: The Transition Framework</h3>
+            <p>How to evolve from trading time for money to building scalable products. A step-by-step framework for productizing your expertise without abandoning your cash flow.</p>
+            <div class="resource-card-footer">
+              <span class="resource-read-time">13 min read</span>
+              <span class="resource-arrow">&rarr;</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 12. The Delegation Blueprint -->
+        <div class="resource-card" data-domain="leadership" data-type="playbook">
+          <div class="resource-card-color leadership"></div>
+          <div class="resource-card-body">
+            <div class="resource-card-tags">
+              <span class="tag tag-sm">Leadership</span>
+              <span class="tag tag-sm tag-outline">Playbook</span>
+            </div>
+            <h3>The Delegation Blueprint</h3>
+            <p>Stop doing $20/hour work when your time is worth $500/hour. The complete system for identifying, delegating, and monitoring tasks so you can focus on what matters.</p>
+            <div class="resource-card-footer">
+              <span class="resource-read-time">10 min read</span>
+              <span class="resource-arrow">&rarr;</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="section section-accent">
+    <div class="container" style="text-align:center;">
+      <h2 class="section-title">Want full access?</h2>
+      <p class="section-sub mx-auto" style="margin-bottom:40px;">BOS members get unlimited access to all frameworks, playbooks, and systems — plus live sessions where these are taught and applied.</p>
+      <a href="apply.html" class="btn btn-primary btn-lg">Apply to BOS</a>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-top">
+        <div class="footer-brand">
+          <span class="footer-logo">BOS</span>
+          <p class="footer-desc">Business Operating System for serious IT founders.</p>
+        </div>
+        <div class="footer-cols">
+          <div class="footer-col">
+            <h4>Learn</h4>
+            <a href="about.html">About BOS</a>
+            <a href="framework.html">Framework</a>
+            <a href="philosophy.html">Philosophy</a>
+          </div>
+          <div class="footer-col">
+            <h4>Explore</h4>
+            <a href="programs.html">Programs</a>
+            <a href="events.html">Events</a>
+            <a href="resources.html">Resources</a>
+          </div>
+          <div class="footer-col">
+            <h4>Connect</h4>
+            <a href="apply.html">Apply</a>
+            <a href="#">LinkedIn</a>
+            <a href="#">Contact</a>
+          </div>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; 2026 BOS. All rights reserved.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
