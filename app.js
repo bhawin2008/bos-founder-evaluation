@@ -1091,6 +1091,76 @@ function renderMembers() {
   });
 }
 
+// ==================== Voice Input ====================
+
+var voiceRecognition = null;
+var voiceActive = false;
+
+function toggleVoiceInput() {
+  var SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SpeechRecognition) {
+    var statusEl = document.getElementById("voice-status");
+    if (statusEl) statusEl.textContent = "Voice input not supported in this browser. Use Chrome or Edge.";
+    return;
+  }
+
+  if (voiceActive && voiceRecognition) {
+    voiceRecognition.stop();
+    return;
+  }
+
+  voiceRecognition = new SpeechRecognition();
+  voiceRecognition.lang = "en-US";
+  voiceRecognition.interimResults = true;
+  voiceRecognition.continuous = false;
+  voiceRecognition.maxAlternatives = 1;
+
+  var btn = document.getElementById("voice-task-btn");
+  var statusEl = document.getElementById("voice-status");
+  var titleInput = document.getElementById("task-title");
+
+  voiceActive = true;
+  btn.classList.add("voice-recording");
+  statusEl.textContent = "Listening...";
+
+  voiceRecognition.onresult = function(event) {
+    var transcript = "";
+    for (var i = 0; i < event.results.length; i++) {
+      transcript += event.results[i][0].transcript;
+    }
+    titleInput.value = transcript.charAt(0).toUpperCase() + transcript.slice(1);
+    titleInput.dispatchEvent(new Event("input"));
+    if (event.results[0].isFinal) {
+      statusEl.textContent = "Done — title filled!";
+      setTimeout(function() { statusEl.textContent = ""; }, 2500);
+    }
+  };
+
+  voiceRecognition.onerror = function(event) {
+    voiceActive = false;
+    btn.classList.remove("voice-recording");
+    if (event.error === "not-allowed") {
+      statusEl.textContent = "Microphone access denied. Allow it in browser settings.";
+    } else if (event.error === "no-speech") {
+      statusEl.textContent = "No speech detected. Try again.";
+    } else {
+      statusEl.textContent = "Error: " + event.error;
+    }
+    setTimeout(function() { statusEl.textContent = ""; }, 3000);
+  };
+
+  voiceRecognition.onend = function() {
+    voiceActive = false;
+    btn.classList.remove("voice-recording");
+    if (statusEl.textContent === "Listening...") {
+      statusEl.textContent = "No speech detected. Tap mic and speak.";
+      setTimeout(function() { statusEl.textContent = ""; }, 2500);
+    }
+  };
+
+  voiceRecognition.start();
+}
+
 // ==================== Tasks ====================
 
 function saveTask(event) {
