@@ -21,7 +21,9 @@ function loadData() {
     tasks: JSON.parse(localStorage.getItem("boss_tasks") || "[]"),
     roles: JSON.parse(localStorage.getItem("boss_roles") || "[]"),
     flags: JSON.parse(localStorage.getItem("boss_flags") || "[]"),
-    categories: JSON.parse(localStorage.getItem("boss_categories") || "null")
+    categories: JSON.parse(localStorage.getItem("boss_categories") || "null"),
+    notes: JSON.parse(localStorage.getItem("boss_notes") || "[]"),
+    autoRules: JSON.parse(localStorage.getItem("boss_autorules") || "[]")
   };
 }
 
@@ -41,6 +43,8 @@ function saveData(data) {
   localStorage.setItem("boss_roles", JSON.stringify(data.roles));
   localStorage.setItem("boss_flags", JSON.stringify(data.flags));
   localStorage.setItem("boss_categories", JSON.stringify(data.categories));
+  localStorage.setItem("boss_notes", JSON.stringify(data.notes || []));
+  localStorage.setItem("boss_autorules", JSON.stringify(data.autoRules || []));
 }
 
 var data = loadData();
@@ -3096,6 +3100,14 @@ function capitalizeFirst(str) {
 
 // ==================== Delete Confirmation ====================
 
+function showDeleteConfirm(type, id) {
+  pendingDeleteType = type;
+  pendingDeleteId = id;
+  var labels = { note: "note", autorule: "auto rule", member: "member", task: "task", role: "role" };
+  document.getElementById("confirm-text").textContent = "Are you sure you want to delete this " + (labels[type] || "item") + "?";
+  openModal("confirm-modal");
+}
+
 function confirmDelete() {
   if (pendingDeleteType === "member") {
     data.members = data.members.filter(function(m) { return m.id !== pendingDeleteId; });
@@ -3106,6 +3118,10 @@ function confirmDelete() {
   } else if (pendingDeleteType === "task") {
     data.tasks = data.tasks.filter(function(t) { return t.id !== pendingDeleteId; });
     data.flags = data.flags.filter(function(f) { return f.taskId !== pendingDeleteId; });
+  } else if (pendingDeleteType === "note") {
+    data.notes = (data.notes || []).filter(function(n) { return n.id !== pendingDeleteId; });
+  } else if (pendingDeleteType === "autorule") {
+    data.autoRules = (data.autoRules || []).filter(function(r) { return r.id !== pendingDeleteId; });
   } else if (pendingDeleteType === "role") {
     data.roles = data.roles.filter(function(r) { return r.id !== pendingDeleteId; });
     data.members.forEach(function(m) {
@@ -3264,14 +3280,502 @@ function renderCategories() {
   container.innerHTML = html;
 }
 
+// ==================== My Notes ====================
+
+var currentNoteFilter = "all";
+
+function filterNotes(cat) {
+  currentNoteFilter = cat;
+  document.querySelectorAll("[data-nfilter]").forEach(function(btn) {
+    btn.classList.toggle("active", btn.getAttribute("data-nfilter") === cat);
+  });
+  renderNotes();
+}
+
+function renderNotes() {
+  var container = document.getElementById("notes-list");
+  if (!container) return;
+  if (!data.notes) data.notes = [];
+  var search = (document.getElementById("notes-search") || {}).value || "";
+  search = search.toLowerCase();
+
+  var filtered = data.notes.filter(function(n) {
+    if (currentNoteFilter !== "all" && n.category !== currentNoteFilter) return false;
+    if (search && n.title.toLowerCase().indexOf(search) === -1 && (n.content || "").toLowerCase().indexOf(search) === -1) return false;
+    return true;
+  }).sort(function(a, b) { return new Date(b.createdAt) - new Date(a.createdAt); });
+
+  if (filtered.length === 0) {
+    container.innerHTML = '<div class="empty-state">No notes found. Click "+ Add Note" to create one.</div>';
+    return;
+  }
+
+  var html = '';
+  filtered.forEach(function(n) {
+    var member = n.memberId ? data.members.find(function(m) { return m.id === n.memberId; }) : null;
+    var isOverdue = n.dueDate && new Date(n.dueDate + "T23:59:59") < new Date() && !n.completed;
+    html += '<div class="card note-card' + (n.completed ? ' note-completed' : '') + '">' +
+      '<div class="card-top">' +
+        '<div class="note-card-header">' +
+          '<span class="note-cat-badge note-cat-' + n.category.toLowerCase() + '">' + escapeHtml(n.category) + '</span>' +
+          (n.completed ? '<span class="note-done-badge">Done</span>' : '') +
+          (isOverdue ? '<span class="note-overdue-badge">Overdue</span>' : '') +
+        '</div>' +
+        '<div class="card-actions">' +
+          '<button onclick="editNote(\'' + n.id + '\')" title="Edit">&#9998;</button>' +
+          '<button onclick="toggleNoteComplete(\'' + n.id + '\')" title="' + (n.completed ? 'Reopen' : 'Mark Done') + '">' + (n.completed ? '&#8634;' : '&#10003;') + '</button>' +
+          '<button onclick="showDeleteConfirm(\'note\',\'' + n.id + '\')" title="Delete">&#10005;</button>' +
+        '</div>' +
+      '</div>' +
+      '<h4 class="note-title">' + escapeHtml(n.title) + '</h4>' +
+      (n.content ? '<p class="note-content">' + escapeHtml(n.content) + '</p>' : '') +
+      '<div class="note-meta">' +
+        (member ? '<span class="note-meta-item" title="Associated member">&#128100; ' + escapeHtml(member.name) + '</span>' : '') +
+        (n.dueDate ? '<span class="note-meta-item' + (isOverdue ? ' note-meta-overdue' : '') + '" title="Due date">&#128197; ' + formatDate(n.dueDate) + '</span>' : '') +
+        (n.link ? '<a class="note-meta-item note-meta-link" href="' + escapeHtml(n.link) + '" target="_blank" rel="noopener" title="Open link">&#128279; Link</a>' : '') +
+        (n.fileName ? '<span class="note-meta-item" title="Attached file">&#128206; ' + escapeHtml(n.fileName) + '</span>' : '') +
+        '<span class="note-meta-item note-meta-date">' + formatDate(n.createdAt.split("T")[0]) + '</span>' +
+      '</div>' +
+    '</div>';
+  });
+  container.innerHTML = html;
+}
+
+function openNoteModal() {
+  document.getElementById("note-modal-title").textContent = "Add Note";
+  document.getElementById("note-form").reset();
+  document.getElementById("note-edit-id").value = "";
+  populateNoteMemberDropdown();
+  openModal("note-modal");
+}
+
+function populateNoteMemberDropdown() {
+  var sel = document.getElementById("note-member");
+  sel.innerHTML = '<option value="">None</option>';
+  data.members.forEach(function(m) {
+    sel.innerHTML += '<option value="' + m.id + '">' + escapeHtml(m.name) + '</option>';
+  });
+}
+
+function saveNote(event) {
+  event.preventDefault();
+  var editId = document.getElementById("note-edit-id").value;
+  var fileInput = document.getElementById("note-file");
+  var existingNote = editId ? data.notes.find(function(n) { return n.id === editId; }) : null;
+
+  var note = {
+    id: editId || generateId(),
+    title: document.getElementById("note-title").value.trim(),
+    content: document.getElementById("note-content").value.trim(),
+    category: document.getElementById("note-category").value,
+    memberId: document.getElementById("note-member").value,
+    dueDate: document.getElementById("note-due").value,
+    link: document.getElementById("note-link").value.trim(),
+    fileName: existingNote ? existingNote.fileName : "",
+    fileData: existingNote ? existingNote.fileData : "",
+    completed: existingNote ? existingNote.completed : false,
+    createdAt: existingNote ? existingNote.createdAt : new Date().toISOString()
+  };
+
+  // Handle file upload (store as base64 in localStorage)
+  if (fileInput.files && fileInput.files[0]) {
+    var file = fileInput.files[0];
+    if (file.size > 5 * 1024 * 1024) {
+      alert("File too large. Max 5MB.");
+      return;
+    }
+    var reader = new FileReader();
+    reader.onload = function(e) {
+      note.fileName = file.name;
+      note.fileData = e.target.result;
+      finishSaveNote(note, editId);
+    };
+    reader.readAsDataURL(file);
+  } else {
+    finishSaveNote(note, editId);
+  }
+}
+
+function finishSaveNote(note, editId) {
+  if (!data.notes) data.notes = [];
+  if (editId) {
+    var idx = data.notes.findIndex(function(n) { return n.id === editId; });
+    if (idx !== -1) data.notes[idx] = note;
+  } else {
+    data.notes.push(note);
+  }
+  saveData(data);
+  closeModal("note-modal");
+  renderNotes();
+}
+
+function editNote(id) {
+  var n = data.notes.find(function(x) { return x.id === id; });
+  if (!n) return;
+  document.getElementById("note-modal-title").textContent = "Edit Note";
+  document.getElementById("note-edit-id").value = n.id;
+  document.getElementById("note-title").value = n.title;
+  document.getElementById("note-content").value = n.content || "";
+  document.getElementById("note-category").value = n.category;
+  populateNoteMemberDropdown();
+  document.getElementById("note-member").value = n.memberId || "";
+  document.getElementById("note-due").value = n.dueDate || "";
+  document.getElementById("note-link").value = n.link || "";
+  openModal("note-modal");
+}
+
+function toggleNoteComplete(id) {
+  var n = data.notes.find(function(x) { return x.id === id; });
+  if (n) { n.completed = !n.completed; saveData(data); renderNotes(); }
+}
+
+function deleteNote(id) {
+  data.notes = data.notes.filter(function(n) { return n.id !== id; });
+  saveData(data);
+  renderNotes();
+}
+
+// ==================== Compare Members ====================
+
+function renderCompare() {
+  var container = document.getElementById("cmp-result");
+  if (!container) return;
+
+  // Populate dropdowns
+  var selA = document.getElementById("cmp-member-a");
+  var selB = document.getElementById("cmp-member-b");
+  var curA = selA.value; var curB = selB.value;
+  [selA, selB].forEach(function(sel) {
+    var cur = sel.value;
+    sel.innerHTML = '<option value="">Select member</option>';
+    data.members.forEach(function(m) {
+      sel.innerHTML += '<option value="' + m.id + '"' + (cur === m.id ? ' selected' : '') + '>' + escapeHtml(m.name) + '</option>';
+    });
+  });
+
+  if (!curA || !curB || curA === curB) {
+    container.innerHTML = '<div class="empty-state">Select two different members to compare.</div>';
+    return;
+  }
+
+  var mA = data.members.find(function(m) { return m.id === curA; });
+  var mB = data.members.find(function(m) { return m.id === curB; });
+  if (!mA || !mB) return;
+
+  var statsA = getCmpStats(mA.id);
+  var statsB = getCmpStats(mB.id);
+
+  var rows = [
+    { label: "Current Zone", a: statsA.zone, b: statsB.zone, type: "zone" },
+    { label: "Net Score", a: statsA.net, b: statsB.net, type: "number" },
+    { label: "Strong Signals", a: statsA.green, b: statsB.green, type: "number" },
+    { label: "Weak Signals", a: statsA.red, b: statsB.red, type: "number-inverse" },
+    { label: "Tasks Assigned", a: statsA.tasksTotal, b: statsB.tasksTotal, type: "number" },
+    { label: "Tasks Completed", a: statsA.tasksCompleted, b: statsB.tasksCompleted, type: "number" },
+    { label: "Completion Rate", a: statsA.completionRate + "%", b: statsB.completionRate + "%", type: "text" },
+    { label: "Overdue Tasks", a: statsA.overdue, b: statsB.overdue, type: "number-inverse" },
+    { label: "Blunders", a: statsA.blunders, b: statsB.blunders, type: "number-inverse" },
+    { label: "Extraordinary", a: statsA.extraordinary, b: statsB.extraordinary, type: "number" },
+    { label: "Trend", a: statsA.trend, b: statsB.trend, type: "trend" }
+  ];
+
+  var html = '<div class="cmp-table">';
+  html += '<div class="cmp-header-row"><div class="cmp-metric-label"></div><div class="cmp-member-name">' + escapeHtml(mA.name) + '</div><div class="cmp-member-name">' + escapeHtml(mB.name) + '</div></div>';
+
+  rows.forEach(function(r) {
+    var aWin = "", bWin = "";
+    if (r.type === "number") { aWin = Number(r.a) > Number(r.b) ? " cmp-win" : ""; bWin = Number(r.b) > Number(r.a) ? " cmp-win" : ""; }
+    if (r.type === "number-inverse") { aWin = Number(r.a) < Number(r.b) ? " cmp-win" : ""; bWin = Number(r.b) < Number(r.a) ? " cmp-win" : ""; }
+
+    var aDisplay = r.a, bDisplay = r.b;
+    if (r.type === "zone") {
+      aDisplay = '<span class="cmp-zone cmp-zone-' + r.a + '">' + (r.a === "green" ? "Strong" : r.a === "red" ? "Weak" : "Steady") + '</span>';
+      bDisplay = '<span class="cmp-zone cmp-zone-' + r.b + '">' + (r.b === "green" ? "Strong" : r.b === "red" ? "Weak" : "Steady") + '</span>';
+    }
+    if (r.type === "trend") {
+      aDisplay = r.a === "rising" ? '<span class="trend-rising">&#9650; Rising</span>' : r.a === "falling" ? '<span class="trend-falling">&#9660; Falling</span>' : '<span class="trend-flat">&#8212; Flat</span>';
+      bDisplay = r.b === "rising" ? '<span class="trend-rising">&#9650; Rising</span>' : r.b === "falling" ? '<span class="trend-falling">&#9660; Falling</span>' : '<span class="trend-flat">&#8212; Flat</span>';
+    }
+
+    html += '<div class="cmp-row">' +
+      '<div class="cmp-metric-label">' + r.label + '</div>' +
+      '<div class="cmp-val' + aWin + '">' + aDisplay + '</div>' +
+      '<div class="cmp-val' + bWin + '">' + bDisplay + '</div>' +
+    '</div>';
+  });
+
+  // Month-over-month comparison
+  html += '</div>';
+  html += '<h3 class="cmp-section-title">6-Month Zone History</h3>';
+  html += '<div class="cmp-history">';
+  var monthKeys = getRecentMonths(6);
+  html += '<div class="cmp-hist-row cmp-hist-header"><div class="cmp-hist-label">Month</div>';
+  monthKeys.forEach(function(mk) { html += '<div class="cmp-hist-cell">' + getMonthLabel(mk) + '</div>'; });
+  html += '</div>';
+  [{ m: mA, label: mA.name }, { m: mB, label: mB.name }].forEach(function(entry) {
+    html += '<div class="cmp-hist-row"><div class="cmp-hist-label">' + escapeHtml(entry.label) + '</div>';
+    monthKeys.forEach(function(mk) {
+      var z = getMemberZoneAtMonth(entry.m.id, mk);
+      var zCls = z === "green" ? "cmp-z-g" : z === "red" ? "cmp-z-r" : "cmp-z-y";
+      html += '<div class="cmp-hist-cell ' + zCls + '">' + (z === "green" ? "S" : z === "red" ? "W" : "St") + '</div>';
+    });
+    html += '</div>';
+  });
+  html += '</div>';
+
+  container.innerHTML = html;
+}
+
+function getCmpStats(memberId) {
+  var f = getMemberFlags(memberId);
+  var eff = getEffectiveFlags(memberId);
+  var zone = getMemberZone(memberId);
+  var trend = getMemberTrend(memberId);
+  var memberTasks = data.tasks.filter(function(t) { return t.assigneeId === memberId; });
+  var completed = memberTasks.filter(function(t) { return t.status === "completed"; });
+  var overdue = memberTasks.filter(function(t) { return isOverdue(t); });
+  var blunders = memberTasks.filter(function(t) { return t.reviewResult === "blunder"; });
+  var extraordinary = memberTasks.filter(function(t) { return t.reviewResult === "extraordinary"; });
+  var rate = memberTasks.length > 0 ? Math.round(completed.length / memberTasks.length * 100) : 0;
+
+  return {
+    zone: zone, net: eff.effNet, green: f.green, red: f.red,
+    tasksTotal: memberTasks.length, tasksCompleted: completed.length,
+    completionRate: rate, overdue: overdue.length,
+    blunders: blunders.length, extraordinary: extraordinary.length,
+    trend: trend
+  };
+}
+
+function getRecentMonths(count) {
+  var months = [];
+  var now = new Date();
+  for (var i = count - 1; i >= 0; i--) {
+    var d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+    months.push(d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0"));
+  }
+  return months;
+}
+
+// ==================== Automated Signal Rules ====================
+
+var autoRuleTriggerLabels = {
+  "overdue_days": "Task overdue by X days",
+  "completed_ontime_streak": "Completed on-time streak (X tasks)",
+  "blunder_in_important": "Blunder on important task",
+  "weekly_completions": "X tasks completed in a week",
+  "no_weak_signals_months": "No weak signals for X months"
+};
+
+function updateAutoRuleFields() {
+  var trigger = document.getElementById("autorule-trigger").value;
+  var thGroup = document.getElementById("autorule-threshold-group");
+  if (trigger === "blunder_in_important") {
+    thGroup.style.display = "none";
+  } else {
+    thGroup.style.display = "";
+  }
+  // Default signal direction
+  var sigSel = document.getElementById("autorule-signal");
+  if (trigger === "overdue_days" || trigger === "blunder_in_important") {
+    sigSel.value = "red";
+  } else {
+    sigSel.value = "green";
+  }
+}
+
+function renderAutoRules() {
+  var container = document.getElementById("autorules-list");
+  if (!container) return;
+  if (!data.autoRules) data.autoRules = [];
+  if (data.autoRules.length === 0) {
+    container.innerHTML = '<div class="empty-state">No auto rules yet. Click "+ Add Rule" to create one.</div>';
+    return;
+  }
+  var html = '';
+  data.autoRules.forEach(function(rule) {
+    var trigLabel = autoRuleTriggerLabels[rule.trigger] || rule.trigger;
+    if (rule.threshold) trigLabel = trigLabel.replace("X", rule.threshold);
+    var sigLabel = rule.signal === "green" ? "Strong" : "Weak";
+    var sigCls = rule.signal === "green" ? "ar-sig-green" : "ar-sig-red";
+    html += '<div class="card ar-card' + (rule.active ? '' : ' ar-inactive') + '">' +
+      '<div class="card-top">' +
+        '<div class="ar-card-header">' +
+          '<span class="ar-status ' + (rule.active ? 'ar-active' : 'ar-paused') + '">' + (rule.active ? 'Active' : 'Paused') + '</span>' +
+          '<h4 class="ar-name">' + escapeHtml(rule.name) + '</h4>' +
+        '</div>' +
+        '<div class="card-actions">' +
+          '<button onclick="toggleAutoRule(\'' + rule.id + '\')" title="' + (rule.active ? 'Pause' : 'Activate') + '">' + (rule.active ? '&#9208;' : '&#9654;') + '</button>' +
+          '<button onclick="editAutoRule(\'' + rule.id + '\')" title="Edit">&#9998;</button>' +
+          '<button onclick="showDeleteConfirm(\'autorule\',\'' + rule.id + '\')" title="Delete">&#10005;</button>' +
+        '</div>' +
+      '</div>' +
+      '<div class="ar-detail">' +
+        '<span class="ar-trigger">' + escapeHtml(trigLabel) + '</span>' +
+        ' &rarr; <span class="' + sigCls + '">' + sigLabel + ' x' + rule.weight + '</span>' +
+      '</div>' +
+    '</div>';
+  });
+  container.innerHTML = html;
+}
+
+function saveAutoRule(event) {
+  event.preventDefault();
+  var editId = document.getElementById("autorule-edit-id").value;
+  var rule = {
+    id: editId || generateId(),
+    name: document.getElementById("autorule-name").value.trim(),
+    trigger: document.getElementById("autorule-trigger").value,
+    threshold: parseInt(document.getElementById("autorule-threshold").value) || 0,
+    signal: document.getElementById("autorule-signal").value,
+    weight: parseInt(document.getElementById("autorule-weight").value) || 1,
+    active: document.getElementById("autorule-active").checked
+  };
+  if (!data.autoRules) data.autoRules = [];
+  if (editId) {
+    var idx = data.autoRules.findIndex(function(r) { return r.id === editId; });
+    if (idx !== -1) data.autoRules[idx] = rule;
+  } else {
+    data.autoRules.push(rule);
+  }
+  saveData(data);
+  closeModal("autorule-modal");
+  renderAutoRules();
+}
+
+function editAutoRule(id) {
+  var r = data.autoRules.find(function(x) { return x.id === id; });
+  if (!r) return;
+  document.getElementById("autorule-modal-title").textContent = "Edit Auto Rule";
+  document.getElementById("autorule-edit-id").value = r.id;
+  document.getElementById("autorule-name").value = r.name;
+  document.getElementById("autorule-trigger").value = r.trigger;
+  document.getElementById("autorule-threshold").value = r.threshold || 3;
+  document.getElementById("autorule-signal").value = r.signal;
+  document.getElementById("autorule-weight").value = r.weight || 1;
+  document.getElementById("autorule-active").checked = r.active;
+  updateAutoRuleFields();
+  openModal("autorule-modal");
+}
+
+function toggleAutoRule(id) {
+  var r = data.autoRules.find(function(x) { return x.id === id; });
+  if (r) { r.active = !r.active; saveData(data); renderAutoRules(); }
+}
+
+function deleteAutoRule(id) {
+  data.autoRules = data.autoRules.filter(function(r) { return r.id !== id; });
+  saveData(data);
+  renderAutoRules();
+}
+
+// --- Execute auto rules on each refresh ---
+function executeAutoRules() {
+  if (!data.autoRules || data.autoRules.length === 0) return;
+  var now = new Date();
+  var todayKey = now.toISOString().split("T")[0];
+
+  data.autoRules.forEach(function(rule) {
+    if (!rule.active) return;
+
+    if (rule.trigger === "overdue_days") {
+      data.tasks.forEach(function(task) {
+        if (!task.dueDate || !task.assigneeId || task.status === "completed" || task.status === "cancelled") return;
+        var due = new Date(task.dueDate + "T23:59:59");
+        var daysOver = Math.floor((now - due) / 86400000);
+        if (daysOver >= rule.threshold) {
+          var flagKey = "ar_" + rule.id + "_" + task.id;
+          var alreadyFlagged = data.flags.some(function(f) { return f.reason && f.reason.indexOf(flagKey) !== -1; });
+          if (!alreadyFlagged) {
+            addFlag(task.assigneeId, task.id, rule.signal, rule.weight, "[Auto] " + rule.name + " (" + flagKey + ")", "", "");
+          }
+        }
+      });
+    }
+
+    if (rule.trigger === "blunder_in_important") {
+      data.tasks.forEach(function(task) {
+        if (task.reviewResult === "blunder" && task.weightage === "important" && task.assigneeId) {
+          var flagKey = "ar_" + rule.id + "_" + task.id;
+          var alreadyFlagged = data.flags.some(function(f) { return f.reason && f.reason.indexOf(flagKey) !== -1; });
+          if (!alreadyFlagged) {
+            addFlag(task.assigneeId, task.id, rule.signal, rule.weight, "[Auto] " + rule.name + " (" + flagKey + ")", "", "");
+          }
+        }
+      });
+    }
+
+    if (rule.trigger === "completed_ontime_streak") {
+      data.members.forEach(function(m) {
+        var memberTasks = data.tasks.filter(function(t) { return t.assigneeId === m.id && t.status === "completed"; });
+        var ontime = memberTasks.filter(function(t) {
+          if (!t.dueDate) return true;
+          return new Date(t.dueDate + "T23:59:59") >= new Date(t.createdAt);
+        });
+        if (ontime.length >= rule.threshold) {
+          var streakKey = "ar_" + rule.id + "_" + m.id + "_" + ontime.length;
+          var flagKey = "ar_" + rule.id + "_" + m.id + "_streak" + rule.threshold;
+          var alreadyFlagged = data.flags.some(function(f) { return f.reason && f.reason.indexOf(flagKey) !== -1; });
+          if (!alreadyFlagged) {
+            addFlag(m.id, "", rule.signal, rule.weight, "[Auto] " + rule.name + " (" + flagKey + ")", "", "");
+          }
+        }
+      });
+    }
+
+    if (rule.trigger === "weekly_completions") {
+      var weekAgo = new Date(now);
+      weekAgo.setDate(weekAgo.getDate() - 7);
+      data.members.forEach(function(m) {
+        var weekCompleted = data.tasks.filter(function(t) {
+          if (t.assigneeId !== m.id || t.status !== "completed") return false;
+          return true; // simplified - counts all completed tasks
+        });
+        if (weekCompleted.length >= rule.threshold) {
+          var flagKey = "ar_" + rule.id + "_" + m.id + "_wk" + getMonthKey(todayKey);
+          var alreadyFlagged = data.flags.some(function(f) { return f.reason && f.reason.indexOf(flagKey) !== -1; });
+          if (!alreadyFlagged) {
+            addFlag(m.id, "", rule.signal, rule.weight, "[Auto] " + rule.name + " (" + flagKey + ")", "", "");
+          }
+        }
+      });
+    }
+
+    if (rule.trigger === "no_weak_signals_months") {
+      data.members.forEach(function(m) {
+        var hasRecent = false;
+        for (var mi = 0; mi < rule.threshold; mi++) {
+          var d = new Date(now.getFullYear(), now.getMonth() - mi, 1);
+          var mk = d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0");
+          var monthRed = data.flags.filter(function(f) {
+            return f.memberId === m.id && f.color === "red" && getMonthKey(f.createdAt) === mk;
+          });
+          if (monthRed.length > 0) hasRecent = true;
+        }
+        if (!hasRecent) {
+          var flagKey = "ar_" + rule.id + "_" + m.id + "_clean" + rule.threshold;
+          var alreadyFlagged = data.flags.some(function(f) { return f.reason && f.reason.indexOf(flagKey) !== -1; });
+          if (!alreadyFlagged) {
+            addFlag(m.id, "", rule.signal, rule.weight, "[Auto] " + rule.name + " (" + flagKey + ")", "", "");
+          }
+        }
+      });
+    }
+  });
+}
+
 function refreshAll() {
   checkOverdueFlags();
+  executeAutoRules();
   renderDashboard();
   renderPredictiveInsights();
   renderMembers();
   renderTasks();
   renderRoles();
   renderCategories();
+  renderNotes();
+  renderAutoRules();
+  renderCompare();
   if (typeof renderReports === "function") renderReports();
 }
 

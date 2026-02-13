@@ -4969,6 +4969,104 @@ select {
 }
 
 /* ======================================================================
+   MY NOTES
+   ====================================================================== */
+
+.notes-filter-row {
+  display: flex; gap: var(--sp-3); align-items: center;
+  flex-wrap: wrap; margin-bottom: var(--sp-4);
+}
+.notes-filter-row .task-search-input { max-width: 260px; }
+
+.note-card { border-left: 3px solid var(--accent); }
+.note-card.note-completed { opacity: 0.6; border-left-color: var(--border); }
+.note-card-header { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.note-cat-badge {
+  display: inline-block;
+  padding: 2px 10px; border-radius: 12px;
+  font-size: 0.68rem; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.5px;
+}
+.note-cat-bos { background: #EEF2FF; color: #4F46E5; }
+.note-cat-atliq { background: #FEF3C7; color: #B45309; }
+.note-cat-self { background: #ECFDF5; color: #047857; }
+.note-cat-team { background: #EFF6FF; color: #1D4ED8; }
+.note-cat-sops { background: #F3E8FF; color: #7C3AED; }
+.note-cat-marketing { background: #FFF1F2; color: #BE123C; }
+.note-done-badge { padding: 2px 8px; border-radius: 10px; font-size: 0.65rem; font-weight: 700; background: #D1FAE5; color: #047857; }
+.note-overdue-badge { padding: 2px 8px; border-radius: 10px; font-size: 0.65rem; font-weight: 700; background: #FEE2E2; color: #B91C1C; }
+.note-title { font-size: 0.92rem; font-weight: 700; color: var(--text); margin: 8px 0 4px; }
+.note-completed .note-title { text-decoration: line-through; color: var(--text-muted); }
+.note-content { font-size: 0.8rem; color: var(--text-secondary); line-height: 1.5; margin-bottom: 8px; white-space: pre-wrap; }
+.note-meta { display: flex; flex-wrap: wrap; gap: 12px; font-size: 0.72rem; color: var(--text-muted); margin-top: 8px; }
+.note-meta-item { display: inline-flex; align-items: center; gap: 4px; }
+.note-meta-overdue { color: #DC2626; font-weight: 600; }
+.note-meta-link { color: var(--accent); text-decoration: none; font-weight: 600; }
+.note-meta-link:hover { text-decoration: underline; }
+.note-meta-date { margin-left: auto; }
+
+/* ======================================================================
+   COMPARE MEMBERS
+   ====================================================================== */
+
+.cmp-selectors {
+  display: flex; align-items: flex-end; gap: var(--sp-4);
+  justify-content: center; margin-bottom: var(--sp-6);
+  flex-wrap: wrap;
+}
+.cmp-select-wrap { flex: 1; max-width: 240px; }
+.cmp-label { display: block; font-size: 0.72rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
+.cmp-select { width: 100%; padding: 10px 14px; border: 1.5px solid var(--border); border-radius: var(--radius); font-size: 0.88rem; background: var(--card); }
+.cmp-select:focus { border-color: var(--accent); outline: none; box-shadow: 0 0 0 3px rgba(79,70,229,0.1); }
+.cmp-vs { font-size: 1.1rem; font-weight: 800; color: var(--text-muted); padding-bottom: 10px; }
+
+.cmp-table { background: var(--card); border-radius: var(--radius-md); border: 1px solid var(--border); overflow: hidden; margin-bottom: var(--sp-5); }
+.cmp-header-row, .cmp-row { display: grid; grid-template-columns: 1fr 1fr 1fr; }
+.cmp-header-row { background: var(--bg-subtle); border-bottom: 2px solid var(--border); }
+.cmp-member-name { padding: 14px 16px; font-size: 0.82rem; font-weight: 700; color: var(--accent); text-align: center; }
+.cmp-row { border-bottom: 1px solid var(--border-light); }
+.cmp-row:last-child { border-bottom: none; }
+.cmp-metric-label { padding: 12px 16px; font-size: 0.78rem; font-weight: 600; color: var(--text-secondary); display: flex; align-items: center; }
+.cmp-val { padding: 12px 16px; font-size: 0.85rem; font-weight: 600; color: var(--text); text-align: center; display: flex; align-items: center; justify-content: center; }
+.cmp-win { background: #F0FDF4; color: #15803D; }
+.cmp-zone { padding: 3px 12px; border-radius: 12px; font-size: 0.72rem; font-weight: 700; }
+.cmp-zone-green { background: #D1FAE5; color: #047857; }
+.cmp-zone-red { background: #FEE2E2; color: #B91C1C; }
+.cmp-zone-yellow { background: #FEF3C7; color: #B45309; }
+
+.cmp-section-title { font-size: 0.88rem; font-weight: 700; color: var(--text); margin-bottom: var(--sp-3); }
+.cmp-history { background: var(--card); border-radius: var(--radius-md); border: 1px solid var(--border); overflow: hidden; }
+.cmp-hist-row { display: grid; grid-template-columns: 120px repeat(6, 1fr); border-bottom: 1px solid var(--border-light); }
+.cmp-hist-row:last-child { border-bottom: none; }
+.cmp-hist-header { background: var(--bg-subtle); font-weight: 700; font-size: 0.72rem; color: var(--text-muted); }
+.cmp-hist-label { padding: 10px 14px; font-size: 0.78rem; font-weight: 600; color: var(--text); display: flex; align-items: center; }
+.cmp-hist-cell { padding: 10px 8px; text-align: center; font-size: 0.75rem; font-weight: 700; }
+.cmp-z-g { background: #D1FAE5; color: #047857; }
+.cmp-z-r { background: #FEE2E2; color: #B91C1C; }
+.cmp-z-y { background: #FEF3C7; color: #B45309; }
+
+/* ======================================================================
+   AUTO SIGNAL RULES
+   ====================================================================== */
+
+.ar-card { border-left: 3px solid var(--accent); }
+.ar-card.ar-inactive { border-left-color: var(--border); opacity: 0.65; }
+.ar-card-header { display: flex; align-items: center; gap: 10px; }
+.ar-name { font-size: 0.88rem; font-weight: 700; color: var(--text); margin: 0; }
+.ar-status {
+  display: inline-block;
+  padding: 2px 10px; border-radius: 10px;
+  font-size: 0.65rem; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.5px;
+}
+.ar-active { background: #D1FAE5; color: #047857; }
+.ar-paused { background: #F3F4F6; color: #6B7280; }
+.ar-detail { font-size: 0.8rem; color: var(--text-secondary); margin-top: 8px; }
+.ar-trigger { font-weight: 500; }
+.ar-sig-green { color: #047857; font-weight: 700; }
+.ar-sig-red { color: #B91C1C; font-weight: 700; }
+
+/* ======================================================================
    RESPONSIVE
    ====================================================================== */
 
@@ -4980,6 +5078,13 @@ select {
   .pi-summary { grid-template-columns: repeat(2, 1fr); }
   .psychology-grid { grid-template-columns: 1fr; }
   .form-row { grid-template-columns: 1fr; }
+  .cmp-selectors { flex-direction: column; align-items: stretch; }
+  .cmp-select-wrap { max-width: 100%; }
+  .cmp-header-row, .cmp-row { grid-template-columns: 1.2fr 1fr 1fr; }
+  .cmp-hist-row { grid-template-columns: 80px repeat(6, 1fr); }
+  .cmp-hist-label { font-size: 0.7rem; }
+  .notes-filter-row { flex-direction: column; align-items: stretch; }
+  .notes-filter-row .task-search-input { max-width: 100%; }
   .sidebar { display: none; }
   .main-content { padding: var(--sp-4); }
   .dash-actions-bar { grid-template-columns: repeat(2, 1fr); }
