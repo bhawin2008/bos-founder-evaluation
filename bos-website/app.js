@@ -46,11 +46,38 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   }, { passive: true });
 
+  // ==================== FAQ Accordion ====================
+
+  var faqItems = document.querySelectorAll(".faq-item");
+
+  faqItems.forEach(function (item) {
+    var question = item.querySelector(".faq-question");
+    if (question) {
+      question.addEventListener("click", function () {
+        var isActive = item.classList.contains("active");
+
+        // Close all FAQ items
+        faqItems.forEach(function (other) {
+          other.classList.remove("active");
+          var btn = other.querySelector(".faq-question");
+          if (btn) btn.setAttribute("aria-expanded", "false");
+        });
+
+        // Toggle current item
+        if (!isActive) {
+          item.classList.add("active");
+          question.setAttribute("aria-expanded", "true");
+        }
+      });
+    }
+  });
+
   // ==================== Scroll Fade-in ====================
 
   var fadeElements = document.querySelectorAll(
     ".problem-card, .framework-card, .how-item, .filter-card, " +
-    ".process-step, .philosophy-card, .what-col"
+    ".process-step, .philosophy-card, .what-col, " +
+    ".tool-card, .testimonial-card, .pricing-card, .faq-item"
   );
 
   fadeElements.forEach(function (el) {
