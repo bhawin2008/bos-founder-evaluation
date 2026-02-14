@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Content GPS – BOS Founder Tool</title>
+  <meta name="description" content="Navigate your content strategy with clarity. A guided system for IT founders to build authority through structured content.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="header">
+    <div class="container header-inner">
+      <div class="brand">
+        <span class="brand-badge">BOS</span>
+        <h1 class="brand-title">Content GPS</h1>
+      </div>
+      <p class="brand-tagline">Navigate your content strategy with clarity.</p>
+    </div>
+  </header>
+
+  <main class="main">
+    <div class="container">
+
+      <!-- Progress Bar -->
+      <div class="progress-bar">
+        <div class="progress-track">
+          <div class="progress-fill" id="progress-fill"></div>
+        </div>
+        <div class="progress-steps">
+          <button class="progress-step active" data-step="0">
+            <span class="step-dot"></span>
+            <span class="step-label">Destination</span>
+          </button>
+          <button class="progress-step" data-step="1">
+            <span class="step-dot"></span>
+            <span class="step-label">Position</span>
+          </button>
+          <button class="progress-step" data-step="2">
+            <span class="step-dot"></span>
+            <span class="step-label">Pillars</span>
+          </button>
+          <button class="progress-step" data-step="3">
+            <span class="step-dot"></span>
+            <span class="step-label">Route</span>
+          </button>
+          <button class="progress-step" data-step="4">
+            <span class="step-dot"></span>
+            <span class="step-label">Compass</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Step 0: Destination -->
+      <section class="step-panel active" id="step-0">
+        <div class="step-header">
+          <span class="step-number">01</span>
+          <h2 class="step-title">Set Your Destination</h2>
+          <p class="step-desc">What do you want your content to achieve? Your destination shapes everything — the topics, the tone, the platforms.</p>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Primary content goal</label>
+          <div class="option-grid">
+            <label class="option-card">
+              <input type="radio" name="primary-goal" value="thought-leadership">
+              <span class="option-inner">
+                <span class="option-icon">🧭</span>
+                <span class="option-title">Thought Leadership</span>
+                <span class="option-desc">Become the go-to expert in your space</span>
+              </span>
+            </label>
+            <label class="option-card">
+              <input type="radio" name="primary-goal" value="lead-generation">
+              <span class="option-inner">
+                <span class="option-icon">🎯</span>
+                <span class="option-title">Lead Generation</span>
+                <span class="option-desc">Attract qualified inbound leads</span>
+              </span>
+            </label>
+            <label class="option-card">
+              <input type="radio" name="primary-goal" value="community-building">
+              <span class="option-inner">
+                <span class="option-icon">🤝</span>
+                <span class="option-title">Community Building</span>
+                <span class="option-desc">Build a loyal audience around your brand</span>
+              </span>
+            </label>
+            <label class="option-card">
+              <input type="radio" name="primary-goal" value="hiring-brand">
+              <span class="option-inner">
+                <span class="option-icon">🏗️</span>
+                <span class="option-title">Hiring &amp; Brand</span>
+                <span class="option-desc">Attract talent and build employer brand</span>
+              </span>
+            </label>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="business-type">What type of business do you run?</label>
+          <select id="business-type" class="form-select">
+            <option value="">Select your business type</option>
+            <option value="saas">SaaS Product</option>
+            <option value="agency">Agency / Consultancy</option>
+            <option value="dev-shop">Dev Shop / Software Studio</option>
+            <option value="freelance">Freelance / Solo Founder</option>
+            <option value="marketplace">Marketplace / Platform</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="content-experience">Current content experience</label>
+          <div class="radio-group">
+            <label class="radio-option">
+              <input type="radio" name="content-experience" value="none">
+              <span>I haven't started creating content yet</span>
+            </label>
+            <label class="radio-option">
+              <input type="radio" name="content-experience" value="sporadic">
+              <span>I post occasionally but inconsistently</span>
+            </label>
+            <label class="radio-option">
+              <input type="radio" name="content-experience" value="consistent">
+              <span>I post regularly but without a clear strategy</span>
+            </label>
+            <label class="radio-option">
+              <input type="radio" name="content-experience" value="strategic">
+              <span>I have a strategy but want to improve it</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="weekly-hours">Hours per week you can invest in content</label>
+          <div class="range-wrapper">
+            <input type="range" id="weekly-hours" min="1" max="15" value="3" class="form-range">
+            <div class="range-labels">
+              <span>1 hr</span>
+              <span class="range-value" id="hours-display">3 hours</span>
+              <span>15 hrs</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="step-actions">
+          <div></div>
+          <button class="btn btn-primary btn-next" data-next="1">Continue to Position →</button>
+        </div>
+      </section>
+
+      <!-- Step 1: Position -->
+      <section class="step-panel" id="step-1">
+        <div class="step-header">
+          <span class="step-number">02</span>
+          <h2 class="step-title">Define Your Position</h2>
+          <p class="step-desc">Positioning is what makes you the obvious choice. Without it, you're just another voice in the noise.</p>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="target-audience">Who is your ideal audience?</label>
+          <textarea id="target-audience" class="form-textarea" rows="3" placeholder="e.g., CTOs at B2B SaaS companies with 10-50 employees who struggle with engineering team scaling"></textarea>
+          <span class="form-hint">Be as specific as possible. The narrower, the stronger your positioning.</span>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="unique-angle">What's your unique angle?</label>
+          <textarea id="unique-angle" class="form-textarea" rows="3" placeholder="e.g., I've scaled 3 dev teams from 5 to 50+ people and have a battle-tested framework for avoiding the common pitfalls"></textarea>
+          <span class="form-hint">What experience, perspective, or methodology makes you different from everyone else talking about this?</span>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">What is your content voice?</label>
+          <div class="option-grid cols-3">
+            <label class="option-card option-card-sm">
+              <input type="radio" name="content-voice" value="direct">
+              <span class="option-inner">
+                <span class="option-title">Direct &amp; Bold</span>
+                <span class="option-desc">No fluff, strong opinions</span>
+              </span>
+            </label>
+            <label class="option-card option-card-sm">
+              <input type="radio" name="content-voice" value="analytical">
+              <span class="option-inner">
+                <span class="option-title">Analytical</span>
+                <span class="option-desc">Data-driven, methodical</span>
+              </span>
+            </label>
+            <label class="option-card option-card-sm">
+              <input type="radio" name="content-voice" value="storyteller">
+              <span class="option-inner">
+                <span class="option-title">Storyteller</span>
+                <span class="option-desc">Narrative, experience-based</span>
+              </span>
+            </label>
+            <label class="option-card option-card-sm">
+              <input type="radio" name="content-voice" value="educator">
+              <span class="option-inner">
+                <span class="option-title">Educator</span>
+                <span class="option-desc">Teaching, step-by-step</span>
+              </span>
+            </label>
+            <label class="option-card option-card-sm">
+              <input type="radio" name="content-voice" value="contrarian">
+              <span class="option-inner">
+                <span class="option-title">Contrarian</span>
+                <span class="option-desc">Challenges norms, provocative</span>
+              </span>
+            </label>
+            <label class="option-card option-card-sm">
+              <input type="radio" name="content-voice" value="builder">
+              <span class="option-inner">
+                <span class="option-title">Builder in Public</span>
+                <span class="option-desc">Transparent, real-time sharing</span>
+              </span>
+            </label>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Primary platforms (select up to 3)</label>
+          <div class="checkbox-grid">
+            <label class="checkbox-option">
+              <input type="checkbox" name="platforms" value="linkedin">
+              <span class="checkbox-inner">
+                <span class="checkbox-title">LinkedIn</span>
+              </span>
+            </label>
+            <label class="checkbox-option">
+              <input type="checkbox" name="platforms" value="twitter">
+              <span class="checkbox-inner">
+                <span class="checkbox-title">X / Twitter</span>
+              </span>
+            </label>
+            <label class="checkbox-option">
+              <input type="checkbox" name="platforms" value="blog">
+              <span class="checkbox-inner">
+                <span class="checkbox-title">Blog / Website</span>
+              </span>
+            </label>
+            <label class="checkbox-option">
+              <input type="checkbox" name="platforms" value="newsletter">
+              <span class="checkbox-inner">
+                <span class="checkbox-title">Newsletter</span>
+              </span>
+            </label>
+            <label class="checkbox-option">
+              <input type="checkbox" name="platforms" value="youtube">
+              <span class="checkbox-inner">
+                <span class="checkbox-title">YouTube</span>
+              </span>
+            </label>
+            <label class="checkbox-option">
+              <input type="checkbox" name="platforms" value="podcast">
+              <span class="checkbox-inner">
+                <span class="checkbox-title">Podcast</span>
+              </span>
+            </label>
+          </div>
+        </div>
+
+        <div class="step-actions">
+          <button class="btn btn-ghost btn-prev" data-prev="0">← Back</button>
+          <button class="btn btn-primary btn-next" data-next="2">Continue to Pillars →</button>
+        </div>
+      </section>
+
+      <!-- Step 2: Pillars -->
+      <section class="step-panel" id="step-2">
+        <div class="step-header">
+          <span class="step-number">03</span>
+          <h2 class="step-title">Map Your Content Pillars</h2>
+          <p class="step-desc">Content pillars are the 3-5 recurring themes everything you create revolves around. They give your audience a reason to follow and your content a structure to scale.</p>
+        </div>
+
+        <div class="pillars-container" id="pillars-container">
+          <div class="pillar-card" data-pillar="0">
+            <div class="pillar-header">
+              <span class="pillar-number">Pillar 1</span>
+              <button class="pillar-remove hidden" aria-label="Remove pillar">&times;</button>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Pillar name</label>
+              <input type="text" class="form-input pillar-name" placeholder="e.g., Engineering Leadership">
+            </div>
+            <div class="form-group">
+              <label class="form-label">What you'll cover</label>
+              <textarea class="form-textarea pillar-topics" rows="2" placeholder="e.g., Hiring, team culture, code review practices, 1-on-1 frameworks"></textarea>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Content ratio</label>
+              <div class="range-wrapper">
+                <input type="range" min="10" max="50" value="33" class="form-range pillar-ratio">
+                <span class="range-value pillar-ratio-display">33%</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="pillar-card" data-pillar="1">
+            <div class="pillar-header">
+              <span class="pillar-number">Pillar 2</span>
+              <button class="pillar-remove hidden" aria-label="Remove pillar">&times;</button>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Pillar name</label>
+              <input type="text" class="form-input pillar-name" placeholder="e.g., Scaling a Dev Shop">
+            </div>
+            <div class="form-group">
+              <label class="form-label">What you'll cover</label>
+              <textarea class="form-textarea pillar-topics" rows="2" placeholder="e.g., Pricing, client management, delivery, operations"></textarea>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Content ratio</label>
+              <div class="range-wrapper">
+                <input type="range" min="10" max="50" value="34" class="form-range pillar-ratio">
+                <span class="range-value pillar-ratio-display">34%</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="pillar-card" data-pillar="2">
+            <div class="pillar-header">
+              <span class="pillar-number">Pillar 3</span>
+              <button class="pillar-remove hidden" aria-label="Remove pillar">&times;</button>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Pillar name</label>
+              <input type="text" class="form-input pillar-name" placeholder="e.g., Founder Lessons">
+            </div>
+            <div class="form-group">
+              <label class="form-label">What you'll cover</label>
+              <textarea class="form-textarea pillar-topics" rows="2" placeholder="e.g., Personal wins/failures, decision-making, mindset"></textarea>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Content ratio</label>
+              <div class="range-wrapper">
+                <input type="range" min="10" max="50" value="33" class="form-range pillar-ratio">
+                <span class="range-value pillar-ratio-display">33%</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <button class="btn btn-outline btn-add-pillar" id="add-pillar">+ Add Pillar</button>
+
+        <div class="ratio-bar" id="ratio-bar">
+          <div class="ratio-label">Content distribution</div>
+          <div class="ratio-track" id="ratio-track"></div>
+          <div class="ratio-total" id="ratio-total">Total: 100%</div>
+        </div>
+
+        <div class="step-actions">
+          <button class="btn btn-ghost btn-prev" data-prev="1">← Back</button>
+          <button class="btn btn-primary btn-next" data-next="3">Continue to Route →</button>
+        </div>
+      </section>
+
+      <!-- Step 3: Route -->
+      <section class="step-panel" id="step-3">
+        <div class="step-header">
+          <span class="step-number">04</span>
+          <h2 class="step-title">Plan Your Route</h2>
+          <p class="step-desc">Your content route is a 4-week rolling plan. Based on your pillars, platforms, and available time, here's your recommended cadence.</p>
+        </div>
+
+        <div class="route-summary" id="route-summary">
+          <div class="route-stat">
+            <span class="route-stat-num" id="route-posts-week">—</span>
+            <span class="route-stat-label">Posts / week</span>
+          </div>
+          <div class="route-stat">
+            <span class="route-stat-num" id="route-platforms">—</span>
+            <span class="route-stat-label">Platforms</span>
+          </div>
+          <div class="route-stat">
+            <span class="route-stat-num" id="route-hours">—</span>
+            <span class="route-stat-label">Hours / week</span>
+          </div>
+        </div>
+
+        <div class="calendar-wrapper">
+          <div class="calendar-header">
+            <h3>4-Week Content Calendar</h3>
+            <button class="btn btn-outline btn-sm" id="regenerate-calendar">Regenerate</button>
+          </div>
+          <div class="calendar-grid" id="calendar-grid">
+            <!-- Generated by JS -->
+          </div>
+        </div>
+
+        <div class="format-mix">
+          <h3 class="format-mix-title">Recommended format mix</h3>
+          <div class="format-grid" id="format-grid">
+            <!-- Generated by JS -->
+          </div>
+        </div>
+
+        <div class="step-actions">
+          <button class="btn btn-ghost btn-prev" data-prev="2">← Back</button>
+          <button class="btn btn-primary btn-next" data-next="4">View Your Compass →</button>
+        </div>
+      </section>
+
+      <!-- Step 4: Compass (Results) -->
+      <section class="step-panel" id="step-4">
+        <div class="step-header">
+          <span class="step-number">05</span>
+          <h2 class="step-title">Your Content Compass</h2>
+          <p class="step-desc">Here's your complete content strategy overview. Use this as your north star for the next 90 days.</p>
+        </div>
+
+        <div class="compass-score" id="compass-score">
+          <div class="score-ring">
+            <svg viewBox="0 0 120 120" class="score-svg">
+              <circle cx="60" cy="60" r="54" class="score-bg" />
+              <circle cx="60" cy="60" r="54" class="score-fill" id="score-circle" />
+            </svg>
+            <span class="score-value" id="score-value">—</span>
+          </div>
+          <div class="score-details">
+            <h3 class="score-label">Strategy Readiness Score</h3>
+            <p class="score-verdict" id="score-verdict">Complete all steps to see your score.</p>
+          </div>
+        </div>
+
+        <div class="compass-grid" id="compass-grid">
+          <div class="compass-card">
+            <h3>Destination</h3>
+            <div class="compass-value" id="compass-goal">—</div>
+          </div>
+          <div class="compass-card">
+            <h3>Audience</h3>
+            <div class="compass-value" id="compass-audience">—</div>
+          </div>
+          <div class="compass-card">
+            <h3>Voice</h3>
+            <div class="compass-value" id="compass-voice">—</div>
+          </div>
+          <div class="compass-card">
+            <h3>Platforms</h3>
+            <div class="compass-value" id="compass-platforms">—</div>
+          </div>
+        </div>
+
+        <div class="compass-pillars" id="compass-pillars">
+          <h3>Your Content Pillars</h3>
+          <div class="compass-pillars-list" id="compass-pillars-list">
+            <!-- Generated by JS -->
+          </div>
+        </div>
+
+        <div class="compass-actions-section">
+          <h3>Recommended Next Actions</h3>
+          <div class="action-list" id="action-list">
+            <!-- Generated by JS -->
+          </div>
+        </div>
+
+        <div class="compass-export">
+          <button class="btn btn-primary" id="export-strategy">Export Strategy (JSON)</button>
+          <button class="btn btn-ghost" id="start-over">Start Over</button>
+        </div>
+
+        <div class="step-actions">
+          <button class="btn btn-ghost btn-prev" data-prev="3">← Back to Route</button>
+          <div></div>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-inner">
+      <span class="footer-brand">BOS</span>
+      <span class="footer-text">Content GPS — Part of the Business Operating System</span>
+    </div>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
