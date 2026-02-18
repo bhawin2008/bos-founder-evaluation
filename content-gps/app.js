@@ -4,7 +4,7 @@
   // ===== State =====
   const state = {
     currentStep: 0,
-    totalSteps: 5,
+    totalSteps: 6,
     data: {
       primaryGoal: '',
       businessType: '',
@@ -127,6 +127,426 @@
 
   const PILLAR_COLORS = ['var(--accent)', 'var(--green)', 'var(--purple)', 'var(--orange)', 'var(--yellow)'];
 
+  // ===== Platform Playbook Data =====
+  const PLATFORM_PLAYBOOK = {
+    linkedin: {
+      name: 'LinkedIn',
+      stats: [
+        { value: '3,000', label: 'Character limit' },
+        { value: '2-5', label: 'Posts per week' },
+        { value: 'Tue-Thu', label: 'Best days' },
+        { value: '7-9 AM', label: 'Peak time' },
+      ],
+      formats: [
+        { name: 'Text Post', desc: 'Personal stories, insights, and takes. Keep paragraphs to 1-2 lines for readability.' },
+        { name: 'Carousel (PDF)', desc: 'Swipeable slides. Great for frameworks, step-by-steps, and data. 5-10 slides optimal.' },
+        { name: 'Article', desc: 'Long-form thought leadership. Use for in-depth analysis or evergreen how-to content.' },
+        { name: 'Poll', desc: 'Quick engagement boost. Ask opinion-based questions relevant to your audience.' },
+        { name: 'Video', desc: 'Native video gets priority. Keep under 3 minutes. Subtitles are essential.' },
+      ],
+      hooks: [
+        'I made a $X mistake so you don\'t have to.',
+        'Hot take: [controversial opinion about industry]',
+        'After [X years] in [field], here are [N] things I wish I knew:',
+        'Stop doing [common practice]. Here\'s why:',
+        'I went from [A] to [B] in [timeframe]. Here\'s the playbook:',
+        'The difference between [junior] and [senior] [role]:',
+        '[X]% of founders get this wrong about [topic].',
+        'Unpopular opinion: [bold statement].',
+      ],
+      tips: [
+        'First 2 lines are your hook — they appear before "see more". Make them count.',
+        'Use line breaks liberally. Wall of text = scroll past.',
+        'Post between 7-9 AM in your audience\'s timezone for maximum reach.',
+        'Reply to every comment in the first 60 minutes. The algorithm rewards early engagement.',
+        'Use 3-5 relevant hashtags. Place them at the end, not inline.',
+        'Tag people only when genuinely relevant — spam tagging hurts your reach.',
+        'Engage with 5-10 posts from your network before you publish. It primes the algorithm.',
+        'End with a question or clear CTA to drive comments.',
+      ],
+      dos: [
+        'Share personal stories and lessons learned',
+        'Use white space and short paragraphs',
+        'Engage authentically with comments',
+        'Post consistently at the same times',
+        'Mix formats: text, carousels, videos',
+      ],
+      donts: [
+        'Write long paragraphs without line breaks',
+        'Use clickbait without delivering value',
+        'Tag people randomly for engagement',
+        'Post and ghost — always engage after',
+        'Copy-paste the same content repeatedly',
+      ],
+    },
+    twitter: {
+      name: 'X / Twitter',
+      stats: [
+        { value: '280', label: 'Chars per tweet' },
+        { value: '3-7', label: 'Tweets per day' },
+        { value: 'Mon-Fri', label: 'Best days' },
+        { value: '8-10 AM', label: 'Peak time' },
+      ],
+      formats: [
+        { name: 'Single Tweet', desc: 'Sharp takes, observations, or questions. Every word must earn its place.' },
+        { name: 'Thread', desc: 'Deep-dive on a topic. First tweet is the hook. 5-15 tweets optimal.' },
+        { name: 'Quote Tweet', desc: 'Add your take to trending conversations. Great for building authority.' },
+        { name: 'Poll', desc: 'Drive engagement with 2-4 option polls. Keep them relevant and fun.' },
+        { name: 'Image/Infographic', desc: 'Screenshots, charts, frameworks. Visual tweets get 35% more engagement.' },
+      ],
+      hooks: [
+        '[Topic] is broken. Here\'s how to fix it:',
+        'Thread: [N] lessons from [experience/achievement]',
+        'Most people think [common belief]. The truth is:',
+        'In [year], I [achievement]. Here\'s exactly how (thread):',
+        'Controversial take: [statement]',
+        'The [topic] cheat sheet you didn\'t know you needed:',
+        'I analyzed [X] [things]. Here\'s what I found:',
+        '[N]-second [topic] tip that will change your [outcome]:',
+      ],
+      tips: [
+        'Your first tweet IS the content. If the hook fails, the thread dies.',
+        'Use threads for long-form. Number each tweet (1/, 2/, etc.) for readability.',
+        'Tweet at peak hours: 8-10 AM and 12-1 PM in your audience\'s timezone.',
+        'Use 1-2 hashtags max. More than that looks spammy on X.',
+        'Quote tweet > reply for visibility. Add genuine value when you do.',
+        'Build in public — share wins, failures, and real numbers. Authenticity wins.',
+        'End threads with a clear CTA: follow, bookmark, or retweet.',
+        'Engage in replies of larger accounts in your niche to gain visibility.',
+      ],
+      dos: [
+        'Be concise and punchy — every word counts',
+        'Join trending conversations in your niche',
+        'Use threads for detailed breakdowns',
+        'Share real numbers and behind-the-scenes',
+        'Bookmark and quote-tweet strategically',
+      ],
+      donts: [
+        'Use more than 2 hashtags per tweet',
+        'Thread without a strong hook tweet',
+        'Ignore replies and mentions',
+        'Post the same tweet format repeatedly',
+        'Buy followers or use engagement pods',
+      ],
+    },
+    blog: {
+      name: 'Blog / Website',
+      stats: [
+        { value: '1.5-2.5K', label: 'Words for SEO' },
+        { value: '1-2', label: 'Posts per week' },
+        { value: 'Tue-Wed', label: 'Best publish days' },
+        { value: '10 AM', label: 'Peak time' },
+      ],
+      formats: [
+        { name: 'How-To Guide', desc: 'Step-by-step tutorials. Include code snippets, screenshots, or diagrams.' },
+        { name: 'Listicle', desc: '"N best tools/tips/practices". Easy to scan and share. Great for SEO.' },
+        { name: 'Case Study', desc: 'Before/after results. Show real data and the process behind the outcome.' },
+        { name: 'Opinion Piece', desc: 'Take a stand on an industry topic. Great for backlinks and social shares.' },
+        { name: 'Comparison Post', desc: '"X vs Y" posts. High search intent and great for capturing decision-stage readers.' },
+      ],
+      hooks: [
+        'The Complete Guide to [Topic] in [Year]',
+        '[N] [Topic] Mistakes That Are Costing You [Outcome]',
+        'How We [Achieved Result] in [Timeframe]: A Step-by-Step Breakdown',
+        '[Topic] vs [Topic]: Which Is Right for Your [Business Type]?',
+        'Why [Common Approach] Is Wrong (And What to Do Instead)',
+        'The [Topic] Playbook: Everything I Learned After [Experience]',
+        '[N] [Topic] Tools Every [Role] Should Be Using in [Year]',
+        'I [Did Something Bold] — Here\'s What Happened',
+      ],
+      tips: [
+        'Target one primary keyword per post. Use it in the title, H1, first paragraph, and URL.',
+        'Write a compelling meta description under 155 characters to boost click-through rates.',
+        'Use H2 and H3 headings to structure content. Search engines and readers love clear hierarchy.',
+        'Keep paragraphs to 2-3 sentences. Use bullet points for scannable sections.',
+        'Add internal links to 2-3 related posts. This boosts SEO and reduces bounce rate.',
+        'Include a clear CTA: email signup, related post, or product/service page.',
+        'Optimize images with alt text and compress for fast loading.',
+        'Update old posts every 6-12 months with fresh data and examples.',
+      ],
+      dos: [
+        'Target specific long-tail keywords',
+        'Use clear heading hierarchy (H1 > H2 > H3)',
+        'Include visuals: diagrams, screenshots, charts',
+        'Add a table of contents for 1,500+ word posts',
+        'Promote each post across social channels',
+      ],
+      donts: [
+        'Publish without a target keyword strategy',
+        'Write walls of text without subheadings',
+        'Forget meta descriptions and alt tags',
+        'Neglect internal linking between posts',
+        'Publish and never update older content',
+      ],
+    },
+    newsletter: {
+      name: 'Newsletter',
+      stats: [
+        { value: '6-10', label: 'Subject line words' },
+        { value: '1-2x', label: 'Per week' },
+        { value: 'Tue-Thu', label: 'Best send days' },
+        { value: '9-10 AM', label: 'Peak open time' },
+      ],
+      formats: [
+        { name: 'Personal Insight', desc: 'One core idea explored in depth with your unique perspective. 400-600 words.' },
+        { name: 'Curated Roundup', desc: '5-7 links with your commentary. Save readers time while showing expertise.' },
+        { name: 'Tactical Breakdown', desc: 'Step-by-step guide on a specific tactic. Include templates or frameworks.' },
+        { name: 'Interview/Spotlight', desc: 'Feature an expert or customer. Cross-promotion builds both audiences.' },
+        { name: 'Behind-the-Scenes', desc: 'Revenue updates, challenges, decisions. Builds trust and loyalty.' },
+      ],
+      hooks: [
+        'The one thing I changed that [result]',
+        'I was wrong about [topic] — here\'s what I learned',
+        '[N] things I bookmarked this week (and why they matter)',
+        'The [topic] framework I use every [timeframe]',
+        'What nobody tells you about [common situation]',
+        'A [role] asked me about [topic]. Here\'s what I said:',
+        'This week I [did something]. Here are my takeaways.',
+        '[Curiosity gap] — I\'ll explain inside.',
+      ],
+      tips: [
+        'Subject line is 80% of the open. Use curiosity, specificity, or urgency.',
+        'Keep your "from name" consistent — readers open based on who sent it.',
+        'Send at the same day/time weekly. Consistency builds habit.',
+        'Start with a hook paragraph. Don\'t waste the preview text.',
+        'One CTA per email. More choices = fewer clicks.',
+        'Ask readers to reply. Replies boost deliverability and build relationships.',
+        'Segment your list based on engagement. Re-engage or prune inactive subscribers.',
+        'A/B test subject lines with 10-20% of your list before sending to all.',
+      ],
+      dos: [
+        'Use a personal, conversational tone',
+        'Include one clear call-to-action',
+        'Be consistent with send schedule',
+        'Write subject lines that spark curiosity',
+        'Ask readers to reply and engage',
+      ],
+      donts: [
+        'Send without testing on mobile',
+        'Overload with multiple CTAs',
+        'Use generic subject lines',
+        'Skip the preview text optimization',
+        'Buy email lists or spam subscribers',
+      ],
+    },
+    youtube: {
+      name: 'YouTube',
+      stats: [
+        { value: '8-15', label: 'Optimal minutes' },
+        { value: '1-2', label: 'Videos per week' },
+        { value: 'Thu-Sat', label: 'Best publish days' },
+        { value: '2-4 PM', label: 'Peak time' },
+      ],
+      formats: [
+        { name: 'Tutorial', desc: 'Screen recordings or step-by-step guides. High search intent and long shelf life.' },
+        { name: 'Talking Head', desc: 'Opinion, analysis, or story. Face-to-camera builds trust. Keep energy high.' },
+        { name: 'Listicle Video', desc: '"Top N tools/tips" — easy to film, high watch time if value-packed.' },
+        { name: 'Interview', desc: 'Bring in guests. Cross-promotion helps both channels grow.' },
+        { name: 'Shorts', desc: '< 60 seconds vertical video. Great for discovery and new subscriber acquisition.' },
+      ],
+      hooks: [
+        '[N] [Topic] Tips That Actually Work in [Year]',
+        'How to [Achieve Result] Step by Step',
+        'I Tried [Thing] for [Duration] — Here\'s What Happened',
+        'Stop Making These [N] [Topic] Mistakes',
+        '[Topic] Tutorial for [Audience]: Complete Guide',
+        'Why Most [Role]s Fail at [Topic] (And How to Fix It)',
+        'The [Tool/Framework] That Changed My [Outcome]',
+        '[Topic] Explained in [N] Minutes',
+      ],
+      tips: [
+        'The first 30 seconds decide if viewers stay. Open with a hook, not an intro.',
+        'Title + thumbnail = 80% of click-through rate. Invest time in both.',
+        'Use keywords in your title, description, and tags for YouTube SEO.',
+        'Add timestamps in your description. It improves watch time and user experience.',
+        'End screens and cards drive viewers to your next video. Always include them.',
+        'Publish consistently. The algorithm rewards channels that upload on schedule.',
+        'Encourage subscribers with a specific reason: "Subscribe for weekly [topic] videos."',
+        'Repurpose YouTube content into blog posts, tweets, and newsletter material.',
+      ],
+      dos: [
+        'Hook viewers in the first 30 seconds',
+        'Invest in good audio (more than video quality)',
+        'Use custom thumbnails with high contrast',
+        'Add chapters/timestamps to descriptions',
+        'Study your audience retention graphs',
+      ],
+      donts: [
+        'Start with a long intro or animation',
+        'Ignore thumbnail optimization',
+        'Upload without a description or tags',
+        'Publish inconsistently with no schedule',
+        'Ask for likes/subs before delivering value',
+      ],
+    },
+    podcast: {
+      name: 'Podcast',
+      stats: [
+        { value: '20-45', label: 'Optimal minutes' },
+        { value: '1', label: 'Episode per week' },
+        { value: 'Mon-Wed', label: 'Best release days' },
+        { value: '5-7 AM', label: 'Peak listen time' },
+      ],
+      formats: [
+        { name: 'Solo Episode', desc: 'Share your expertise directly. Best for thought leadership and personal branding.' },
+        { name: 'Interview', desc: 'Bring on guests. Cross-promotion and diverse perspectives grow your audience.' },
+        { name: 'Co-Host Banter', desc: 'Regular co-host discussions. Great for personality-driven shows.' },
+        { name: 'Case Study Deep-Dive', desc: 'Analyze a real company or decision in depth. Highly shareable and educational.' },
+        { name: 'Q&A / Mailbag', desc: 'Answer listener questions. Builds community and keeps content listener-driven.' },
+      ],
+      hooks: [
+        'The [Topic] Mistake That Cost Me [Amount/Result]',
+        '[N] Things Every [Role] Should Know About [Topic]',
+        'Inside [Company/Decision]: What Really Happened',
+        'How [Guest] Built [Achievement] From Scratch',
+        'The Honest Truth About [Topic] Nobody Talks About',
+        'My [Timeframe] Review: What Worked, What Didn\'t',
+        '[Topic] Masterclass: From Zero to [Result]',
+        'Answering Your Top [N] Questions About [Topic]',
+      ],
+      tips: [
+        'Invest in a good microphone. Audio quality is the #1 factor in listener retention.',
+        'Create a consistent intro/outro. It builds brand recognition.',
+        'Write detailed show notes with timestamps, links, and a summary.',
+        'Submit to all major directories: Apple, Spotify, Google, and Amazon.',
+        'Record 3-5 episodes before launching to build a buffer.',
+        'Cut clips for social media. 30-60 second highlights drive discovery.',
+        'Ask listeners to leave reviews — it\'s the #1 growth lever for podcasts.',
+        'Repurpose transcripts into blog posts, Twitter threads, and LinkedIn posts.',
+      ],
+      dos: [
+        'Invest in quality audio equipment',
+        'Create detailed show notes with links',
+        'Cut short clips for social promotion',
+        'Be consistent with your release schedule',
+        'Ask for reviews on Apple Podcasts',
+      ],
+      donts: [
+        'Record in echoey or noisy environments',
+        'Publish without show notes or descriptions',
+        'Launch with only one episode',
+        'Forget to promote on other channels',
+        'Record without a rough outline or structure',
+      ],
+    },
+  };
+
+  // ===== Writing Frameworks =====
+  const WRITING_FRAMEWORKS = [
+    {
+      name: 'AIDA',
+      full: 'Attention, Interest, Desire, Action',
+      steps: [
+        'Attention — Grab them with a bold hook or surprising stat',
+        'Interest — Explain the problem or opportunity they relate to',
+        'Desire — Show the transformation or result they want',
+        'Action — Tell them exactly what to do next',
+      ],
+    },
+    {
+      name: 'PAS',
+      full: 'Problem, Agitate, Solution',
+      steps: [
+        'Problem — State the pain point your audience faces',
+        'Agitate — Make the pain feel urgent and real',
+        'Solution — Present your approach as the answer',
+      ],
+    },
+    {
+      name: 'BAB',
+      full: 'Before, After, Bridge',
+      steps: [
+        'Before — Describe the current painful situation',
+        'After — Paint a picture of the ideal outcome',
+        'Bridge — Show how to get from before to after',
+      ],
+    },
+    {
+      name: 'SCQA',
+      full: 'Situation, Complication, Question, Answer',
+      steps: [
+        'Situation — Set the context everyone agrees on',
+        'Complication — Introduce the challenge or change',
+        'Question — Frame the key question that needs answering',
+        'Answer — Deliver your insight or solution',
+      ],
+    },
+  ];
+
+  // ===== Content Repurposing Map =====
+  const REPURPOSE_MAP = [
+    {
+      source: 'Blog Post (1,500-2,000 words)',
+      label: 'Original',
+      outputs: [
+        'LinkedIn post — pull out one key insight with a personal angle',
+        'Twitter thread — break into 5-10 key takeaways',
+        'Newsletter — summarize with a personal intro and CTA',
+        'YouTube video — use the blog outline as your script',
+        'Carousel — turn key points into visual slides',
+        'Podcast segment — discuss the topic in more depth',
+      ],
+    },
+    {
+      source: 'Podcast Episode (30-45 min)',
+      label: 'Original',
+      outputs: [
+        'Blog post — transcribe and edit into a written article',
+        'Twitter thread — pull top 5 quotes or insights',
+        'Short video clips — 30-60 second highlights for social',
+        'Newsletter — summarize key takeaways and link to episode',
+        'LinkedIn post — share one lesson learned from the conversation',
+      ],
+    },
+    {
+      source: 'Client/Customer Win',
+      label: 'Original',
+      outputs: [
+        'Case study blog post — full before/after with data',
+        'LinkedIn post — celebrate the win and tag the client',
+        'Tweet — share one key metric or result',
+        'Testimonial graphic — use a quote for visual content',
+        'Newsletter feature — include in your weekly update',
+      ],
+    },
+  ];
+
+  // ===== Engagement Strategies =====
+  const ENGAGEMENT_STRATEGIES = [
+    {
+      title: 'Pre-Post Warm-Up',
+      items: [
+        'Engage with 5-10 posts in your niche 30 min before publishing',
+        'Leave thoughtful comments (not just "great post")',
+        'This signals the algorithm you\'re active and primes your feed',
+      ],
+    },
+    {
+      title: 'The 60-Minute Rule',
+      items: [
+        'Stay active for 60 min after posting',
+        'Reply to every comment within the first hour',
+        'Ask follow-up questions to keep threads going',
+      ],
+    },
+    {
+      title: 'Collaboration Growth',
+      items: [
+        'Guest post on others\' newsletters or blogs',
+        'Co-create content with complementary founders',
+        'Feature customers and partners — they\'ll share it',
+      ],
+    },
+    {
+      title: 'Content Stacking',
+      items: [
+        'Repurpose one pillar piece into 5-7 social posts',
+        'Cross-post adapted content across platforms',
+        'Build a content library you can reference and reshare',
+      ],
+    },
+  ];
+
   // ===== DOM References =====
   const progressFill = document.getElementById('progress-fill');
   const progressSteps = document.querySelectorAll('.progress-step');
@@ -166,6 +586,7 @@
     // Run step-specific logic
     if (step === 3) generateRoute();
     if (step === 4) generateCompass();
+    if (step === 5) generateCreatorStep();
 
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
@@ -566,6 +987,347 @@
     URL.revokeObjectURL(url);
   }
 
+  // ===== Content Creator & Platform Playbook =====
+  function generateCreatorStep() {
+    collectStepData(state.currentStep > 0 ? state.currentStep - 1 : 0);
+    const d = state.data;
+    const platforms = d.platforms.length > 0 ? d.platforms : ['linkedin'];
+    const pillars = d.pillars.filter((p) => p.name);
+
+    generatePlaybookTabs(platforms);
+    populateCreatorSelects(platforms, pillars);
+    generateStrategies(platforms);
+
+    // Show first platform's playbook
+    if (platforms.length > 0) {
+      renderPlaybook(platforms[0]);
+    }
+  }
+
+  // --- Platform Playbook ---
+  function generatePlaybookTabs(platforms) {
+    const container = document.getElementById('playbook-platform-tabs');
+    container.innerHTML = platforms
+      .map(
+        (p, i) =>
+          `<button class="playbook-platform-btn${i === 0 ? ' active' : ''}" data-platform="${p}">${PLATFORM_LABELS[p] || p}</button>`
+      )
+      .join('');
+
+    container.querySelectorAll('.playbook-platform-btn').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        container.querySelectorAll('.playbook-platform-btn').forEach((b) => b.classList.remove('active'));
+        btn.classList.add('active');
+        renderPlaybook(btn.dataset.platform);
+      });
+    });
+  }
+
+  function renderPlaybook(platform) {
+    const data = PLATFORM_PLAYBOOK[platform];
+    if (!data) return;
+
+    const content = document.getElementById('playbook-content');
+    content.innerHTML = `
+      <!-- Quick Stats -->
+      <div class="playbook-card">
+        <div class="playbook-card-header">
+          <span class="playbook-card-title">${escapeHtml(data.name)} — Quick Stats</span>
+        </div>
+        <div class="playbook-stat-grid">
+          ${data.stats.map((s) => `
+            <div class="playbook-stat">
+              <div class="playbook-stat-value">${escapeHtml(s.value)}</div>
+              <div class="playbook-stat-label">${escapeHtml(s.label)}</div>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+
+      <!-- Content Formats -->
+      <div class="playbook-card">
+        <div class="playbook-card-header">
+          <span class="playbook-card-title">Content Formats That Work</span>
+        </div>
+        <div class="playbook-card-body">
+          ${data.formats.map((f) => `
+            <div class="playbook-item">
+              <span class="playbook-item-bullet">></span>
+              <span><strong>${escapeHtml(f.name)}</strong> — ${escapeHtml(f.desc)}</span>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+
+      <!-- Hook Formulas -->
+      <div class="playbook-card">
+        <div class="playbook-card-header">
+          <span class="playbook-card-title">Proven Hook Formulas</span>
+        </div>
+        <div class="playbook-card-body">
+          ${data.hooks.map((h) => `
+            <div class="playbook-item">
+              <span class="playbook-item-bullet">></span>
+              <span>${escapeHtml(h)}</span>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+
+      <!-- Platform Tips -->
+      <div class="playbook-card">
+        <div class="playbook-card-header">
+          <span class="playbook-card-title">Platform-Specific Tips</span>
+        </div>
+        <div class="playbook-card-body">
+          ${data.tips.map((t) => `
+            <div class="playbook-item">
+              <span class="playbook-item-bullet">></span>
+              <span>${escapeHtml(t)}</span>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+
+      <!-- Do's and Don'ts -->
+      <div class="playbook-card">
+        <div class="playbook-card-header">
+          <span class="playbook-card-title">Do's & Don'ts</span>
+        </div>
+        <div class="playbook-dos-donts">
+          <div class="playbook-do">
+            <div class="playbook-do-title">Do</div>
+            <ul class="playbook-do-list">
+              ${data.dos.map((d) => `<li>${escapeHtml(d)}</li>`).join('')}
+            </ul>
+          </div>
+          <div class="playbook-dont">
+            <div class="playbook-dont-title">Don't</div>
+            <ul class="playbook-dont-list">
+              ${data.donts.map((d) => `<li>${escapeHtml(d)}</li>`).join('')}
+            </ul>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  // --- Content Creator ---
+  function populateCreatorSelects(platforms, pillars) {
+    const platformSelect = document.getElementById('creator-platform');
+    platformSelect.innerHTML = platforms
+      .map((p) => `<option value="${p}">${PLATFORM_LABELS[p] || p}</option>`)
+      .join('');
+
+    const pillarSelect = document.getElementById('creator-pillar');
+    pillarSelect.innerHTML =
+      (pillars.length > 0
+        ? pillars.map((p, i) => `<option value="${i}">${escapeHtml(p.name)}</option>`)
+        : ['<option value="0">General</option>']
+      ).join('');
+
+    updateCreatorFormats();
+    updateTemplateChips();
+    updateCreatorTips();
+
+    // Bind change events
+    platformSelect.addEventListener('change', () => {
+      updateCreatorFormats();
+      updateTemplateChips();
+      updateCreatorTips();
+      updateEditorCounter();
+    });
+  }
+
+  function updateCreatorFormats() {
+    const platform = document.getElementById('creator-platform').value;
+    const data = PLATFORM_PLAYBOOK[platform];
+    if (!data) return;
+
+    const formatSelect = document.getElementById('creator-format');
+    formatSelect.innerHTML = data.formats
+      .map((f) => `<option value="${escapeHtml(f.name)}">${escapeHtml(f.name)}</option>`)
+      .join('');
+  }
+
+  function updateTemplateChips() {
+    const platform = document.getElementById('creator-platform').value;
+    const data = PLATFORM_PLAYBOOK[platform];
+    if (!data) return;
+
+    const container = document.getElementById('template-chips');
+    container.innerHTML = data.hooks
+      .map(
+        (h, i) =>
+          `<button class="template-chip" data-idx="${i}">${escapeHtml(h)}</button>`
+      )
+      .join('');
+
+    container.querySelectorAll('.template-chip').forEach((chip) => {
+      chip.addEventListener('click', () => {
+        container.querySelectorAll('.template-chip').forEach((c) => c.classList.remove('active'));
+        chip.classList.add('active');
+
+        const textarea = document.getElementById('creator-textarea');
+        const pillarSelect = document.getElementById('creator-pillar');
+        const pillarIdx = parseInt(pillarSelect.value);
+        const pillars = state.data.pillars.filter((p) => p.name);
+        const pillar = pillars[pillarIdx] || { name: 'your niche', topics: '' };
+        const topic = pillar.topics ? pillar.topics.split(',')[0].trim() : pillar.name;
+
+        let hookText = data.hooks[parseInt(chip.dataset.idx)] || '';
+        hookText = hookText.replace(/\[Topic\]|\[topic\]/g, topic);
+        hookText = hookText.replace(/\[N\]/g, '5');
+        hookText = hookText.replace(/\[Year\]|\[year\]/g, new Date().getFullYear().toString());
+        hookText = hookText.replace(/\[.*?\]/g, '___');
+
+        textarea.value = hookText + '\n\n';
+        textarea.focus();
+        textarea.setSelectionRange(textarea.value.length, textarea.value.length);
+        updateEditorCounter();
+      });
+    });
+  }
+
+  function updateCreatorTips() {
+    const platform = document.getElementById('creator-platform').value;
+    const data = PLATFORM_PLAYBOOK[platform];
+    if (!data) return;
+
+    const tipsContainer = document.getElementById('creator-tips');
+    const topTips = data.tips.slice(0, 5);
+    tipsContainer.innerHTML = `
+      <div class="creator-tips-title">Quick Tips for ${escapeHtml(data.name)}</div>
+      <div class="tip-list">
+        ${topTips.map((t) => `<div class="tip-item">${escapeHtml(t)}</div>`).join('')}
+      </div>
+    `;
+  }
+
+  function updateEditorCounter() {
+    const textarea = document.getElementById('creator-textarea');
+    const counter = document.getElementById('editor-counter');
+    const platform = document.getElementById('creator-platform').value;
+
+    const charLimits = {
+      linkedin: 3000,
+      twitter: 280,
+      blog: null,
+      newsletter: null,
+      youtube: 5000,
+      podcast: null,
+    };
+
+    const limit = charLimits[platform];
+    const len = textarea.value.length;
+
+    if (limit) {
+      counter.textContent = `${len} / ${limit}`;
+      counter.className = 'editor-counter';
+      if (len > limit) counter.classList.add('error');
+      else if (len > limit * 0.9) counter.classList.add('warning');
+    } else {
+      counter.textContent = `${len} characters`;
+      counter.className = 'editor-counter';
+    }
+  }
+
+  // --- Growth Strategies ---
+  function generateStrategies(platforms) {
+    // Writing Frameworks
+    const frameworkGrid = document.getElementById('framework-grid');
+    frameworkGrid.innerHTML = WRITING_FRAMEWORKS
+      .map(
+        (f) => `
+        <div class="framework-card">
+          <div class="framework-name">${escapeHtml(f.name)}</div>
+          <div class="framework-full">${escapeHtml(f.full)}</div>
+          <div class="framework-steps">
+            ${f.steps.map((s, i) => `
+              <div class="framework-step">
+                <span class="framework-step-num">${i + 1}</span>
+                <span>${escapeHtml(s)}</span>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      `
+      )
+      .join('');
+
+    // Repurpose Flow
+    const repurposeFlow = document.getElementById('repurpose-flow');
+    repurposeFlow.innerHTML = REPURPOSE_MAP
+      .map(
+        (r) => `
+        <div class="repurpose-card">
+          <div class="repurpose-source">
+            <span>${escapeHtml(r.source)}</span>
+            <span class="repurpose-source-label">${escapeHtml(r.label)}</span>
+          </div>
+          <div class="repurpose-outputs">
+            ${r.outputs.map((o) => `
+              <div class="repurpose-output">
+                <span class="repurpose-arrow">-></span>
+                <span>${escapeHtml(o)}</span>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      `
+      )
+      .join('');
+
+    // Engagement Grid
+    const engagementGrid = document.getElementById('engagement-grid');
+    engagementGrid.innerHTML = ENGAGEMENT_STRATEGIES
+      .map(
+        (e) => `
+        <div class="engagement-card">
+          <div class="engagement-card-title">${escapeHtml(e.title)}</div>
+          <ul class="engagement-list">
+            ${e.items.map((item) => `<li>${escapeHtml(item)}</li>`).join('')}
+          </ul>
+        </div>
+      `
+      )
+      .join('');
+
+    // Schedule Grid
+    const scheduleGrid = document.getElementById('schedule-grid');
+    const hours = state.data.weeklyHours || 3;
+    scheduleGrid.innerHTML = platforms
+      .map((p) => {
+        const data = PLATFORM_PLAYBOOK[p];
+        if (!data) return '';
+        const stats = data.stats;
+        return `
+          <div class="schedule-card">
+            <div class="schedule-platform">${escapeHtml(data.name)}</div>
+            <div class="schedule-details">
+              <div class="schedule-detail">
+                <span class="schedule-detail-label">Frequency</span>
+                <span class="schedule-detail-value">${escapeHtml(stats[1].value)} ${escapeHtml(stats[1].label.toLowerCase())}</span>
+              </div>
+              <div class="schedule-detail">
+                <span class="schedule-detail-label">Best Days</span>
+                <span class="schedule-detail-value">${escapeHtml(stats[2].value)}</span>
+              </div>
+              <div class="schedule-detail">
+                <span class="schedule-detail-label">Peak Time</span>
+                <span class="schedule-detail-value">${escapeHtml(stats[3].value)}</span>
+              </div>
+              <div class="schedule-detail">
+                <span class="schedule-detail-label">Your Budget</span>
+                <span class="schedule-detail-value">${Math.round(hours / platforms.length)} hrs/week</span>
+              </div>
+            </div>
+          </div>
+        `;
+      })
+      .join('');
+  }
+
   // ===== Utilities =====
   function escapeHtml(str) {
     const div = document.createElement('div');
@@ -614,6 +1376,47 @@
         location.reload();
       }
     });
+
+    // Creator tab switching
+    document.querySelectorAll('.creator-tab').forEach((tab) => {
+      tab.addEventListener('click', () => {
+        document.querySelectorAll('.creator-tab').forEach((t) => t.classList.remove('active'));
+        document.querySelectorAll('.creator-tab-panel').forEach((p) => p.classList.remove('active'));
+        tab.classList.add('active');
+        const panel = document.getElementById('tab-' + tab.dataset.creatorTab);
+        if (panel) panel.classList.add('active');
+      });
+    });
+
+    // Content editor char counter
+    const creatorTextarea = document.getElementById('creator-textarea');
+    if (creatorTextarea) {
+      creatorTextarea.addEventListener('input', updateEditorCounter);
+    }
+
+    // Copy to clipboard
+    const copyBtn = document.getElementById('copy-content');
+    if (copyBtn) {
+      copyBtn.addEventListener('click', () => {
+        const textarea = document.getElementById('creator-textarea');
+        if (textarea.value) {
+          navigator.clipboard.writeText(textarea.value).then(() => {
+            copyBtn.textContent = 'Copied!';
+            setTimeout(() => { copyBtn.textContent = 'Copy to Clipboard'; }, 2000);
+          });
+        }
+      });
+    }
+
+    // Clear content
+    const clearBtn = document.getElementById('clear-content');
+    if (clearBtn) {
+      clearBtn.addEventListener('click', () => {
+        document.getElementById('creator-textarea').value = '';
+        document.querySelectorAll('.template-chip').forEach((c) => c.classList.remove('active'));
+        updateEditorCounter();
+      });
+    }
 
     // Limit platform checkboxes to 3
     document.querySelectorAll('input[name="platforms"]').forEach((cb) => {
