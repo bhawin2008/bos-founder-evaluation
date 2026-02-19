@@ -995,7 +995,7 @@
     const pillars = d.pillars.filter((p) => p.name);
 
     generatePlaybookTabs(platforms);
-    populateCreatorSelects(platforms, pillars);
+    initTransformer();
     generateStrategies(platforms);
 
     // Show first platform's playbook
@@ -1112,124 +1112,330 @@
     `;
   }
 
-  // --- Content Creator ---
-  function populateCreatorSelects(platforms, pillars) {
-    const platformSelect = document.getElementById('creator-platform');
-    platformSelect.innerHTML = platforms
-      .map((p) => `<option value="${p}">${PLATFORM_LABELS[p] || p}</option>`)
-      .join('');
-
-    const pillarSelect = document.getElementById('creator-pillar');
-    pillarSelect.innerHTML =
-      (pillars.length > 0
-        ? pillars.map((p, i) => `<option value="${i}">${escapeHtml(p.name)}</option>`)
-        : ['<option value="0">General</option>']
-      ).join('');
-
-    updateCreatorFormats();
-    updateTemplateChips();
-    updateCreatorTips();
-
-    // Bind change events
-    platformSelect.addEventListener('change', () => {
-      updateCreatorFormats();
-      updateTemplateChips();
-      updateCreatorTips();
-      updateEditorCounter();
-    });
-  }
-
-  function updateCreatorFormats() {
-    const platform = document.getElementById('creator-platform').value;
-    const data = PLATFORM_PLAYBOOK[platform];
-    if (!data) return;
-
-    const formatSelect = document.getElementById('creator-format');
-    formatSelect.innerHTML = data.formats
-      .map((f) => `<option value="${escapeHtml(f.name)}">${escapeHtml(f.name)}</option>`)
-      .join('');
-  }
-
-  function updateTemplateChips() {
-    const platform = document.getElementById('creator-platform').value;
-    const data = PLATFORM_PLAYBOOK[platform];
-    if (!data) return;
-
-    const container = document.getElementById('template-chips');
-    container.innerHTML = data.hooks
-      .map(
-        (h, i) =>
-          `<button class="template-chip" data-idx="${i}">${escapeHtml(h)}</button>`
-      )
-      .join('');
-
-    container.querySelectorAll('.template-chip').forEach((chip) => {
-      chip.addEventListener('click', () => {
-        container.querySelectorAll('.template-chip').forEach((c) => c.classList.remove('active'));
-        chip.classList.add('active');
-
-        const textarea = document.getElementById('creator-textarea');
-        const pillarSelect = document.getElementById('creator-pillar');
-        const pillarIdx = parseInt(pillarSelect.value);
-        const pillars = state.data.pillars.filter((p) => p.name);
-        const pillar = pillars[pillarIdx] || { name: 'your niche', topics: '' };
-        const topic = pillar.topics ? pillar.topics.split(',')[0].trim() : pillar.name;
-
-        let hookText = data.hooks[parseInt(chip.dataset.idx)] || '';
-        hookText = hookText.replace(/\[Topic\]|\[topic\]/g, topic);
-        hookText = hookText.replace(/\[N\]/g, '5');
-        hookText = hookText.replace(/\[Year\]|\[year\]/g, new Date().getFullYear().toString());
-        hookText = hookText.replace(/\[.*?\]/g, '___');
-
-        textarea.value = hookText + '\n\n';
-        textarea.focus();
-        textarea.setSelectionRange(textarea.value.length, textarea.value.length);
-        updateEditorCounter();
+  // --- Content Transformer Engine ---
+  function initTransformer() {
+    const input = document.getElementById('transformer-input');
+    const counter = document.getElementById('transformer-counter');
+    if (input) {
+      input.addEventListener('input', () => {
+        counter.textContent = input.value.length + ' characters';
       });
-    });
-  }
-
-  function updateCreatorTips() {
-    const platform = document.getElementById('creator-platform').value;
-    const data = PLATFORM_PLAYBOOK[platform];
-    if (!data) return;
-
-    const tipsContainer = document.getElementById('creator-tips');
-    const topTips = data.tips.slice(0, 5);
-    tipsContainer.innerHTML = `
-      <div class="creator-tips-title">Quick Tips for ${escapeHtml(data.name)}</div>
-      <div class="tip-list">
-        ${topTips.map((t) => `<div class="tip-item">${escapeHtml(t)}</div>`).join('')}
-      </div>
-    `;
-  }
-
-  function updateEditorCounter() {
-    const textarea = document.getElementById('creator-textarea');
-    const counter = document.getElementById('editor-counter');
-    const platform = document.getElementById('creator-platform').value;
-
-    const charLimits = {
-      linkedin: 3000,
-      twitter: 280,
-      blog: null,
-      newsletter: null,
-      youtube: 5000,
-      podcast: null,
-    };
-
-    const limit = charLimits[platform];
-    const len = textarea.value.length;
-
-    if (limit) {
-      counter.textContent = `${len} / ${limit}`;
-      counter.className = 'editor-counter';
-      if (len > limit) counter.classList.add('error');
-      else if (len > limit * 0.9) counter.classList.add('warning');
-    } else {
-      counter.textContent = `${len} characters`;
-      counter.className = 'editor-counter';
     }
+  }
+
+  function transformContent() {
+    const rawText = document.getElementById('transformer-input').value.trim();
+    if (!rawText || rawText.length < 30) {
+      alert('Please write at least a few sentences of rough content to transform.');
+      return;
+    }
+
+    const analysis = analyzeContent(rawText);
+
+    // Show sub-topics
+    renderSubTopics(analysis.subTopics);
+
+    // Generate refined version
+    renderRefined(analysis);
+
+    // Generate platform outputs
+    renderLinkedIn(analysis);
+    renderTwitterThread(analysis);
+    renderBlogOutline(analysis);
+    renderNewsletter(analysis);
+    renderYouTubeScript(analysis);
+
+    // Show all sections
+    document.getElementById('transformer-subtopics').classList.remove('hidden');
+    document.getElementById('transformer-refined').classList.remove('hidden');
+    document.getElementById('transformer-outputs').classList.remove('hidden');
+
+    // Scroll to results
+    document.getElementById('transformer-subtopics').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  function analyzeContent(text) {
+    // Split into sentences
+    const sentences = text
+      .replace(/([.!?])\s+/g, '$1|||')
+      .split('|||')
+      .map((s) => s.trim())
+      .filter((s) => s.length > 10);
+
+    // Split into paragraphs
+    const paragraphs = text
+      .split(/\n\s*\n|\n/)
+      .map((p) => p.trim())
+      .filter((p) => p.length > 10);
+
+    // Extract key sentences (with numbers/data, shorter punchy ones, first & last)
+    const keySentences = [];
+    const hookCandidates = [];
+
+    sentences.forEach((s, i) => {
+      if (/\d+%|\$\d|[0-9]+ (year|month|week|day|hour|people|team|engineer|client|customer)/i.test(s)) {
+        keySentences.push(s);
+      }
+      if (s.length < 120 && s.length > 20) {
+        hookCandidates.push(s);
+      }
+    });
+
+    if (sentences.length > 0) keySentences.unshift(sentences[0]);
+    if (sentences.length > 2) keySentences.push(sentences[sentences.length - 1]);
+
+    // Deduplicate
+    const uniqueKey = [...new Set(keySentences)];
+
+    // Extract sub-topics from paragraph beginnings
+    const subTopics = [];
+    paragraphs.forEach((p) => {
+      const firstSentence = p.split(/[.!?]/)[0].trim();
+      if (firstSentence.length > 10 && firstSentence.length < 80) {
+        // Clean up to make it a topic label
+        let topic = firstSentence
+          .replace(/^(I think|I believe|I've been|I was|I found|I realized|We|My|The|In my|After|So|But|And|Also|However)\s+/i, '')
+          .replace(/\s+(is|are|was|were|that|which|because|when|where|how|why)\s+.*/i, '');
+        topic = topic.charAt(0).toUpperCase() + topic.slice(1);
+        if (topic.length > 5 && topic.length < 60 && !subTopics.includes(topic)) {
+          subTopics.push(topic);
+        }
+      }
+    });
+
+    // If we got fewer than 3 sub-topics, extract from key noun phrases
+    if (subTopics.length < 3) {
+      const nounPhrases = text.match(/(?:the |a |an )?(?:[A-Z][a-z]+(?:\s+[a-z]+){0,2})/g) || [];
+      nounPhrases.forEach((np) => {
+        const cleaned = np.replace(/^(the |a |an )/i, '').trim();
+        if (cleaned.length > 3 && cleaned.length < 40 && !subTopics.includes(cleaned)) {
+          subTopics.push(cleaned);
+        }
+      });
+    }
+
+    // Generate a title
+    const hookSentence = hookCandidates[0] || sentences[0] || text.slice(0, 100);
+    const title = generateTitle(hookSentence, text);
+
+    // Extract core takeaways (most impactful sentences)
+    const takeaways = sentences
+      .filter((s) => s.length > 30 && s.length < 200)
+      .filter((s) => /important|key|lesson|learn|mistake|result|impact|change|realize|discover|secret|truth|actually/i.test(s) || /\d/.test(s))
+      .slice(0, 5);
+
+    if (takeaways.length < 3) {
+      sentences.filter((s) => s.length > 40 && s.length < 180).slice(0, 5 - takeaways.length).forEach((s) => {
+        if (!takeaways.includes(s)) takeaways.push(s);
+      });
+    }
+
+    return {
+      raw: text,
+      sentences,
+      paragraphs,
+      keySentences: uniqueKey,
+      hookCandidates,
+      subTopics: subTopics.slice(0, 7),
+      title,
+      takeaways,
+      hookSentence,
+      wordCount: text.split(/\s+/).length,
+    };
+  }
+
+  function generateTitle(hook, fullText) {
+    // Try to create a compelling title from the hook
+    let title = hook.replace(/[.!?,;:]+$/, '').trim();
+    if (title.length > 70) {
+      title = title.slice(0, 67) + '...';
+    }
+    // Make it more title-like
+    if (!/^(Why|How|What|The|[0-9])/.test(title)) {
+      if (/mistake|wrong|fail|bad/i.test(fullText)) {
+        title = 'The Mistake Most People Make: ' + title.charAt(0).toLowerCase() + title.slice(1);
+      } else if (/learn|lesson|realiz/i.test(fullText)) {
+        title = 'What I Learned: ' + title.charAt(0).toLowerCase() + title.slice(1);
+      }
+    }
+    return title.length > 80 ? title.slice(0, 77) + '...' : title;
+  }
+
+  function cleanSentence(s) {
+    return s.replace(/^\s*(So,?|And,?|But,?|Also,?|Well,?|Like,?|Actually,?|Basically,?|I mean,?|You know,?)\s*/i, '')
+      .replace(/\s+/g, ' ')
+      .trim();
+  }
+
+  function renderSubTopics(subTopics) {
+    const container = document.getElementById('subtopic-chips');
+    container.innerHTML = subTopics
+      .map((t) => `<span class="subtopic-chip">${escapeHtml(t)}</span>`)
+      .join('');
+  }
+
+  function renderRefined(a) {
+    const container = document.getElementById('refined-content');
+    const refined = a.sentences.map(cleanSentence).filter((s) => s.length > 15);
+
+    // Group into proper paragraphs (3-4 sentences each)
+    const paras = [];
+    for (let i = 0; i < refined.length; i += 3) {
+      paras.push(refined.slice(i, i + 3).join(' '));
+    }
+
+    container.textContent = paras.join('\n\n');
+  }
+
+  function renderLinkedIn(a) {
+    const container = document.getElementById('linkedin-content');
+    const charCount = document.getElementById('linkedin-chars');
+
+    // LinkedIn format: Hook line, then spaced-out insights, then CTA
+    const hook = cleanSentence(a.hookSentence).replace(/[.]+$/, '') + '.';
+    const body = a.takeaways.slice(0, 4).map((t) => cleanSentence(t)).join('\n\n');
+    const cta = '\n\nWhat\'s your experience with this? Drop your thoughts below.\n\n---\nFound this useful? Repost to share with your network.';
+
+    const post = hook + '\n\n' + body + cta;
+    container.textContent = post;
+    charCount.textContent = post.length + ' / 3,000 chars';
+  }
+
+  function renderTwitterThread(a) {
+    const container = document.getElementById('twitter-content');
+    const charCount = document.getElementById('twitter-chars');
+
+    const tweets = [];
+
+    // Tweet 1: Hook
+    const hook = cleanSentence(a.hookSentence).replace(/[.]+$/, '');
+    tweets.push('1/ ' + (hook.length > 250 ? hook.slice(0, 247) + '...' : hook) + '\n\nA thread:');
+
+    // Middle tweets: key takeaways
+    a.takeaways.slice(0, 5).forEach((t, i) => {
+      let tweet = cleanSentence(t);
+      if (tweet.length > 270) tweet = tweet.slice(0, 267) + '...';
+      tweets.push((i + 2) + '/ ' + tweet);
+    });
+
+    // Final tweet: CTA
+    tweets.push((tweets.length + 1) + '/ That\'s a wrap.\n\nIf this resonated:\n- Like this thread\n- Repost the first tweet\n- Follow for more insights like this');
+
+    const thread = tweets.join('\n\n---\n\n');
+    container.textContent = thread;
+    charCount.textContent = tweets.length + ' tweets';
+  }
+
+  function renderBlogOutline(a) {
+    const container = document.getElementById('blog-content');
+
+    let outline = '# ' + a.title + '\n\n';
+    outline += '## Introduction\n';
+    outline += cleanSentence(a.sentences[0] || '') + ' ';
+    if (a.sentences[1]) outline += cleanSentence(a.sentences[1]);
+    outline += '\n\nIn this post, I\'ll break down the key lessons and actionable takeaways.\n\n';
+
+    // Generate sections from sub-topics
+    a.subTopics.slice(0, 5).forEach((topic, i) => {
+      outline += '## ' + (i + 1) + '. ' + topic + '\n';
+      // Find sentences related to this topic
+      const related = a.sentences.filter((s) =>
+        s.toLowerCase().includes(topic.toLowerCase().split(' ')[0])
+      );
+      if (related.length > 0) {
+        outline += cleanSentence(related[0]) + '\n';
+        if (related[1]) outline += '\n' + cleanSentence(related[1]) + '\n';
+      } else if (a.takeaways[i]) {
+        outline += cleanSentence(a.takeaways[i]) + '\n';
+      }
+      outline += '\n';
+    });
+
+    outline += '## Key Takeaways\n';
+    a.takeaways.slice(0, 4).forEach((t) => {
+      outline += '- ' + cleanSentence(t) + '\n';
+    });
+
+    outline += '\n## Conclusion\n';
+    outline += cleanSentence(a.sentences[a.sentences.length - 1] || a.hookSentence);
+    outline += '\n\nWhat would you add to this list? Share your thoughts in the comments.';
+
+    container.textContent = outline;
+  }
+
+  function renderNewsletter(a) {
+    const container = document.getElementById('newsletter-content');
+
+    let nl = 'Subject: ' + a.title + '\n';
+    nl += 'Preview: ' + cleanSentence(a.hookSentence).slice(0, 90) + '...\n\n';
+    nl += '---\n\n';
+    nl += 'Hey there,\n\n';
+    nl += cleanSentence(a.hookSentence) + '\n\n';
+    nl += 'I\'ve been thinking about this a lot lately, and I wanted to share what I\'ve learned.\n\n';
+
+    // Key Points
+    nl += 'Here are the key takeaways:\n\n';
+    a.takeaways.slice(0, 4).forEach((t, i) => {
+      nl += (i + 1) + '. ' + cleanSentence(t) + '\n\n';
+    });
+
+    // Wrap up
+    nl += '---\n\n';
+    nl += 'The bottom line? ';
+    nl += cleanSentence(a.sentences[a.sentences.length - 1] || a.takeaways[0] || a.hookSentence) + '\n\n';
+    nl += 'Hit reply and let me know — what\'s been your experience with this?\n\n';
+    nl += 'Talk soon,\n[Your name]';
+
+    container.textContent = nl;
+  }
+
+  function renderYouTubeScript(a) {
+    const container = document.getElementById('youtube-content');
+
+    let script = '=== VIDEO TITLE ===\n';
+    script += a.title + '\n\n';
+
+    script += '=== HOOK (0:00 - 0:30) ===\n';
+    script += '"' + cleanSentence(a.hookSentence) + '"\n';
+    script += 'In this video, I\'m going to break down exactly what I\'ve learned.\n\n';
+
+    script += '=== INTRO (0:30 - 1:00) ===\n';
+    script += 'Before we dive in, if you find this valuable, hit subscribe and the bell icon.\n';
+    script += 'This is something most people get wrong, and I want to make sure you don\'t.\n\n';
+
+    script += '=== MAIN CONTENT ===\n\n';
+    a.subTopics.slice(0, 5).forEach((topic, i) => {
+      const timestamp = (i + 1) + ':00';
+      script += '--- Point ' + (i + 1) + ': ' + topic + ' (' + timestamp + ') ---\n';
+      if (a.takeaways[i]) {
+        script += cleanSentence(a.takeaways[i]) + '\n';
+      }
+      const related = a.sentences.filter((s) =>
+        s.toLowerCase().includes(topic.toLowerCase().split(' ')[0])
+      );
+      if (related.length > 1) {
+        script += cleanSentence(related[1] || related[0]) + '\n';
+      }
+      script += '\n';
+    });
+
+    script += '=== RECAP & CTA ===\n';
+    script += 'So to recap:\n';
+    a.takeaways.slice(0, 4).forEach((t, i) => {
+      script += (i + 1) + '. ' + cleanSentence(t).slice(0, 100) + '\n';
+    });
+    script += '\nIf this was helpful, drop a comment with your biggest takeaway.\n';
+    script += 'Subscribe for more videos like this, and I\'ll see you in the next one.\n\n';
+
+    script += '=== DESCRIPTION ===\n';
+    script += a.title + '\n\n';
+    script += 'In this video:\n';
+    a.subTopics.slice(0, 5).forEach((topic, i) => {
+      script += '0' + (i + 1) + ':00 - ' + topic + '\n';
+    });
+    script += '\n#' + a.subTopics.slice(0, 3).map((t) => t.replace(/\s+/g, '')).join(' #');
+
+    container.textContent = script;
   }
 
   // --- Growth Strategies ---
@@ -1388,35 +1594,38 @@
       });
     });
 
-    // Content editor char counter
-    const creatorTextarea = document.getElementById('creator-textarea');
-    if (creatorTextarea) {
-      creatorTextarea.addEventListener('input', updateEditorCounter);
+    // Transform button
+    const transformBtn = document.getElementById('transform-btn');
+    if (transformBtn) {
+      transformBtn.addEventListener('click', transformContent);
     }
 
-    // Copy to clipboard
-    const copyBtn = document.getElementById('copy-content');
-    if (copyBtn) {
-      copyBtn.addEventListener('click', () => {
-        const textarea = document.getElementById('creator-textarea');
-        if (textarea.value) {
-          navigator.clipboard.writeText(textarea.value).then(() => {
-            copyBtn.textContent = 'Copied!';
-            setTimeout(() => { copyBtn.textContent = 'Copy to Clipboard'; }, 2000);
+    // Clear transformer
+    const clearTransformerBtn = document.getElementById('clear-transformer');
+    if (clearTransformerBtn) {
+      clearTransformerBtn.addEventListener('click', () => {
+        document.getElementById('transformer-input').value = '';
+        document.getElementById('transformer-counter').textContent = '0 characters';
+        document.getElementById('transformer-subtopics').classList.add('hidden');
+        document.getElementById('transformer-refined').classList.add('hidden');
+        document.getElementById('transformer-outputs').classList.add('hidden');
+      });
+    }
+
+    // Copy buttons for all output cards
+    document.querySelectorAll('.output-copy-btn').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const targetId = btn.dataset.target;
+        const target = document.getElementById(targetId);
+        if (target && target.textContent) {
+          navigator.clipboard.writeText(target.textContent).then(() => {
+            const orig = btn.textContent;
+            btn.textContent = 'Copied!';
+            setTimeout(() => { btn.textContent = orig; }, 2000);
           });
         }
       });
-    }
-
-    // Clear content
-    const clearBtn = document.getElementById('clear-content');
-    if (clearBtn) {
-      clearBtn.addEventListener('click', () => {
-        document.getElementById('creator-textarea').value = '';
-        document.querySelectorAll('.template-chip').forEach((c) => c.classList.remove('active'));
-        updateEditorCounter();
-      });
-    }
+    });
 
     // Limit platform checkboxes to 3
     document.querySelectorAll('input[name="platforms"]').forEach((cb) => {
