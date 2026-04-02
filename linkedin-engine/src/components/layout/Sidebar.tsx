@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
-import { createClient } from "@/lib/supabase/client";
+import { DEMO_MODE } from "@/lib/demo";
 import { useUser } from "@/hooks/useUser";
 import { useSubscription } from "@/hooks/useSubscription";
 import { Badge } from "@/components/ui/badge";
@@ -31,6 +31,11 @@ export function Sidebar() {
   const { tier, isTrialing, trialDaysLeft } = useSubscription(profile);
 
   async function handleLogout() {
+    if (DEMO_MODE) {
+      router.push("/");
+      return;
+    }
+    const { createClient } = await import("@/lib/supabase/client");
     const supabase = createClient();
     await supabase.auth.signOut();
     router.push("/");

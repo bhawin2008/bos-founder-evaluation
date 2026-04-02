@@ -1,9 +1,23 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@/lib/supabase/server";
-import { generatePrompts } from "@/lib/ai/claude";
+import { DEMO_PROMPTS } from "@/lib/demo";
 
 export async function POST(request: NextRequest) {
   try {
+    const { industry } = await request.json();
+
+    if (!industry) {
+      return NextResponse.json(
+        { error: "Industry is required" },
+        { status: 400 }
+      );
+    }
+
+    // Demo mode: return mock prompts
+    if (process.env.NEXT_PUBLIC_DEMO_MODE === "true") {
+      return NextResponse.json({ prompts: DEMO_PROMPTS });
+    }
+
+    const { createClient } = await import("@/lib/supabase/server");
     const supabase = await createClient();
     const {
       data: { user },
@@ -13,19 +27,12 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const { industry, contentPillars, goal } = await request.json();
-
-    if (!industry) {
-      return NextResponse.json(
-        { error: "Industry is required" },
-        { status: 400 }
-      );
-    }
-
+    const body = await request.clone().json();
+    const { generatePrompts } = await import("@/lib/ai/claude");
     const prompts = await generatePrompts(
       industry,
-      contentPillars || [],
-      goal || "grow_audience"
+      body.contentPillars || [],
+      body.goal || "grow_audience"
     );
 
     return NextResponse.json({ prompts });

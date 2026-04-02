@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useUser } from "@/hooks/useUser";
 import { useSubscription } from "@/hooks/useSubscription";
 import { useToast } from "@/components/ui/toast";
-import { createClient } from "@/lib/supabase/client";
+import { DEMO_MODE } from "@/lib/demo";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
@@ -68,6 +68,14 @@ export default function SettingsPage() {
 
   async function handleSave() {
     setSaving(true);
+
+    if (DEMO_MODE) {
+      addToast({ title: "Settings saved!", variant: "success" });
+      setSaving(false);
+      return;
+    }
+
+    const { createClient } = await import("@/lib/supabase/client");
     const supabase = createClient();
     const { error } = await supabase
       .from("profiles")

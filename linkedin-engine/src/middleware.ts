@@ -1,7 +1,12 @@
-import { updateSession } from "@/lib/supabase/middleware";
-import type { NextRequest } from "next/server";
+import { NextResponse, type NextRequest } from "next/server";
 
 export async function middleware(request: NextRequest) {
+  // Skip auth in demo mode
+  if (process.env.NEXT_PUBLIC_DEMO_MODE === "true") {
+    return NextResponse.next();
+  }
+
+  const { updateSession } = await import("@/lib/supabase/middleware");
   return await updateSession(request);
 }
 

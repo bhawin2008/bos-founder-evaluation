@@ -5,7 +5,7 @@ import { useSearchParams } from "next/navigation";
 import { usePostCreator } from "@/hooks/usePostCreator";
 import { useUser } from "@/hooks/useUser";
 import { useToast } from "@/components/ui/toast";
-import { createClient } from "@/lib/supabase/client";
+import { DEMO_MODE } from "@/lib/demo";
 import { Editor } from "@/components/post-creator/Editor";
 import { HookSuggestions } from "@/components/post-creator/HookSuggestions";
 import { TemplateSelector } from "@/components/post-creator/TemplateSelector";
@@ -124,18 +124,33 @@ export default function CreatePage() {
     }
 
     setSaving(true);
-    const supabase = createClient();
-    const { error } = await supabase.from("posts").insert({
-      user_id: profile?.id,
-      content,
-      status: "draft",
-      content_type: "text",
-    });
 
-    if (error) {
-      addToast({ title: "Failed to save draft", variant: "destructive" });
-    } else {
+    if (DEMO_MODE) {
+      // Save to localStorage in demo mode
+      const drafts = JSON.parse(localStorage.getItem("le_drafts") || "[]");
+      drafts.push({
+        id: crypto.randomUUID(),
+        content,
+        status: "draft",
+        created_at: new Date().toISOString(),
+      });
+      localStorage.setItem("le_drafts", JSON.stringify(drafts));
       addToast({ title: "Draft saved!", variant: "success" });
+    } else {
+      const { createClient } = await import("@/lib/supabase/client");
+      const supabase = createClient();
+      const { error } = await supabase.from("posts").insert({
+        user_id: profile?.id,
+        content,
+        status: "draft",
+        content_type: "text",
+      });
+
+      if (error) {
+        addToast({ title: "Failed to save draft", variant: "destructive" });
+      } else {
+        addToast({ title: "Draft saved!", variant: "success" });
+      }
     }
     setSaving(false);
   }

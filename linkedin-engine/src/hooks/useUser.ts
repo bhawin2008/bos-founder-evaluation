@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { createClient } from "@/lib/supabase/client";
+import { DEMO_MODE, DEMO_PROFILE } from "@/lib/demo";
 import type { Profile } from "@/types";
 import type { User } from "@supabase/supabase-js";
 
@@ -11,9 +11,17 @@ export function useUser() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const supabase = createClient();
+    if (DEMO_MODE) {
+      setUser({ id: DEMO_PROFILE.id, email: DEMO_PROFILE.email } as User);
+      setProfile(DEMO_PROFILE);
+      setLoading(false);
+      return;
+    }
 
-    async function getUser() {
+    async function init() {
+      const { createClient } = await import("@/lib/supabase/client");
+      const supabase = createClient();
+
       const {
         data: { user },
       } = await supabase.auth.getUser();
@@ -29,20 +37,20 @@ export function useUser() {
       }
 
       setLoading(false);
+
+      const {
+        data: { subscription },
+      } = supabase.auth.onAuthStateChange((_event, session) => {
+        setUser(session?.user ?? null);
+        if (!session?.user) {
+          setProfile(null);
+        }
+      });
+
+      return () => subscription.unsubscribe();
     }
 
-    getUser();
-
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user ?? null);
-      if (!session?.user) {
-        setProfile(null);
-      }
-    });
-
-    return () => subscription.unsubscribe();
+    init();
   }, []);
 
   return { user, profile, loading };
