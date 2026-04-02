@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, Suspense } from "react";
+import { useSearchParams } from "next/navigation";
 import { usePostCreator } from "@/hooks/usePostCreator";
 import { useUser } from "@/hooks/useUser";
 import { useToast } from "@/components/ui/toast";
@@ -13,7 +14,77 @@ import { PostPreview } from "@/components/post-creator/PostPreview";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Save, Trash2 } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
+import { Save, Trash2, Sparkles, PenLine, Lightbulb, FolderOpen } from "lucide-react";
+
+function WelcomeModal() {
+  const searchParams = useSearchParams();
+  const [open, setOpen] = useState(false);
+
+  useEffect(() => {
+    if (searchParams.get("welcome") === "true") {
+      setOpen(true);
+      // Clean the URL
+      window.history.replaceState({}, "", "/create");
+    }
+  }, [searchParams]);
+
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogContent className="sm:max-w-md">
+        <DialogHeader>
+          <div className="mx-auto mb-3 h-12 w-12 rounded-xl bg-accent/10 flex items-center justify-center">
+            <Sparkles className="h-6 w-6 text-accent" />
+          </div>
+          <DialogTitle className="text-center">
+            Welcome to LinkedIn Engine!
+          </DialogTitle>
+          <DialogDescription className="text-center">
+            Your 7-day free Pro trial has started. Here&apos;s what you can do:
+          </DialogDescription>
+        </DialogHeader>
+        <div className="space-y-3 py-2">
+          <div className="flex items-start gap-3 rounded-lg bg-muted/50 p-3">
+            <PenLine className="h-5 w-5 text-primary shrink-0 mt-0.5" />
+            <div>
+              <p className="text-sm font-medium">Post Creator</p>
+              <p className="text-xs text-muted-foreground">
+                Write with 50+ hooks, 8 templates, and AI-powered feedback
+              </p>
+            </div>
+          </div>
+          <div className="flex items-start gap-3 rounded-lg bg-muted/50 p-3">
+            <Lightbulb className="h-5 w-5 text-accent shrink-0 mt-0.5" />
+            <div>
+              <p className="text-sm font-medium">Inspiration Engine</p>
+              <p className="text-xs text-muted-foreground">
+                Daily prompts, swipe file, and &ldquo;what if&rdquo; creative sparks
+              </p>
+            </div>
+          </div>
+          <div className="flex items-start gap-3 rounded-lg bg-muted/50 p-3">
+            <FolderOpen className="h-5 w-5 text-green-600 shrink-0 mt-0.5" />
+            <div>
+              <p className="text-sm font-medium">Resource Library</p>
+              <p className="text-xs text-muted-foreground">
+                Hooks, templates, CTA frameworks — all organized by use case
+              </p>
+            </div>
+          </div>
+        </div>
+        <Button className="w-full" onClick={() => setOpen(false)}>
+          Start Writing <PenLine className="h-4 w-4 ml-1" />
+        </Button>
+      </DialogContent>
+    </Dialog>
+  );
+}
 
 export default function CreatePage() {
   const {
@@ -36,6 +107,15 @@ export default function CreatePage() {
   const { profile } = useUser();
   const { addToast } = useToast();
   const [saving, setSaving] = useState(false);
+
+  // Pick up prompt from Inspiration Engine (via sessionStorage)
+  useEffect(() => {
+    const prompt = sessionStorage.getItem("linkedin_engine_prompt");
+    if (prompt) {
+      setContent(prompt);
+      sessionStorage.removeItem("linkedin_engine_prompt");
+    }
+  }, [setContent]);
 
   async function handleSaveDraft() {
     if (!content.trim()) {
@@ -62,6 +142,9 @@ export default function CreatePage() {
 
   return (
     <div className="space-y-4">
+      <Suspense>
+        <WelcomeModal />
+      </Suspense>
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-semibold">Post Creator</h1>
