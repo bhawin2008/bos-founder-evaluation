@@ -5,6 +5,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { createClient } from "@/lib/supabase/client";
 import { useUser } from "@/hooks/useUser";
+import { useSubscription } from "@/hooks/useSubscription";
 import { Badge } from "@/components/ui/badge";
 import {
   PenLine,
@@ -13,6 +14,7 @@ import {
   Settings,
   LogOut,
   Sparkles,
+  Clock,
 } from "lucide-react";
 
 const navItems = [
@@ -26,6 +28,7 @@ export function Sidebar() {
   const pathname = usePathname();
   const router = useRouter();
   const { profile } = useUser();
+  const { tier, isTrialing, trialDaysLeft } = useSubscription(profile);
 
   async function handleLogout() {
     const supabase = createClient();
@@ -33,12 +36,7 @@ export function Sidebar() {
     router.push("/");
   }
 
-  const tierLabel =
-    profile?.subscription_tier === "pro"
-      ? "Pro"
-      : profile?.subscription_tier === "basic"
-        ? "Basic"
-        : "Free";
+  const tierLabel = tier === "pro" ? "Pro" : tier === "basic" ? "Basic" : "Free";
 
   return (
     <aside className="hidden lg:flex w-64 flex-col border-r bg-card h-screen sticky top-0">
@@ -90,6 +88,12 @@ export function Sidebar() {
                 {tierLabel}
               </Badge>
             </div>
+          </div>
+        )}
+        {isTrialing && trialDaysLeft > 0 && (
+          <div className="mb-3 flex items-center gap-2 rounded-lg bg-accent/10 px-3 py-2 text-xs text-accent">
+            <Clock className="h-3.5 w-3.5 shrink-0" />
+            <span className="font-medium">{trialDaysLeft} day{trialDaysLeft !== 1 ? "s" : ""} left in trial</span>
           </div>
         )}
         <button

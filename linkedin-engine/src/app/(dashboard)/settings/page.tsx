@@ -11,6 +11,7 @@ import { Select } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useRazorpay } from "@/hooks/useRazorpay";
 import { User, CreditCard, Crown } from "lucide-react";
 
 const industries = [
@@ -46,6 +47,9 @@ const contentPillarOptions = [
 export default function SettingsPage() {
   const { profile, loading } = useUser();
   const { tier, isActive, isTrialing, trialDaysLeft } = useSubscription(profile);
+  const { checkout, loading: paymentLoading } = useRazorpay({
+    onSuccess: () => window.location.reload(),
+  });
   const { addToast } = useToast();
 
   const [fullName, setFullName] = useState(profile?.full_name || "");
@@ -205,8 +209,14 @@ export default function SettingsPage() {
                 Subscribe to continue using Post Creator, Inspiration Engine,
                 and Resources.
               </p>
-              <Button variant="accent" size="sm" className="mt-3">
-                View Plans
+              <Button
+                variant="accent"
+                size="sm"
+                className="mt-3"
+                onClick={() => checkout("basic_monthly")}
+                disabled={paymentLoading}
+              >
+                {paymentLoading ? "Processing..." : "Subscribe Now"}
               </Button>
             </div>
           )}
@@ -232,6 +242,20 @@ export default function SettingsPage() {
                 <li>Inspiration Engine</li>
                 <li>Basic Resources</li>
               </ul>
+              {tier !== "basic" && tier !== "pro" && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="w-full mt-4"
+                  onClick={() => checkout("basic_monthly")}
+                  disabled={paymentLoading}
+                >
+                  {paymentLoading ? "Processing..." : "Subscribe to Basic"}
+                </Button>
+              )}
+              {tier === "basic" && (
+                <p className="text-xs text-green-600 font-medium mt-4">Current plan</p>
+              )}
             </div>
             <div className="rounded-lg border border-accent p-4">
               <p className="text-sm font-semibold">Pro</p>
@@ -253,6 +277,20 @@ export default function SettingsPage() {
                 <li>Premium Resources</li>
                 <li>Tribe Access (Skool)</li>
               </ul>
+              {tier !== "pro" && (
+                <Button
+                  variant="accent"
+                  size="sm"
+                  className="w-full mt-4"
+                  onClick={() => checkout("pro_monthly")}
+                  disabled={paymentLoading}
+                >
+                  {paymentLoading ? "Processing..." : "Subscribe to Pro"}
+                </Button>
+              )}
+              {tier === "pro" && (
+                <p className="text-xs text-green-600 font-medium mt-4">Current plan</p>
+              )}
             </div>
           </div>
         </CardContent>
