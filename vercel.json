@@ -1,0 +1,9 @@
+{
+  "installCommand": "npm install && cd linkedin-engine && npm install",
+  "buildCommand": "cd linkedin-engine && npm run build",
+  "outputDirectory": "linkedin-engine/.next",
+  "framework": "nextjs",
+  "env": {
+    "NEXT_PUBLIC_DEMO_MODE": "true"
+  }
+}
