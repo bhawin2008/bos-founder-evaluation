@@ -1,10 +1,9 @@
 {
-  "buildCommand": "cd linkedin-engine && npm install && npm run build",
+  "installCommand": "npm install && cd linkedin-engine && npm install",
+  "buildCommand": "cd linkedin-engine && npm run build",
   "outputDirectory": "linkedin-engine/.next",
   "framework": "nextjs",
-  "installCommand": "cd linkedin-engine && npm install",
   "env": {
-    "NEXT_PUBLIC_DEMO_MODE": "true",
-    "NEXT_PUBLIC_APP_URL": "https://bos-founder-evaluation-bhavins-projects-301251ec.vercel.app"
+    "NEXT_PUBLIC_DEMO_MODE": "true"
   }
 }
